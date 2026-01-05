@@ -1,0 +1,101 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+{% block title %}{% if edit %}Update SubCategory{% else %}Create SubCategory{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title mb-0">
+        {% if edit %}Update SubCategory{% else %}Create New SubCategory{% endif %}
+      </h5>
+    </div>
+
+    <div class="card-body">
+
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+          {{ message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="row gy-3">
+
+          <!-- Category Dropdown -->
+          <div class="col-12">
+            <label class="form-label">Select Category</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="solar:tag-outline"></iconify-icon>
+              </span>
+
+              <select name="category" class="form-control" required>
+                <option value="" disabled selected>Select a Category</option>
+                {% for cat in categories %}
+                  <option value="{{ cat.id }}"
+                    {% if edit and subcategory.category.id == cat.id %}selected{% endif %}>
+                    {{ cat.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- SubCategory Name Field -->
+          <div class="col-12">
+            <label class="form-label">SubCategory Name</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:tag-outline"></iconify-icon>
+              </span>
+
+              <input 
+                type="text" 
+                name="name" 
+                class="form-control" 
+                placeholder="Enter SubCategory Name"
+                value="{{ subcategory.name|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+
+              {% if edit %}
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-circle-check"></i>
+                Update SubCategory
+              </button>
+              {% else %}
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-circle-check"></i>
+                Create SubCategory
+              </button>
+              {% endif %}
+
+              <a href="{% url 'subcategory_list' %}" class="btn btn-outline-secondary">
+                <i class="fa-regular fa-circle-xmark"></i>
+                Cancel
+              </a>
+
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

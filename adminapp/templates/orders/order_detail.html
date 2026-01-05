@@ -1,0 +1,250 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+
+{% block title %}Order Details - #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Order Details</h6>
+        <ul class="d-flex align-items-center gap-2">
+            <li class="fw-medium">
+                <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <i class="ri-home-4-line"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">
+                <a href="{% url 'order_list' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    Orders
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">Order #{{ order.id }}</li>
+        </ul>
+    </div>
+
+    <div class="row gy-4">
+        <!-- Order Summary Card -->
+        <div class="col-lg-8 col-md-12">
+            <div class="card h-100">
+                <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
+                    <h6 class="text-lg fw-semibold mb-0">Order #{{ order.id }}</h6>
+<form method="post" class="d-flex align-items-center gap-2">
+    {% csrf_token %}
+    <select name="status" class="form-select form-select-sm w-auto">
+        {% for key, label in status_choices %}
+
+            <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary">
+        Update
+    </button>
+</form>
+
+
+                    
+                </div>
+                <div class="card-body p-24">
+                    <div class="table-responsive scroll-sm">
+                        <table class="table bordered-table sm-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-sm fw-semibold">Product</th>
+                                    <th scope="col" class="text-sm fw-semibold text-center">Price</th>
+                                    <th scope="col" class="text-sm fw-semibold text-center">Quantity</th>
+                                    <th scope="col" class="text-sm fw-semibold text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            {% if item.product.primary_image %}
+                                            <img src="{{ item.product.primary_image.image.url }}" 
+                                                 alt="{{ item.product.name }}" 
+                                                 class="w-60-px h-60-px rounded-4 object-fit-cover flex-shrink-0">
+                                            {% else %}
+                                            <div class="w-60-px h-60-px rounded-4 bg-neutral-200 d-flex align-items-center justify-content-center flex-shrink-0">
+                                                <i class="ri-image-line text-xl text-neutral-600"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="text-md mb-0 fw-normal">{{ item.product.name }}</h6>
+                                                {% if item.product.brand %}
+                                                <span class="text-sm text-secondary-light fw-normal">{{ item.product.brand.name }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-md fw-medium text-secondary-light">₹{{ item.price }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-md fw-medium text-secondary-light">{{ item.quantity }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="text-md fw-semibold text-primary-light">
+                                            ₹{% widthratio item.price 1 item.quantity %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Order Total -->
+                    <div class="d-flex align-items-center justify-content-between mt-24 pt-24 border-top">
+                        <div>
+                            <h6 class="text-xl fw-semibold mb-0">Order Total</h6>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="text-xxl fw-bold text-primary-600 mb-0">₹{{ order.total_price }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer & Delivery Info -->
+        <div class="col-lg-4 col-md-12">
+            <div class="row gy-4">
+                <!-- Customer Information -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Customer Information</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div class="d-flex align-items-center gap-3 mb-16">
+                                <div class="w-44-px h-44-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-user-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-secondary-light mb-4">Full Name</p>
+                                    <h6 class="text-md fw-semibold mb-0">{{ order.address.full_name }}</h6>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3 mb-16">
+                                <div class="w-44-px h-44-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-phone-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-secondary-light mb-4">Phone Number</p>
+                                    <h6 class="text-md fw-semibold mb-0">{{ order.address.phone }}</h6>
+                                </div>
+                            </div>
+
+                            {% if order.address.email %}
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-44-px h-44-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-mail-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-secondary-light mb-4">Email</p>
+                                    <h6 class="text-md fw-semibold mb-0">{{ order.address.email }}</h6>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Address -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Delivery Address</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="w-44-px h-44-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-map-pin-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-md fw-medium text-secondary-light mb-8">
+                                        {{ order.address.street }}
+                                    </p>
+                                    <p class="text-sm text-secondary-light mb-0">
+                                        {{ order.address.city }}, {{ order.address.state }}<br>
+                                        {{ order.address.postal_code }}<br>
+                                        {{ order.address.country }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Details -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Order Details</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div class="d-flex align-items-center justify-content-between mb-16">
+                                <span class="text-sm text-secondary-light">Order Date</span>
+                                <span class="text-sm fw-semibold text-primary-light">
+                                    {{ order.created_at|date:"d M Y, H:i" }}
+                                </span>
+                            </div>
+
+                            {% if order.updated_at %}
+                            <div class="d-flex align-items-center justify-content-between mb-16">
+                                <span class="text-sm text-secondary-light">Last Updated</span>
+                                <span class="text-sm fw-semibold text-primary-light">
+                                    {{ order.updated_at|date:"d M Y, H:i" }}
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-sm text-secondary-light">Payment Status</span>
+                                <span class="badge bg-success-100 text-success-600 px-16 py-6 radius-4 fw-semibold text-sm">
+                                    Paid
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex align-items-center gap-3 mt-24">
+        <a href="{% url 'order_list' %}" class="btn btn-neutral-600 radius-8 px-24 py-12">
+            <i class="ri-arrow-left-line"></i>
+            Back to Orders
+        </a>
+        <button onclick="window.print()" class="btn btn-primary-600 radius-8 px-24 py-12">
+            <i class="ri-printer-line"></i>
+            Print Order
+        </button>
+    </div>
+</div>
+
+<style>
+@media print {
+    .sidebar, .navbar-header, footer, .btn, .breadcrumb {
+        display: none !important;
+    }
+    .dashboard-main-body {
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+</style>
+{% endblock %}

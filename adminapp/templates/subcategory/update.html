@@ -1,0 +1,23 @@
+<h2>Edit SubCategory</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Category:</label>
+    <select name="category">
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if cat.id == sub.category.id %}selected{% endif %}>
+            {{ cat.name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label>Name:</label>
+    <input type="text" name="name" value="{{ sub.name }}">
+
+    <br><br>
+
+    <button type="submit">Update</button>
+</form>

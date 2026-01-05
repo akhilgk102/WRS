@@ -1,0 +1,177 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+{% block title %}{% if edit %}Update Coupon{% else %}Create Coupon{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+  <div class="card">
+
+    <!-- Card Header -->
+    <div class="card-header">
+      <h5 class="card-title mb-0">
+        {% if edit %}Update Coupon{% else %}Create New Coupon{% endif %}
+      </h5>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+          {{ message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- FORM -->
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="row gy-3">
+
+          <!-- Coupon Code -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Coupon Code</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:ticket-percent-outline"></iconify-icon>
+              </span>
+
+              <input 
+                type="text" 
+                name="code" 
+                class="form-control" 
+                placeholder="Enter Coupon Code"
+                value="{{ coupon.code|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Discount Amount -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Discount Amount (₹)</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:currency-inr"></iconify-icon>
+              </span>
+
+              <input 
+                type="number"
+                name="discount"
+                step="0.01"
+                class="form-control"
+                placeholder="0.00"
+                value="{{ coupon.discount|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Valid From -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Valid From</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:calendar-start"></iconify-icon>
+              </span>
+
+              <input 
+                type="datetime-local"
+                name="valid_from"
+                class="form-control"
+                value="{{ coupon.valid_from|default:''|date:'Y-m-d\TH:i' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Valid To -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Valid To</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:calendar-end"></iconify-icon>
+              </span>
+
+              <input 
+                type="datetime-local"
+                name="valid_to"
+                class="form-control"
+                value="{{ coupon.valid_to|default:''|date:'Y-m-d\TH:i' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Usage Limit -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Usage Limit (Optional)</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:counter"></iconify-icon>
+              </span>
+
+              <input 
+                type="number"
+                name="usage_limit"
+                class="form-control"
+                placeholder="Enter usage limit"
+                value="{{ coupon.usage_limit|default:'' }}">
+            </div>
+          </div>
+
+          <!-- Active Checkbox -->
+          {% if edit %}
+          <div class="col-md-6 col-12 d-flex align-items-end">
+            <label class="d-flex align-items-center gap-2">
+              <input 
+                type="checkbox"
+                name="is_active"
+                class="form-check-input"
+                {% if coupon.is_active %}checked{% endif %}>
+              <span>Active Coupon</span>
+            </label>
+          </div>
+          {% endif %}
+
+          <!-- Buttons -->
+          <div class="col-12">
+            <div class="row mt-3">
+
+              <!-- Left Button -->
+              <div class="col-6">
+                {% if edit %}
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fa-regular fa-circle-check"></i>
+                  Update Coupon
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fa-regular fa-circle-check"></i>
+                  Create Coupon
+                </button>
+                {% endif %}
+              </div>
+
+              <!-- Right Button -->
+              <div class="col-6">
+                <a href="{% url 'coupon_list' %}" class="btn btn-outline-secondary w-100">
+                  <i class="fa-regular fa-circle-xmark"></i>
+                  Cancel
+                </a>
+              </div>
+
+            </div>
+          </div>
+
+        </div> <!-- row -->
+
+      </form>
+
+    </div> <!-- card-body -->
+
+  </div> <!-- card -->
+</div> <!-- dashboard-main-body -->
+
+{% endblock %}

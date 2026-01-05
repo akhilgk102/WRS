@@ -1,0 +1,680 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Products{% endblock %}
+
+{% block content %}
+
+<style>
+/* Specific styles for collection/products page only - won't affect base.html */
+.collection-grid-wrapper {
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr; /* Single column to remove sidebar space */
+  grid-auto-columns: 1fr;
+  display: grid;
+  max-width: 100%;
+}
+
+/* Hide the left sidebar on products page */
+.collection-categories-flex-wrap {
+  display: none !important;
+}
+
+/* Make product list wrapper take full width */
+.product-collection-list-wrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Ensure split content takes full width when sidebar is hidden */
+#w-node-f1bf3d3d-69ab-1392-f21c-23b6b2acfb6c-d3b577fb {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Products grid - 4 columns with proper spacing */
+.products-grid-wrap {
+  grid-column-gap: 20px;
+  grid-row-gap: 54px;
+  grid-template-rows: auto;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-columns: 1fr;
+  display: grid;
+  width: 100%;
+}
+
+.products-grid-wrap.collection {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Product cards */
+.single-product-wrap {
+  background-color: var(--white);
+  border: 1px solid rgba(30, 30, 30, .2);
+  border-radius: 15px;
+  min-height: 100%;
+  padding: 40px 30px 55px;
+  position: relative;
+  width: 100%;
+}
+
+/* Tablet view */
+@media screen and (max-width: 991px) {
+  .collection-grid-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .products-grid-wrap,
+  .products-grid-wrap.collection {
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 40px;
+  }
+}
+
+/* Mobile view */
+@media screen and (max-width: 767px) {
+  .products-grid-wrap,
+  .products-grid-wrap.collection {
+    grid-template-columns: 1fr;
+    grid-column-gap: 15px;
+    grid-row-gap: 30px;
+  }
+}
+
+/* Small mobile view */
+@media screen and (max-width: 479px) {
+  .products-grid-wrap,
+  .products-grid-wrap.collection {
+    grid-template-columns: 1fr;
+  }
+  
+  .single-product-wrap {
+    padding: 15px 15px 30px;
+  }
+}
+
+
+
+
+    @media screen and (max-width: 767px) {
+        .product-img-wrapper {
+            max-width: 400px !important;
+            height: 200px;
+            margin-bottom: 10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    
+
+
+    /* Product name truncation */
+    .product-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4em;
+        max-height: 2.8em;
+        font-size: 1.3rem;
+    }
+
+    /* Price styling */
+    .product-original-price {
+        text-decoration: line-through !important;
+        color: #424242 !important;
+        font-size: 0.95rem !important;
+    }
+
+    .product-price.text-danger {
+        color: #dc3545 !important;
+        font-weight: bold !important;
+    }
+
+    .product-price-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    /* Image hover effect */
+    .product-img-wrap {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .product-img-wrap img {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .product-img-wrap img.hover-image {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .product-img-wrapper.has-multiple-images .product-img-wrap:hover img.primary-image {
+        opacity: 0;
+    }
+
+    .product-img-wrapper.has-multiple-images .product-img-wrap:hover img.hover-image {
+        opacity: 1;
+    }
+
+    /* Image indicators */
+    .image-indicators {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 5px;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-img-wrapper:hover .image-indicators {
+        opacity: 1;
+    }
+
+    .indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .indicator-dot.active {
+        background-color: #fff;
+    }
+
+    /* Sorting dropdown */
+    .sort-dropdown {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .sort-dropdown:focus {
+        outline: none;
+        border-color: #666;
+    }
+
+    /* Pagination styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.2s;
+    }
+
+    .pagination a:hover {
+        background-color: #f0f0f0;
+        border-color: #999;
+    }
+
+    .pagination .current {
+        background-color: #333;
+        color: white;
+        border-color: #333;
+    }
+
+    .pagination .disabled {
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+    /* Active filter styling */
+    .collection-category-form-flex.active {
+        background-color: #f0f0f0;
+        font-weight: 600;
+    }
+
+    .showing-item-details-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .sort-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sort-wrapper label {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+    }
+</style>
+
+<section class="section after-banner">
+    <div class="container">
+        <div class="collection-grid-wrapper">
+            <div id="w-node-a5368eac-3ff3-80b3-9178-c5b11f31620b-d3b577fb" class="split-content">
+                <div class="collection-categories-flex-wrap">
+                    <!-- Categories Filter -->
+                    <!-- <div class="single-collection-category-wrap"
+                        style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                        <h5 class="collection-category-title">Categories</h5>
+                        <div class="collection-category-list-wrap">
+                            <div class="w-dyn-list">
+                                <div role="list" class="collection-category-list-flex w-dyn-items">
+                                    
+                                    <div role="listitem" class="w-dyn-item">
+                                        <div class="collection-category-list-item">
+                                            <div class="collection-category-list-form w-form">
+                                                <form method="get" class="collection-category-form-content-wrap">
+                                                    <a href="?{% if price_filter %}price={{ price_filter }}&{% endif %}{% if sort_by %}sort={{ sort_by }}{% endif %}" 
+                                                       class="collection-category-form-flex w-inline-block {% if not category_filter %}active{% endif %}">
+                                                        <div class="collection-category-checkbox-flex">
+                                                            <div class="collection-category-name">All Categories</div>
+                                                        </div>
+                                                        <div class="category-item-count-wrap">
+                                                            <div class="category-item-number">{{ total_products }}</div>
+                                                        </div>
+                                                    </a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% for category in categories %}
+                                    <div role="listitem" class="w-dyn-item">
+                                        <div class="collection-category-list-item">
+                                            <div class="collection-category-list-form w-form">
+                                                <form method="get" class="collection-category-form-content-wrap">
+                                                    <a href="?category={{ category.slug }}{% if price_filter %}&price={{ price_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                                       class="collection-category-form-flex w-inline-block {% if category_filter == category.slug %}active{% endif %}">
+                                                        <div class="collection-category-checkbox-flex">
+                                                            <div class="collection-category-name">{{ category.name }}</div>
+                                                        </div>
+                                                        <div class="category-item-count-wrap">
+                                                            <div class="category-item-number">{{ category.product_count }}</div>
+                                                        </div>
+                                                    </a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="w-dyn-item">
+                                        <div>No categories found.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <!-- Price Filter -->
+                    <!-- <div class="single-collection-category-wrap"
+                        style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                        <h5 class="collection-category-title">Price</h5>
+                        <div class="collection-category-list-wrap">
+                            <div class="w-dyn-list">
+                                <div role="list" class="collection-category-list-flex w-dyn-items">
+                                   
+                                    <div role="listitem" class="w-dyn-item">
+                                        <div class="collection-category-list-item">
+                                            <div class="collection-category-list-form w-form">
+                                                <form method="get" class="collection-category-form-content-wrap">
+                                                    <a href="?{% if category_filter %}category={{ category_filter }}&{% endif %}{% if sort_by %}sort={{ sort_by }}{% endif %}" 
+                                                       class="collection-category-form-flex w-inline-block {% if not price_filter %}active{% endif %}">
+                                                        <div class="collection-category-checkbox-flex">
+                                                            <div class="collection-category-name">All Prices</div>
+                                                        </div>
+                                                        <div class="category-item-count-wrap">
+                                                            <div class="category-item-number">{{ total_products }}</div>
+                                                        </div>
+                                                    </a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div role="listitem" class="w-dyn-item">
+                                        <div class="collection-category-list-item">
+                                            <div class="collection-category-list-form w-form">
+                                                <form method="get" class="collection-category-form-content-wrap">
+                                                    <a href="?price=0-99{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                                       class="collection-category-form-flex w-inline-block {% if price_filter == '0-99' %}active{% endif %}">
+                                                        <div class="collection-category-checkbox-flex">
+                                                            <div class="collection-category-name">₹0.00 - ₹99.99</div>
+                                                        </div>
+                                                        <div class="category-item-count-wrap">
+                                                            <div class="category-item-number">{{ price_ranges.range_0_99 }}</div>
+                                                        </div>
+                                                    </a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div role="listitem" class="w-dyn-item">
+                                        <div class="collection-category-list-item">
+                                            <div class="collection-category-list-form w-form">
+                                                <form method="get" class="collection-category-form-content-wrap">
+                                                    <a href="?price=100-199{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                                       class="collection-category-form-flex w-inline-block {% if price_filter == '100-199' %}active{% endif %}">
+                                                        <div class="collection-category-checkbox-flex">
+                                                            <div class="collection-category-name">₹100.00 - ₹199.99</div>
+                                                        </div>
+                                                        <div class="category-item-count-wrap">
+                                                            <div class="category-item-number">{{ price_ranges.range_100_199 }}</div>
+                                                        </div>
+                                                    </a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div role="listitem" class="w-dyn-item">
+                                        <div class="collection-category-list-item">
+                                            <div class="collection-category-list-form w-form">
+                                                <form method="get" class="collection-category-form-content-wrap">
+                                                    <a href="?price=200-plus{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                                       class="collection-category-form-flex w-inline-block {% if price_filter == '200-plus' %}active{% endif %}">
+                                                        <div class="collection-category-checkbox-flex">
+                                                            <div class="collection-category-name">₹200 and above</div>
+                                                        </div>
+                                                        <div class="category-item-count-wrap">
+                                                            <div class="category-item-number">{{ price_ranges.range_200_plus }}</div>
+                                                        </div>
+                                                    </a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+
+            <div id="w-node-f1bf3d3d-69ab-1392-f21c-23b6b2acfb6c-d3b577fb" class="split-content">
+                <div class="product-collection-list-wrapper">
+                    <div class="showing-item-details-wrapper">
+                        <div class="showing-item-details">
+                            Showing {{ products.start_index }} - {{ products.end_index }} of {{ total_products }} result{{ total_products|pluralize }}
+                        </div>
+                        
+                        <div class="sort-wrapper">
+                            <label for="sort-select">Sort by:</label>
+                            <select id="sort-select" class="sort-dropdown" onchange="applySorting(this.value)">
+                                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                                <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="product-collection-list w-dyn-list">
+                        <div role="list" class="products-grid-wrap collection w-dyn-items">
+                            {% for product in products %}
+                            <div role="listitem" class="w-dyn-item">
+                                <div data-w-id="bdc49c1b-7cac-28d0-b50e-d0872b166c62"
+                                    style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;"
+                                    class="single-product-wrap">
+                                    <div class="product-contents-wrapper">
+                                        <div class="product-img-wrapper {% if product.images.all|length > 1 %}has-multiple-images{% endif %}" data-product-id="{{ product.id }}">
+                                            <a href="{% url 'product_detail_no_login' product.slug %}" class="product-img-wrap w-inline-block"
+                                                style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                                                <div style="width:100%; height:auto; padding:10px; position: relative;">
+                                                    {% if product.primary_image %}
+                                                    <img src="{{ product.primary_image.image.url }}"
+                                                        alt="{{ product.name }}"
+                                                        class="primary-image"
+                                                        style="width:100%; height:200px; display:block; border:1px solid #ddd; object-fit: cover;">
+                                                    
+                                                    {% with product.images.all as all_images %}
+                                                        {% if all_images|length > 1 %}
+                                                            {% for image in all_images %}
+                                                                {% if not image.is_primary %}
+                                                                <img src="{{ image.image.url }}"
+                                                                    alt="{{ product.name }}"
+                                                                    class="hover-image"
+                                                                    style="width:100%; height:200px; display:block; border:1px solid #ddd; object-fit: cover;">
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                    {% else %}
+                                                    <img src="{% static 'img/stock_img/65bf646cf9ce14831cf9cc9e_Product-Img-22.png' %}"
+                                                        alt="{{ product.name }}"
+                                                        class="primary-image"
+                                                        style="width:100%; height:200px; display:block; border:1px solid #ddd; object-fit: cover;">
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                {% with product.images.all as all_images %}
+                                                    {% if all_images|length > 1 %}
+                                                    <div class="image-indicators">
+                                                        {% for image in all_images %}
+                                                        <span class="indicator-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></span>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </a>
+                                        </div>
+                                        <div class="product-details-wrap"
+                                            style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                                            <a href="{% url 'product_detail_no_login' product.slug %}" class="product-name-wrap w-inline-block">
+                                                <h5 class="product-name">{{ product.name }}</h5>
+                                            </a>
+                                            <div class="product-price-wrap">
+                                                {% if product.offer_price %}
+                                                    <div class="product-price text-danger fw-bold" data-price="{{ product.offer_price }}"></div>
+                                                    <div class="product-original-price text-muted text-decoration-line-through" data-price="{{ product.price }}"></div>
+                                                {% else %}
+                                                    <div class="product-price" data-price="{{ product.price }}"></div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="product-small-buttons-flex">
+                                        <a href="{% url 'product_detail_no_login' product.slug %}" class="product-small-button w-inline-block">
+                                            <img src="{% static 'img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}"
+                                                loading="lazy" alt="" class="product-small-buttons-icon">
+                                        </a>
+                                    </div>
+                                    <div class="product-add-to-cart">
+                                        <form method="post" action=""
+                                            class="w-commerce-commerceaddtocartform add-cart-default-state">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                                            <input onclick="openLoginModal(event)" type="submit"
+                                                class="w-commerce-commerceaddtocartbutton add-to-cart-button"
+                                                value="Add to Cart">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="w-dyn-empty">
+                                <div>No products found.</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if products.has_other_pages %}
+                    <div class="pagination">
+                        {% if products.has_previous %}
+                            <a href="?page=1{% if category_filter %}&category={{ category_filter }}{% endif %}{% if price_filter %}&price={{ price_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">&laquo; First</a>
+                            <a href="?page={{ products.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if price_filter %}&price={{ price_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a>
+                        {% else %}
+                            <span class="disabled">&laquo; First</span>
+                            <span class="disabled">Previous</span>
+                        {% endif %}
+
+                        {% for num in products.paginator.page_range %}
+                            {% if products.number == num %}
+                                <span class="current">{{ num }}</span>
+                            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                                <a href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if price_filter %}&price={{ price_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if products.has_next %}
+                            <a href="?page={{ products.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if price_filter %}&price={{ price_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a>
+                            <a href="?page={{ products.paginator.num_pages }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if price_filter %}&price={{ price_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Last &raquo;</a>
+                        {% else %}
+                            <span class="disabled">Next</span>
+                            <span class="disabled">Last &raquo;</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Format prices
+        const prices = document.querySelectorAll(".product-price");
+        prices.forEach((priceElement) => {
+            let amount = priceElement.getAttribute("data-price");
+            if (amount) {
+                let num = parseFloat(amount);
+                let formatted = num.toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                priceElement.innerHTML = "₹" + formatted;
+            }
+        });
+
+        const originalPrices = document.querySelectorAll(".product-original-price");
+        originalPrices.forEach((priceElement) => {
+            let amount = priceElement.getAttribute("data-price");
+            if (amount) {
+                let num = parseFloat(amount);
+                let formatted = num.toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                priceElement.innerHTML = "₹" + formatted;
+            }
+        });
+
+        // Image hover cycling functionality
+        document.querySelectorAll('.product-img-wrapper').forEach(wrapper => {
+            const imgWrap = wrapper.querySelector('.product-img-wrap');
+            const primaryImage = imgWrap.querySelector('.primary-image');
+            const hoverImages = imgWrap.querySelectorAll('.hover-image');
+            const indicators = wrapper.querySelectorAll('.indicator-dot');
+            
+            if (hoverImages.length === 0) return;
+
+            let currentIndex = 0;
+            let hoverInterval;
+            let isHovering = false;
+
+            hoverImages.forEach(img => img.style.opacity = '0');
+
+            imgWrap.addEventListener('mouseenter', function() {
+                isHovering = true;
+                currentIndex = 1;
+                showImage(1);
+                
+                hoverInterval = setInterval(() => {
+                    currentIndex++;
+                    if (currentIndex > hoverImages.length) {
+                        currentIndex = 1;
+                    }
+                    showImage(currentIndex);
+                }, 1500);
+            });
+
+            imgWrap.addEventListener('mouseleave', function() {
+                isHovering = false;
+                clearInterval(hoverInterval);
+                if (primaryImage) primaryImage.style.opacity = '1';
+                hoverImages.forEach(img => img.style.opacity = '0');
+                updateIndicators(0);
+            });
+
+            indicators.forEach((dot, index) => {
+                dot.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearInterval(hoverInterval);
+                    currentIndex = index;
+                    showImage(index);
+                    
+                    if (isHovering) {
+                        hoverInterval = setInterval(() => {
+                            currentIndex++;
+                            if (currentIndex > hoverImages.length) {
+                                currentIndex = 1;
+                            }
+                            showImage(currentIndex);
+                        }, 1500);
+                    }
+                });
+            });
+
+            function showImage(index) {
+                if (index === 0) {
+                    if (primaryImage) primaryImage.style.opacity = '1';
+                    hoverImages.forEach(img => img.style.opacity = '0');
+                } else {
+                    if (primaryImage) primaryImage.style.opacity = '0';
+                    hoverImages.forEach((img, i) => {
+                        img.style.opacity = i === (index - 1) ? '1' : '0';
+                    });
+                }
+                updateIndicators(index);
+            }
+
+            function updateIndicators(activeIndex) {
+                indicators.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === activeIndex);
+                });
+            }
+        });
+    });
+
+    function applySorting(sortValue) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', sortValue);
+        window.location.search = urlParams.toString();
+    }
+</script>
+
+{% endblock %}

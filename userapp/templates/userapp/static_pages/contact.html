@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Mobile-only card design changes */
+    @media (max-width: 767px) {
+        .contact-info-flex-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .single-contact-info-wrap {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            max-width: 100%;
+        }
+
+        .single-contact-info-wrap:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-info-icon {
+            width: 35px;
+            height: 35px;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .contact-info-content {
+            flex: 1;
+        }
+
+        .contact-info-title {
+            color: #1e1e1e;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .contact-info-details {
+            color: #737b86;
+            font-size: 13px;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .contact-info-divider {
+            display: none;
+        }
+    }
+
+    @media (max-width: 479px) {
+        .contact-info-flex-wrap {
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .single-contact-info-wrap {
+            padding: 12px;
+            gap: 12px;
+            border-radius: 8px;
+        }
+
+        .contact-info-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .contact-info-title {
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .contact-info-details {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<section class="section after-banner">
+    <div class="container">
+        <div class="contact-content-wrap">
+            <div class="contact-info-flex-wrap">
+                <div class="single-contact-info-wrap">
+                    <img src="https://cdn.prod.website-files.com/65b8e0357ac2740d76d66728/65c4d6fc24502015a1a369c5_Contact-Icon-3.svg"
+                        loading="lazy" alt="" class="contact-info-icon">
+                    <div class="contact-info-content">
+                        <h4 class="contact-info-title">Message</h4>
+                        <p class="contact-info-details">Send us a text &amp; an ambassador will respond 1-814-251-9966</p>
+                    </div>
+                </div>
+                <div class="contact-info-divider _1"></div>
+                <div class="single-contact-info-wrap">
+                    <img src="https://cdn.prod.website-files.com/65b8e0357ac2740d76d66728/65c4d6fc5c24fddd6fe05ac0_Contact-Icon-2.svg"
+                        loading="lazy" alt="" class="contact-info-icon">
+                    <div class="contact-info-content">
+                        <h4 class="contact-info-title">Address</h4>
+                        <p class="contact-info-details">461 Valencia Street San Francisco, CA 94103 Manhattan NYC</p>
+                    </div>
+                </div>
+                <div class="contact-info-divider _2"></div>
+                <div class="single-contact-info-wrap">
+                    <img src="https://cdn.prod.website-files.com/65b8e0357ac2740d76d66728/65c4d6fde6003d5501492385_Contact-Icon-1.svg"
+                        loading="lazy" alt="" class="contact-info-icon">
+                    <div class="contact-info-content">
+                        <h4 class="contact-info-title">We're Open</h4>
+                        <p class="contact-info-details">Our store has opened for shopping, exchanges Every day 11am to 7pm</p>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-form-wrapper">
+                <div class="contact-form-title-wrap">
+                    <h3 class="contact-form-title">Got Any Questions?</h3>
+                    <p class="contact-form-details">Use the form below to get in touch with the sales team</p>
+                </div>
+                <div class="contact-form-wrap w-form">
+                    <form id="email-form" name="email-form" data-name="Email Form" method="post"
+                        class="contact-form-content" aria-label="Email Form">
+                        {% csrf_token %}
+                        <div class="contact-fields-grid">
+                            <div class="single-contact-field-wrap">
+                                <input class="contact-form-field w-input" maxlength="256" name="First-Name"
+                                    data-name="First Name" placeholder="First Name" type="text" id="First-Name"
+                                    required="">
+                            </div>
+                            <div class="single-contact-field-wrap">
+                                <input class="contact-form-field w-input" maxlength="256" name="Last-Name"
+                                    data-name="Last Name" placeholder="Last Name" type="text" id="Last-Name" required="">
+                            </div>
+                        </div>
+                        <div class="single-contact-field-wrap mb-32">
+                            <input class="contact-form-field w-input" maxlength="256" name="Email-Address"
+                                data-name="Email Address" placeholder="Email Address" type="email" id="Email-Address"
+                                required="">
+                        </div>
+                        <div class="single-contact-field-wrap message">
+                            <textarea placeholder="Type Message Here...." maxlength="5000" id="Message" name="Message"
+                                data-name="Message" class="contact-form-message w-input"></textarea>
+                        </div>
+                        <div class="contact-form-btn-wrap">
+                            <input type="submit" data-wait="Please wait..."
+                                class="primary-button w-button" value="Send Message">
+                        </div>
+                    </form>
+                    <div class="w-form-done" tabindex="-1" role="region" aria-label="Email Form success">
+                        <div>Thank you! Your submission has been received!</div>
+                    </div>
+                    <div class="w-form-fail" tabindex="-1" role="region" aria-label="Email Form failure">
+                        <div>Oops! Something went wrong while submitting the form.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

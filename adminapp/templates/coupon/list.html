@@ -1,0 +1,499 @@
+{% extends "admin_base2.html" %}
+{% load static %}
+
+{% block title %} Coupons Management {% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">Coupons Management</h6>
+    <ul class="d-flex align-items-center gap-2">
+      <li class="fw-medium">
+        <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+          Dashboard
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">Coupons</li>
+    </ul>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="mb-24">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card basic-data-table">
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <h5 class="card-title mb-0">All Coupons</h5>
+      <div class="d-flex align-items-center gap-3">
+        <div class="position-relative">
+          <input type="text" id="couponSearch" class="form-control form-control-sm" placeholder="Search coupons..." style="padding-left: 35px; min-width: 200px;">
+          <iconify-icon icon="ion:search-outline" class="position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></iconify-icon>
+        </div>
+
+        <a href="{% url 'coupon_create' %}" class=" d-flex btn btn-primary-600 radius-8 px-20 py-11">
+          <iconify-icon icon="solar:add-circle-outline" class="text-xl me-1"></iconify-icon>
+          Create Coupon
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table bordered-table mb-0" id="couponTable">
+          <thead>
+            <tr>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:ticket-outline" class="text-xl"></iconify-icon>
+                  Coupon Code
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:tag-price-outline" class="text-xl"></iconify-icon>
+                  Discount
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:users-group-rounded-outline" class="text-xl"></iconify-icon>
+                  Usage
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:calendar-outline" class="text-xl"></iconify-icon>
+                  Valid Till
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:clock-circle-outline" class="text-xl"></iconify-icon>
+                  Status
+                </div>
+              </th>
+              <th scope="col" class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <iconify-icon icon="solar:settings-outline" class="text-xl"></iconify-icon>
+                  Action
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="couponTableBody">
+            {% for coupon in coupons %}
+            <tr class="coupon-row" data-coupon-code="{{ coupon.code|lower }}" data-status="{% if coupon.is_active %}active{% else %}inactive{% endif %}">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="flex-shrink-0 w-40-px h-40-px bg-primary-100 text-primary-600 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:ticket-bold" style="font-size: 20px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <h6 class="text-md mb-0 fw-semibold">{{ coupon.code }}</h6>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="flex-shrink-0 w-40-px h-40-px bg-success-100 text-success-600 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:dollar-bold" style="font-size: 20px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <span class="fw-semibold coupon-discount" data-discount="{{ coupon.discount }}"></span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="flex-shrink-0">
+                    <div class="progress-stacked" style="width: 100px; height: 8px;">
+                      {% if coupon.usage_limit %}
+                        {% widthratio coupon.used_count 1 100 as used_percentage_raw %}
+                        {% widthratio used_percentage_raw coupon.usage_limit 1 as used_percentage %}
+                        <div class="progress" role="progressbar" style="width: {{ used_percentage }}%">
+                          <div class="progress-bar bg-primary-600"></div>
+                        </div>
+                      {% else %}
+                        <div class="progress" role="progressbar" style="width: 100%">
+                          <div class="progress-bar bg-primary-600"></div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="text-md mb-0 fw-semibold">
+                      {{ coupon.used_count }}
+                      {% if coupon.usage_limit %}
+                        <span class="text-secondary-light">/ {{ coupon.usage_limit }}</span>
+                      {% else %}
+                        <span class="text-secondary-light">/ ∞</span>
+                      {% endif %}
+                    </h6>
+                    <span class="text-sm text-secondary-light">Times used</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <span class="fw-medium">{{ coupon.valid_to|date:"d M Y" }}</span>
+                  <span class="text-sm text-secondary-light">{{ coupon.valid_to|date:"h:i A" }}</span>
+                </div>
+              </td>
+              <td>
+                {% if coupon.is_active %}
+                <span class="badge bg-success-100 text-success-600 px-3 py-3">
+                  <iconify-icon icon="solar:check-circle-bold" class="me-1"></iconify-icon>
+                  Active
+                </span>
+                {% else %}
+                <span class="badge bg-danger-100 text-danger-600 px-3 py-3">
+                  <iconify-icon icon="solar:close-circle-bold" class="me-1"></iconify-icon>
+                  Inactive
+                </span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <a href="{% url 'coupon_update' coupon.id %}" class="w-40-px h-40-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center" title="Edit Coupon">
+                    <iconify-icon icon="solar:pen-outline" width="20" height="20"></iconify-icon>
+                  </a>
+                  <a href="{% url 'coupon_delete' coupon.id %}" class="w-40-px h-40-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center" title="Delete Coupon" onclick="return confirm('Are you sure you want to delete this coupon?');">
+                    <iconify-icon icon="mingcute:delete-2-line" width="22" height="22"></iconify-icon>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-5">
+                <div class="d-flex flex-column align-items-center gap-3">
+                  <div class="w-80-px h-80-px bg-neutral-100 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:ticket-outline" class="text-neutral-400" style="font-size: 48px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <h5 class="mb-1">No Coupons Found</h5>
+                    <p class="text-secondary-light mb-0">Create your first coupon to get started</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if coupons.has_other_pages %}
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-24">
+        <div class="text-secondary-light">
+          Showing {{ coupons.start_index }} to {{ coupons.end_index }} of {{ coupons.paginator.count }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination d-flex align-items-center gap-2 mb-0">
+            {% if coupons.has_previous %}
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page=1">
+                <iconify-icon icon="ep:d-arrow-left" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ coupons.previous_page_number }}">
+                <iconify-icon icon="solar:arrow-left-linear" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            {% endif %}
+
+            <li class="page-item">
+              <a class="page-link bg-primary-600 text-white fw-medium radius-8 border-0 px-3 py-2" href="javascript:void(0)">{{ coupons.number }}</a>
+            </li>
+
+            {% if coupons.has_next %}
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ coupons.next_page_number }}">
+                <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ coupons.paginator.num_pages }}">
+                <iconify-icon icon="ep:d-arrow-right" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Search and Filter Functionality Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('couponSearch');
+  const statusFilter = document.getElementById('statusFilter');
+  const couponRows = document.querySelectorAll('.coupon-row');
+  
+  // Search and filter functionality
+  function filterCoupons() {
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const statusValue = statusFilter ? statusFilter.value.toLowerCase() : '';
+    let visibleCount = 0;
+    
+    couponRows.forEach(function(row) {
+      const couponCode = row.getAttribute('data-coupon-code') || '';
+      const status = row.getAttribute('data-status') || '';
+      
+      const matchesSearch = couponCode.includes(searchTerm);
+      const matchesStatus = statusValue === '' || status === statusValue;
+      
+      if (matchesSearch && matchesStatus) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', filterCoupons);
+  }
+  
+  if (statusFilter) {
+    statusFilter.addEventListener('change', filterCoupons);
+  }
+
+  // Format discount prices in Indian Rupee format
+  const discounts = document.querySelectorAll(".coupon-discount");
+  discounts.forEach((discountElement) => {
+    let amount = discountElement.getAttribute("data-discount");
+    if (amount) {
+      let num = parseFloat(amount);
+      let formatted = num.toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      discountElement.innerHTML = "₹" + formatted;
+    }
+  });
+});
+</script>
+
+<style>
+/* Additional custom styles */
+.hover-text-primary:hover {
+  color: #487fff !important;
+}
+
+.bg-primary-100 {
+  background-color: rgba(72, 127, 255, 0.15);
+}
+
+.bg-success-100 {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+
+.bg-danger-100 {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.bg-neutral-100 {
+  background-color: rgba(156, 163, 175, 0.15);
+}
+
+.text-primary-600 {
+  color: #487fff;
+}
+
+.text-success-600 {
+  color: #22c55e;
+}
+
+.text-danger-600 {
+  color: #ef4444;
+}
+
+.text-neutral-600 {
+  color: #6b7280;
+}
+
+.w-40-px {
+  width: 40px;
+}
+
+.h-40-px {
+  height: 40px;
+}
+
+.w-80-px {
+  width: 80px;
+}
+
+.h-80-px {
+  height: 80px;
+}
+
+.coupon-row {
+  transition: background-color 0.2s ease;
+}
+
+.coupon-row:hover {
+  background-color: #f9fafb;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #487fff;
+  box-shadow: 0 0 0 0.2rem rgba(72, 127, 255, 0.25);
+}
+
+/* Status Badge Styles */
+.badge {
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px !important;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Active Status */
+.bg-success-100.text-success-600 {
+  background-color: #d1fae5;
+  color: #059669;
+  border-color: #34d399;
+}
+
+.bg-success-100.text-success-600:hover {
+  background-color: #a7f3d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Inactive Status */
+.bg-danger-100.text-danger-600 {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #f87171;
+}
+
+.bg-danger-100.text-danger-600:hover {
+  background-color: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Icon styling within badges */
+.badge iconify-icon {
+  font-size: 17px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .badge {
+    font-size: 14px;
+    padding: 8px 12px !important;
+    gap: 4px;
+  }
+  
+  .badge iconify-icon {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .badge {
+    font-size: 14px;
+    padding: 7px 10px !important;
+  }
+  
+  .badge iconify-icon {
+    font-size: 15px;
+  }
+}
+
+.rounded-circle {
+  border-radius: 50% !important;
+}
+
+.text-secondary-light {
+  color: #9ca3af;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+/* Progress Bar Styles */
+.progress-stacked {
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.bg-primary-600 {
+  background-color: #487fff;
+}
+
+/* Button Styles */
+.btn-primary-600 {
+  background-color: #487fff;
+  color: white;
+  border: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-600:hover {
+  background-color: #3b6ecc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(72, 127, 255, 0.3);
+}
+
+.radius-8 {
+  border-radius: 8px;
+}
+
+.px-20 {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.py-11 {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+</style>
+
+<!-- Add Iconify Script if not already included in base template -->
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+{% endblock %}

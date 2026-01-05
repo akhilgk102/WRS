@@ -1,0 +1,66 @@
+{% extends 'admin_base2.html' %}
+
+{% block title %}Add Product to {{ section.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Add Product to {{ section.name }}</h2>
+        <a href="{% url 'homepage_sections_manage' %}" class="btn btn-secondary">Back</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" id="search-form" class="mb-4">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search-input" placeholder="Search products...">
+                    <button class="btn btn-outline-secondary" type="button" id="search-btn">Search</button>
+                </div>
+            </form>
+
+            <div class="row" id="products-container">
+                {% for product in products %}
+                <div class="col-md-3 mb-3 product-item" data-name="{{ product.name|lower }}">
+                    <div class="card">
+                        {% if product.primary_image %}
+                            <img src="{{ product.primary_image.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light text-center p-4">No Image</div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ product.name }}</h6>
+                            <p class="card-text">
+                                <small>{{ product.category.name }}</small><br>
+                                <strong>AED {{ product.final_price }}</strong>
+                            </p>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-sm btn-primary w-100">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('search-input').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const products = document.querySelectorAll('.product-item');
+    
+    products.forEach(product => {
+        const productName = product.getAttribute('data-name');
+        if (productName.includes(searchTerm)) {
+            product.style.display = '';
+        } else {
+            product.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

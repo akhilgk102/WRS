@@ -1,0 +1,1323 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block content %}
+
+<style>
+    .more-image-wrap:hover {
+        border-color: #ddd;
+    }
+
+    .more-image-wrap.active {
+        border-color: #007bff;
+    }
+
+    /* Main image container for zoom effect */
+    .product-single-image-wrap {
+        position: relative;
+        overflow: hidden;
+        cursor: zoom-in;
+    }
+
+    .product-single-img {
+        transition: transform 0.3s ease;
+        transform-origin: center center;
+    }
+
+    /* Zoom lens overlay */
+    .zoom-lens {
+        position: absolute;
+        border: 2px solid #d4d4d4;
+        background-color: rgba(255, 255, 255, 0.3);
+        width: 150px;
+        height: 150px;
+        pointer-events: none;
+        display: none;
+    }
+
+    /* Zoomed image result container */
+    .zoom-result {
+        position: absolute;
+        right: -420px;
+        top: 0;
+        width: 400px;
+        height: 400px;
+        border: 1px solid #d4d4d4;
+        background-color: #fff;
+        display: none;
+        overflow: hidden;
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .zoom-result img {
+        position: absolute;
+    }
+
+.product-meta-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta-divider {
+    color: #ddd;
+    font-size: 14px;
+}
+
+.meta-label {
+    font-weight: 500;
+    color: #666;
+    font-size: 16px;
+}
+
+.meta-value {
+    color: #333;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.meta-value.category-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.meta-value.category-link:hover {
+    text-decoration: underline;
+}
+
+.stock-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stock-badge.in-stock {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.stock-badge.low-stock {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.stock-badge.out-of-stock {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+@media (max-width: 991px) {
+    .product-meta-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .meta-divider {
+        display: none;
+    }
+    
+    .meta-item {
+        width: 100%;
+    }
+}
+
+.discount-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+    .price-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .product-price.original-striked {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 18px;
+    }
+
+    @media (max-width: 991px) {
+        .zoom-result {
+            display: none !important;
+        }
+        
+        .product-meta-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+
+</style>
+
+<section class="section after-banner">
+    <div class="container">
+        <div class="product-single-grid-wrap">
+            <div id="w-node-d8eedbf7-4f72-8e4d-bd4a-0a0da0ac42cd-27f240f8" class="product-single-image-grid">
+                <div id="w-node-_34a3fd3a-e645-ca8f-1545-f5ad2855daed-27f240f8" class="more-images-wrapper">
+                    <div class="w-dyn-list w-dyn-items-repeater-ref">
+                        <div role="list" class="product-more-images-flex w-dyn-items">
+                            {% for image in product.images.all %}
+                            <div role="listitem" class="w-dyn-item w-dyn-repeater-item">
+                                <div class="single-more-image-wrapper" data-image-url="{{ image.image.url }}">
+                                    <div class="single-more-image-wrap">
+                                        <div class="more-image-wrap {% if forloop.first %}active{% endif %}">
+                                            <img alt="{{ product.name }}" loading="lazy" src="{{ image.image.url }}"
+                                                class="more-image">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div role="listitem" class="w-dyn-item w-dyn-repeater-item">
+                                <div class="single-more-image-wrapper"
+                                    data-image-url="{% static 'img/stock_img/65bf646cf9ce14831cf9cc9e_Product-Img-22.png' %}">
+                                    <div class="single-more-image-wrap">
+                                        <div class="more-image-wrap active">
+                                            <img alt="Default" loading="lazy"
+                                                src="{% static 'img/stock_img/65bf646cf9ce14831cf9cc9e_Product-Img-22.png' %}"
+                                                class="more-image">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div id="w-node-d4f2414e-e24b-432b-451a-d83d0ae65db8-27f240f8" class="product-single-img-wrap">
+                    <div class="product-single-image-wrapper">
+                        <div class="product-single-image-wrap" id="imageZoomContainer">
+                            <div class="zoom-lens" id="zoomLens"></div>
+                            {% if product.primary_image %}
+                            <img alt="{{ product.name }}" loading="lazy" src="{{ product.primary_image.image.url }}"
+                                class="product-single-img" id="mainImage">
+                            {% else %}
+                            <img alt="{{ product.name }}" loading="lazy"
+                                src="{% static 'img/stock_img/65bf646cf9ce14831cf9cc9e_Product-Img-22.png' %}"
+                                class="product-single-img" id="mainImage">
+                            {% endif %}
+                            <div class="zoom-result" id="zoomResult">
+                                <img src="" id="zoomedImage" alt="Zoomed view">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="w-node-e25b27cf-7deb-0a4b-0310-37aa7952f84f-27f240f8" class="product-single-details-wrapper">
+                <h4 class="product-single-title">{{ product.name }}</h4>
+                
+                <!-- Product Meta Information -->
+<div class="product-meta-info">
+    {% if product.category %}
+    <div class="meta-item">
+        <span class="meta-label">Category:</span>
+        <a href="{% url 'category_products_no_login' product.category.slug %}" class="meta-value category-link">
+            {{ product.category.name }}
+        </a>
+    </div>
+    <span class="meta-divider">|</span>
+    {% endif %}
+    
+    {% if product.brand %}
+    <div class="meta-item">
+        <span class="meta-label">Brand:</span>
+        <span class="meta-value">{{ product.brand.name }}</span>
+    </div>
+    <span class="meta-divider">|</span>
+    {% endif %}
+    
+    {% if product.sku %}
+    <div class="meta-item">
+        <span class="meta-label">SKU:</span>
+        <span class="meta-value">{{ product.sku }}</span>
+    </div>
+    <span class="meta-divider">|</span>
+    {% endif %}
+    
+    <div class="meta-item">
+        <span class="meta-label">Availability:</span>
+        {% if product.stock > 10 %}
+            <span class="stock-badge in-stock">In Stock</span>
+        {% elif product.stock > 0 %}
+            <span class="stock-badge low-stock">Only {{ product.stock }} left</span>
+        {% else %}
+            <span class="stock-badge out-of-stock">Out of Stock</span>
+        {% endif %}
+    </div>
+</div>
+                
+<!-- Replace the static star rating section with this dynamic version -->
+
+<div class="product-review product-single">
+    {% if average_rating %}
+        {% with average_rating|floatformat:0 as rating_int %}
+            {% for i in "12345" %}
+                {% if forloop.counter <= rating_int|add:0 %}
+                    <img src="{% static 'img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" 
+                         loading="lazy" alt="Star" class="product-review-star">
+                {% else %}
+                    <img src="{% static 'img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}" 
+                         loading="lazy" alt="Star" class="product-review-star">
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
+        <span class="rating-text">({{ average_rating|floatformat:1 }} / {{ total_reviews }} review{{ total_reviews|pluralize }})</span>
+    {% else %}
+        {% for i in "12345" %}
+            <img src="{% static 'img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}" 
+                 loading="lazy" alt="Star" class="product-review-star">
+        {% endfor %}
+        <span class="rating-text">(No reviews yet)</span>
+    {% endif %}
+</div>
+
+<style>
+.product-review.product-single {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.rating-text {
+    font-size: 14px;
+    color: #666;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.product-review-star {
+    width: 25px;
+    height: 25px;
+}
+</style>
+                
+                <div class="product-price-wrap product-single">
+                    <div class="price-wrapper">
+                        {% if product.offer_price %}
+                            <!-- Show offer price -->
+                            <div class="product-price product-single" data-price="{{ product.offer_price }}"></div>
+                            <!-- Show original price as striked -->
+                            <div class="product-price original-striked" data-price="{{ product.price }}"></div>
+                            <!-- Calculate and show discount percentage -->
+                            <span class="discount-badge" data-original="{{ product.price }}" data-offer="{{ product.offer_price }}"></span>
+                        {% else %}
+                            <!-- Show regular price -->
+                            <div class="product-price product-single" data-price="{{ product.price }}"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <p class="product-single-details note">{{ product.description|safe }}</p>
+                
+<div class="product-single-add-to-cart-wrapper">
+    <form method="POST" action="{% url 'add_to_cart' product.id %}" class="product-single-add-to-cart-wrap">
+        {% csrf_token %}
+        <div class="quantity-control">
+            <button type="button" class="quantity-btn minus-btn" {% if product.stock == 0 %}disabled{% endif %}>−</button>
+            <input type="number"
+                name="quantity"
+                min="1"
+                max="{{ product.stock }}"
+                value="1"
+                class="add-to-cart-quantity"
+                {% if product.stock == 0 %}disabled{% endif %}>
+            <button type="button" class="quantity-btn plus-btn" {% if product.stock == 0 %}disabled{% endif %}>+</button>
+        </div>
+
+        <button onclick="openLoginModal(event)" class="primary-button" {% if product.stock == 0 %}disabled{% endif %}>
+            {% if product.stock == 0 %}
+                Out of Stock
+            {% else %}
+                Add to Cart
+            {% endif %}
+            <div class="primary-button-hover-bg"></div>
+        </button>
+    </form>
+</div>
+
+                <style>
+                    .product-single-add-to-cart-wrap {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.quantity-btn {
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    border: none;
+    border-right: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.quantity-btn:last-child {
+    border-right: none;
+    border-left: 1px solid #ddd;
+}
+
+.quantity-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+input.add-to-cart-quantity {
+    all: unset !important;
+    width: 60px !important;
+    height: 50px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    text-align: center !important;
+
+    color: #000 !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    line-height: 40px !important;
+    background: #fff !important;
+    border: none !important;
+}
+
+
+.add-to-cart-quantity::-webkit-outer-spin-button,
+.add-to-cart-quantity::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.add-to-cart-quantity:focus {
+    outline: none;
+}
+
+.add-to-cart-quantity:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+}
+                </style>
+
+                <div class="social-links-wrapper">
+                    <div class="social-links-title">Share :</div>
+                    <div class="footer-siocial-links-wrap author-single-social-link-wrap">
+                        <a href="https://www.facebook.com/" target="_blank"
+                            class="single-footer-social-link _1 w-inline-block">
+                            <div>
+                                <i style="font-size: 1.7rem;" class="fa-brands fa-facebook-f"></i>
+                            </div>
+                        </a>
+                        <a href="https://twitter.com/" target="_blank" style="background-color: #25d366;"
+                            class="single-footer-social-link _2 w-inline-block">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="26" fill="currentColor"
+                                    class="bi bi-whatsapp" viewBox="0 0 16 16">
+                                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
+                                </svg>
+                            </div>
+                        </a>
+                        <a href="https://www.pinterest.com/" target="_blank" 
+                            style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);"
+                            class="single-footer-social-link _3 w-inline-block">
+                            <div><i style="font-size: 1.7rem;" class="fa-brands fa-instagram"></i></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section more-product-details">
+    <div class="container">
+        <div class="more-product-info-wrapper">
+            <div data-current="Tab 1" data-easing="ease" data-duration-in="300" data-duration-out="100"
+                class="more-info-tabs-wrapper w-tabs">
+                <div class="more-info-tabs-menu w-tab-menu" role="tablist">
+                    <a data-w-tab="Tab 1" class="more-info-tabs-link w-inline-block w-tab-link w--current"
+                        id="w-tabs-0-data-w-tab-0" href="#w-tabs-0-data-w-pane-0" role="tab"
+                        aria-controls="w-tabs-0-data-w-pane-0" aria-selected="true">
+                        <div>Specification</div>
+                    </a>
+                    <a data-w-tab="Tab 2" class="more-info-tabs-link w-inline-block w-tab-link" tabindex="-1"
+                        id="w-tabs-0-data-w-tab-1" href="#w-tabs-0-data-w-pane-1" role="tab"
+                        aria-controls="w-tabs-0-data-w-pane-1" aria-selected="false">
+                        <div>Description</div>
+                    </a>
+                    <a data-w-tab="Tab 3" class="more-info-tabs-link w-inline-block w-tab-link" tabindex="-1"
+                        id="w-tabs-0-data-w-tab-2" href="#w-tabs-0-data-w-pane-2" role="tab"
+                        aria-controls="w-tabs-0-data-w-pane-2" aria-selected="false">
+                        <div>Reviews</div>
+                    </a>
+                </div>
+                <div class="w-tab-content">
+                    <div data-w-tab="Tab 1" class="w-tab-pane w--tab-active" id="w-tabs-0-data-w-pane-0" role="tabpanel"
+                        aria-labelledby="w-tabs-0-data-w-tab-0">
+                        <div class="prosuct-spacification-wrapper">
+                            <div class="spacification-title-wrap">
+                                <h3 class="spacification-title">Specification</h3>
+                            </div>
+
+                            {% if product.attributes.all %}
+                            <div class="features-title-wrap">
+                                <h4 class="features-title">Product Features</h4>
+                            </div>
+                            <div class="spacification-details-list-wrapper">
+                                <ul role="list" class="spacification-details-list-wrap w-list-unstyled">
+                                    {% for attribute in product.attributes.all %}
+                                    <li class="spacification-details-list-item">
+                                        <div class="spacification-details-item-flex">
+                                            <div class="split-content">
+                                                <div class="spacification-details-text">{{ attribute.key }}</div>
+                                            </div>
+                                            <div class="split-content">
+                                                <div class="spacification-details-text black">{{ attribute.value }}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% else %}
+                            <div class="spacification-details-list-wrapper">
+                                <ul role="list" class="spacification-details-list-wrap w-list-unstyled">
+                                    <li class="spacification-details-list-item">
+                                        <div class="spacification-details-item-flex">
+                                            <div class="split-content">
+                                                <div class="spacification-details-text">No specifications available</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div data-w-tab="Tab 2" class="w-tab-pane" id="w-tabs-0-data-w-pane-1" role="tabpanel"
+                        aria-labelledby="w-tabs-0-data-w-tab-1">
+                        <div class="product-details-tab-single-content">
+                            <div class="product-description-wrap">
+                                <div class="product-description w-richtext">
+                                    <p>{{ product.description|safe }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div data-w-tab="Tab 3" class="w-tab-pane" id="w-tabs-0-data-w-pane-2" role="tabpanel"
+                        aria-labelledby="w-tabs-0-data-w-tab-2">
+                        <div class="product-details-tab-single-content">
+                            
+<!-- Review Statistics Section -->
+<div class="review-stats-container">
+    <!-- Total Reviews Card -->
+    <div class="stat-card">
+        <div class="stat-icon-wrapper">
+            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="stat-number">{{ total_reviews|default:"0" }}</div>
+        <div class="stat-label">Total Reviews</div>
+        <div class="stat-trend positive">
+            <svg class="trend-icon" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>21% growth this year</span>
+        </div>
+    </div>
+
+    <!-- Average Rating Card -->
+    <div class="stat-card featured">
+        <div class="stat-icon-wrapper primary">
+            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="stat-number primary">{{ average_rating|default:"0.0" }}</div>
+        <div class="star-display">
+            {% for i in "12345" %}
+                {% if i|add:"0" <= average_rating|default:0 %}
+                    <svg class="star filled" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                    </svg>
+                {% else %}
+                    <svg class="star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                    </svg>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="stat-label">Average Rating</div>
+    </div>
+
+<div class="stat-card wide">
+    <div class="stat-label-top">Rating Distribution</div>
+    <div class="rating-bars">
+        <div class="rating-row">
+            <span class="rating-label">5</span>
+            <div class="star-mini">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" style="width: {{ rating_5_percent }}%"></div>
+            </div>
+            <span class="rating-count">{{ rating_5_count }}</span>
+        </div>
+
+        <div class="rating-row">
+            <span class="rating-label">4</span>
+            <div class="star-mini">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" style="width: {{ rating_4_percent }}%"></div>
+            </div>
+            <span class="rating-count">{{ rating_4_count }}</span>
+        </div>
+
+        <div class="rating-row">
+            <span class="rating-label">3</span>
+            <div class="star-mini">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" style="width: {{ rating_3_percent }}%"></div>
+            </div>
+            <span class="rating-count">{{ rating_3_count }}</span>
+        </div>
+
+        <div class="rating-row">
+            <span class="rating-label">2</span>
+            <div class="star-mini">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" style="width: {{ rating_2_percent }}%"></div>
+            </div>
+            <span class="rating-count">{{ rating_2_count }}</span>
+        </div>
+
+        <div class="rating-row">
+            <span class="rating-label">1</span>
+            <div class="star-mini">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" style="width: {{ rating_1_percent }}%"></div>
+            </div>
+            <span class="rating-count">{{ rating_1_count }}</span>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<style>
+ /* Modern Review Statistics Design */
+.review-stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;  /* Reduced from 32px */
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0B3F66 0%, #7e1dfa 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+.stat-card.featured {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid #0B3F66;
+}
+
+.stat-card.wide {
+    grid-column: span 1;
+}
+
+.stat-icon-wrapper {
+    width: 58px;  /* Reduced from 56px */
+    height: 58px;  /* Reduced from 56px */
+    margin: 0 auto 16px;  /* Reduced from 20px */
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.stat-icon-wrapper.primary {
+    background: linear-gradient(135deg, #0B3F66 0%, #7e1dfa 100%);
+}
+
+.stat-card:hover .stat-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.stat-icon {
+    width: 34px;  /* Reduced from 28px */
+    height: 34px;  /* Reduced from 28px */
+    color: #6b7280;
+}
+
+.stat-icon-wrapper.primary .stat-icon {
+    color: #ffffff;
+}
+
+.stat-number {
+    font-size: 40px;  /* Reduced from 48px */
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+    margin-bottom: 8px;  /* Reduced from 12px */
+    font-family: 'Archivo', sans-serif;
+}
+
+.stat-number.primary {
+    background: linear-gradient(135deg, #0B3F66 0%, #7e1dfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 15px;  /* Reduced from 14px */
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;  /* Reduced from 16px */
+}
+
+.stat-label-top {
+    font-size: 16px;  /* Reduced from 16px */
+    font-weight: 600;
+    color: #1f2937;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;  /* Reduced from 24px */
+    text-align: center;
+}
+
+.star-display {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 12px;  /* Reduced from 16px */
+}
+
+.star-display .star {
+    width: 25px;  /* Reduced from 24px */
+    height:25px;  /* Reduced from 24px */
+    fill: #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.star-display .star.filled {
+    fill: #fbbf24;
+    filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3));
+}
+
+.stat-card:hover .star.filled {
+    transform: scale(1.1);
+}
+
+.stat-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;  /* Reduced from 8px 16px */
+    background: #ecfdf5;
+    border-radius: 20px;
+    font-size: 14px;  /* Reduced from 13px */
+    font-weight: 600;
+    color: #059669;
+}
+
+.stat-trend.positive {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.trend-icon {
+    width: 12px;  /* Reduced from 14px */
+    height: 12px;  /* Reduced from 14px */
+}
+
+.rating-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;  /* Reduced from 16px */
+}
+
+.rating-row {
+    display: grid;
+    grid-template-columns: 20px 20px 1fr 40px;
+    align-items: center;
+    gap: 10px;  /* Reduced from 12px */
+}
+
+.rating-label {
+    font-size: 17px;  /* Reduced from 15px */
+    font-weight: 600;
+    color: #374151;
+    text-align: right;
+}
+
+.star-mini {
+    width: 17px;  /* Reduced from 16px */
+    height: 17px;  /* Reduced from 16px */
+}
+
+.star-mini svg {
+    width: 100%;
+    height: 100%;
+    fill: #fbbf24;
+}
+
+.bar-container {
+    height: 10px;  /* Reduced from 10px */
+    background: #f3f4f6;
+    border-radius: 8px;  /* Reduced from 10px */
+    overflow: hidden;
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 8px;  /* Reduced from 10px */
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.rating-count {
+    font-size: 14px;  /* Reduced from 13px */
+    font-weight: 600;
+    color: #6b7280;
+    text-align: right;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .review-stats-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .stat-card {
+        padding: 20px;  /* Reduced from 24px */
+    }
+    
+    .stat-number {
+        font-size: 36px;  /* Reduced from 40px */
+    }
+    
+    .stat-card.wide {
+        grid-column: span 1;
+    }
+    
+    .rating-row {
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-card {
+        padding: 18px;  /* Reduced from 20px */
+    }
+    
+    .stat-icon-wrapper {
+        width: 44px;  /* Reduced from 48px */
+        height: 44px;  /* Reduced from 48px */
+        margin-bottom: 14px;  /* Reduced from 16px */
+    }
+    
+    .stat-icon {
+        width: 22px;  /* Reduced from 24px */
+        height: 22px;  /* Reduced from 24px */
+    }
+    
+    .stat-number {
+        font-size: 32px;  /* Reduced from 36px */
+        margin-bottom: 6px;  /* Reduced from 8px */
+    }
+    
+    .star-display .star {
+        width: 18px;  /* Reduced from 20px */
+        height: 18px;  /* Reduced from 20px */
+    }
+    
+    .rating-bars {
+        gap: 10px;  /* Reduced from 12px */
+    }
+}
+</style>
+                            {% if user_can_review %}
+<div class="write-review-box">
+    <h4>Write a Review</h4>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Review Title*</label>
+            <input type="text" name="title" required class="form-control" placeholder="Summarize your experience">
+        </div>
+
+        <div class="form-group">
+            <label>Rating*</label>
+            <div class="review-star-selector" id="reviewStarRating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <input type="hidden" name="rating" id="reviewRatingInput" required>
+        </div>
+
+        <div class="form-group">
+            <label>Your Review*</label>
+            <textarea name="content" required class="form-control" rows="5" placeholder="Share your experience with this product"></textarea>
+        </div>
+
+        <button type="submit" class="primary-button"><span>Submit Review</span></button>
+    </form>
+</div>
+{% else %}
+
+{% endif %}
+
+<style>
+/* Write Review Section - Checkout Style */
+.write-review-box {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.write-review-box h4 {
+    font-size: 25px;
+    font-weight: 600;
+    margin: 0 0 25px 0;
+    color: #000;
+    font-family: 'Archivo', sans-serif;
+}
+
+.write-review-box .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.write-review-box .form-group label {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    font-family: 'Archivo', sans-serif;
+}
+
+.write-review-box .form-control {
+    width: 100%;
+    padding: 15px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Archivo', sans-serif;
+    transition: border-color 0.3s;
+    background: #fff;
+}
+
+.write-review-box .form-control:focus {
+    outline: none;
+    border-color: #7e1dfa;
+}
+
+.write-review-box .form-control::placeholder {
+    color: #999;
+}
+
+.write-review-box textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.review-star-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+    font-size: 32px;
+}
+
+.review-star-selector .star {
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.review-star-selector .star:hover,
+.review-star-selector .star.hover,
+.review-star-selector .star.selected {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+.write-review-box .primary-button {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px 32px;
+    background: #0b3f66;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: none; /* prevent text animation */
+}
+
+/* CIRCLE (center expand) */
+.write-review-box .primary-button::before {
+    content: "";   /* IMPORTANT: no text here */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    background: #ef1b27;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.8s ease-out;
+    z-index: 0;
+}
+
+.write-review-box .primary-button:hover::before {
+    transform: translate(-50%, -50%) scale(60);
+}
+
+/* TEXT stays above */
+.write-review-box .primary-button span {
+    position: relative;
+    z-index: 2;
+}
+
+
+@media screen and (max-width: 767px) {
+    .write-review-box {
+        padding: 20px;
+    }
+    
+    .write-review-box h4 {
+        font-size: 18px;
+    }
+    
+    .review-star-selector {
+        font-size: 28px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Review star rating selector
+    const stars = document.querySelectorAll("#reviewStarRating .star");
+    const ratingInput = document.getElementById("reviewRatingInput");
+
+    if (stars.length > 0 && ratingInput) {
+        stars.forEach((star, index) => {
+            star.addEventListener("mouseover", () => {
+                stars.forEach(s => s.classList.remove("hover"));
+                for (let i = 0; i <= index; i++) {
+                    stars[i].classList.add("hover");
+                }
+            });
+
+            star.addEventListener("mouseout", () => {
+                stars.forEach(s => s.classList.remove("hover"));
+            });
+
+            star.addEventListener("click", () => {
+                ratingInput.value = index + 1;
+                stars.forEach(s => s.classList.remove("selected"));
+                for (let i = 0; i <= index; i++) {
+                    stars[i].classList.add("selected");
+                }
+            });
+        });
+    }
+});
+</script>
+
+                            <div class="product-details-reviews-wrap">
+                                {% for review in product.reviews.all %}
+                                <div class="product-details-reviews-single">
+                                    <div class="product-details-rivew-wrap">
+                                        <div class="product-details-rivew-author">
+                                            <div class="product-details-rivew-author-img-wrap">
+                                                <img loading="lazy"
+                                                    src="{% static 'img/stock_img/65c77802447b8996076c9818_Product Details Rivew Author Img.png' %}"
+                                                    alt="" class="product-details-rivew-author-img">
+                                            </div>
+                                            <div class="product-details-rivew-author-name">
+                                                {{ review.user.full_name|default:review.user.email }}
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="product-details-rivews">
+                                        <div class="product-details-rivews-star">
+                                            {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <img loading="lazy"
+                                                    src="{% static 'img/stock_img/65c77802447b8996076c9817_Product Rivew Star1.svg' %}"
+                                                    alt="" class="product-details-rivews-star-img">
+                                            {% else %}
+                                                <img loading="lazy"
+                                                    src="{% static 'img/stock_img/65c77802447b8996076c9816_Product Rivew Star2.svg' %}"
+                                                    alt="" class="product-details-rivews-star-img">
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <div class="product-details-rivews-text">{{ review.created_at|timesince }} ago</div>
+                                    </div>
+                                    <div class="product-details-title-date">
+                                        <h3 class="product-details-title">{{ review.title }}</h3>
+                                        <div class="product-details-rivew-date">{{ review.created_at|date:"jS M Y" }} by
+                                            {{ review.user.full_name|default:review.user.email }}</div>
+                                    </div>
+                                    <div class="product-details-description-wrap">
+                                        <p class="product-details-description-text">{{ review.content }}</p>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="product-details-reviews-single">
+                                    <p>No reviews yet.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity control functionality
+    const minusBtn = document.querySelector('.minus-btn');
+    const plusBtn = document.querySelector('.plus-btn');
+    const quantityInput = document.querySelector('.add-to-cart-quantity');
+    
+    if (minusBtn && plusBtn && quantityInput) {
+        minusBtn.addEventListener('click', function() {
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+        });
+        
+        plusBtn.addEventListener('click', function() {
+            let currentValue = parseInt(quantityInput.value);
+            let maxValue = parseInt(quantityInput.max);
+            if (currentValue < maxValue) {
+                quantityInput.value = currentValue + 1;
+            }
+        });
+    }
+
+    // Image gallery functionality
+    const moreImageWrappers = document.querySelectorAll('.single-more-image-wrapper');
+    const mainImage = document.getElementById('mainImage');
+    const zoomedImage = document.getElementById('zoomedImage');
+
+    moreImageWrappers.forEach(wrapper => {
+        wrapper.addEventListener('click', function() {
+            const imageUrl = this.getAttribute('data-image-url');
+            mainImage.src = imageUrl;
+            zoomedImage.src = imageUrl;
+            
+            document.querySelectorAll('.more-image-wrap').forEach(wrap => {
+                wrap.classList.remove('active');
+            });
+            this.querySelector('.more-image-wrap').classList.add('active');
+        });
+    });
+
+    // Image zoom functionality
+    const imageContainer = document.getElementById('imageZoomContainer');
+    const zoomLens = document.getElementById('zoomLens');
+    const zoomResult = document.getElementById('zoomResult');
+
+    if (imageContainer && mainImage && zoomLens && zoomResult && zoomedImage) {
+        zoomedImage.src = mainImage.src;
+
+        imageContainer.addEventListener('mouseenter', function() {
+            if (window.innerWidth > 991) {
+                zoomLens.style.display = 'block';
+                zoomResult.style.display = 'block';
+            }
+        });
+
+        imageContainer.addEventListener('mouseleave', function() {
+            zoomLens.style.display = 'none';
+            zoomResult.style.display = 'none';
+        });
+
+        imageContainer.addEventListener('mousemove', function(e) {
+            if (window.innerWidth > 991) {
+                const rect = imageContainer.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+
+                const lensWidth = zoomLens.offsetWidth / 2;
+                const lensHeight = zoomLens.offsetHeight / 2;
+
+                x = Math.max(lensWidth, Math.min(x, rect.width - lensWidth));
+                y = Math.max(lensHeight, Math.min(y, rect.height - lensHeight));
+
+                zoomLens.style.left = (x - lensWidth) + 'px';
+                zoomLens.style.top = (y - lensHeight) + 'px';
+
+                const zoomLevel = 2.5;
+                const fx = (zoomResult.offsetWidth / zoomLens.offsetWidth);
+                const fy = (zoomResult.offsetHeight / zoomLens.offsetHeight);
+
+                zoomedImage.style.width = (mainImage.width * zoomLevel) + 'px';
+                zoomedImage.style.height = (mainImage.height * zoomLevel) + 'px';
+                zoomedImage.style.left = -(x * fx * zoomLevel - zoomResult.offsetWidth / 2) + 'px';
+                zoomedImage.style.top = -(y * fy * zoomLevel - zoomResult.offsetHeight / 2) + 'px';
+            }
+        });
+    }
+
+    // Price formatting
+    const priceElements = document.querySelectorAll('[data-price]');
+    priceElements.forEach(element => {
+        const price = parseFloat(element.getAttribute('data-price'));
+        element.textContent = '₹' + price.toFixed(2);
+    });
+
+    // Discount calculation
+    const discountBadge = document.querySelector('.discount-badge');
+    if (discountBadge) {
+        const originalPrice = parseFloat(discountBadge.getAttribute('data-original'));
+        const offerPrice = parseFloat(discountBadge.getAttribute('data-offer'));
+        const discount = Math.round(((originalPrice - offerPrice) / originalPrice) * 100);
+        discountBadge.textContent = discount + '% OFF';
+    }
+});
+</script>
+
+{% endblock %}

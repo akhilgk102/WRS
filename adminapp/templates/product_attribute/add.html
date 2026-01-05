@@ -1,0 +1,108 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+{% block title %}{% if edit %}Update Attribute{% else %}Add Attribute{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <h5 class="card-title mb-0">
+        {% if edit %}Update Attribute for {{ product.name }}{% else %}Add Attribute for {{ product.name }}{% endif %}
+      </h5>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+          {{ message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="row gy-3">
+
+          <!-- Key -->
+          <div class="col-12">
+            <label class="form-label">Attribute Key</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:key-outline"></iconify-icon>
+              </span>
+
+              <input 
+                type="text" 
+                name="key" 
+                class="form-control"
+                placeholder="Enter key (e.g., Color, Size)" 
+                value="{{ attribute.key|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Value -->
+          <div class="col-12">
+            <label class="form-label">Attribute Value</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:tag-text-outline"></iconify-icon>
+              </span>
+
+              <input 
+                type="text" 
+                name="value" 
+                class="form-control"
+                placeholder="Enter value (e.g., Red, XL)" 
+                value="{{ attribute.value|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="col-12">
+            <div class="row">
+
+              <!-- Submit -->
+              <div class="col-md-6 col-12 mb-2">
+                {% if edit %}
+                <button class="btn btn-primary w-100">
+                  <i class="fa-regular fa-circle-check"></i>
+                  Update Attribute
+                </button>
+                {% else %}
+                <button class="btn btn-primary w-100">
+                  <i class="fa-regular fa-circle-check"></i>
+                  Add Attribute
+                </button>
+                {% endif %}
+              </div>
+
+              <!-- Cancel -->
+              <div class="col-md-6 col-12">
+                <a href="{% url 'attribute_list' product.id %}" class="btn btn-outline-secondary w-100">
+                  <i class="fa-regular fa-circle-xmark"></i>
+                  Cancel
+                </a>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

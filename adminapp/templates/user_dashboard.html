@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6fc;
+            margin: 0;
+        }
+
+        .topbar {
+            background: #7e1dfa;
+            padding: 15px 25px;
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-row div {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .links a {
+            display: block;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fd;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .links a:hover {
+            background: #7e1dfa;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    My Account
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h2 class="section-title">Welcome, {{ request.user.email }}</h2>
+
+        <div class="profile-row">
+            <div><b>Email:</b> {{ request.user.email }}</div>
+            <div><b>Mobile:</b> {{ request.user.mobile }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Quick Links</h2>
+
+        <div class="links">
+            <a href="#">🛒 My Orders</a>
+            <a href="#">❤️ Wishlist</a>
+            <a href="#">📦 Track Order</a>
+            <a href="#">⚙️ Edit Profile</a>
+            <a href="/logout/">🚪 Logout</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

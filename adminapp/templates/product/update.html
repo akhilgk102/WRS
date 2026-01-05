@@ -1,0 +1,378 @@
+{%extends 'admin_base.html'%}
+{%load static%}
+{%block title%}Edit Product{%endblock%}
+
+{%block content%}
+<!-- Product Edit Section -->
+<section class="section authentication">
+  <div class="container-wide">
+    <div class="auth-header">
+      <h1 class="sign-in-title">Edit Product</h1>
+      <p class="alternative-details">Update product information</p>
+    </div>
+
+    {% if messages %}
+    <div class="messages-wrapper">
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" class="product-form">
+      {% csrf_token %}
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name" class="form-label">Product Name</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            <input type="text" name="name" id="name" class="form-input" placeholder="Enter product name" value="{{ product.name }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category" class="form-label">Category</label>
+          <div class="input-wrapper">
+            <svg class="input-icon w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.583 8.445h.01M10.86 19.71l-6.573-6.63a.993.993 0 0 1 0-1.4l7.329-7.394A.98.98 0 0 1 12.31 4l5.734.007A1.968 1.968 0 0 1 20 5.983v5.5a.992.992 0 0 1-.316.727l-7.44 7.5a.974.974 0 0 1-1.384.001Z"/>
+            </svg>
+            <select name="category" id="category" class="form-input" required>
+              <option value="">-- Select Category --</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if product.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="subcategory" class="form-label">SubCategory (Optional)</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"></path>
+            </svg>
+            <select name="subcategory" id="subcategory" class="form-input">
+              <option value="">-- Optional --</option>
+              {% for sub in subcategories %}
+              <option value="{{ sub.id }}" {% if product.subcategory and product.subcategory.id == sub.id %}selected{% endif %}>{{ sub.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="brand" class="form-label">Brand (Optional)</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            <select name="brand" id="brand" class="form-input">
+              <option value="">-- Optional --</option>
+              {% for brand in brands %}
+              <option value="{{ brand.id }}" {% if product.brand and product.brand.id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Description</label>
+        <div class="input-wrapper">
+          <svg class="input-icon textarea-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <textarea name="description" id="description" class="form-input textarea-input" placeholder="Enter product description" rows="4">{{ product.description }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="price" class="form-label">Price</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <input type="number" step="0.01" name="price" id="price" class="form-input" placeholder="0.00" value="{{ product.price }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="stock" class="form-label">Stock</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <input type="number" name="stock" id="stock" class="form-input" placeholder="Enter stock quantity" value="{{ product.stock }}" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sku" class="form-label">SKU</label>
+        <div class="input-wrapper">
+          <svg class="input-icon w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M2.9917 4.9834V18.917M9.96265 4.9834V18.917M15.9378 4.9834V18.917m2.9875-13.9336V18.917"/>
+            <path stroke="currentColor" stroke-linecap="round" d="M5.47925 4.4834V19.417m1.9917-14.9336V19.417M21.4129 4.4834V19.417M13.4461 4.4834V19.417"/>
+          </svg>
+          <input type="text" name="sku" id="sku" class="form-input" placeholder="Enter SKU code" value="{{ product.sku }}">
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="is_featured" id="is_featured" class="checkbox-input" {% if product.is_featured %}checked{% endif %}>
+          <span class="checkbox-text">Featured Product</span>
+        </label>
+      </div>
+
+      <button type="submit" class="submit-button">
+        <span>Update Product</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  .section.authentication {
+    background: #f7fafc;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .container-wide {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding-left: 150px;
+    padding-right: 150px;
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .sign-in-title {
+    color: #1a202c;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .alternative-details {
+    color: #718096;
+    font-size: 15px;
+    margin: 0;
+  }
+
+  .messages-wrapper {
+    margin-bottom: 24px;
+  }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+  }
+
+  .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  .product-form {
+    width: 100%;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+    width: 100%;
+  }
+
+  .form-label {
+    color: #2d3748;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .textarea-icon {
+    top: 16px;
+    transform: none;
+  }
+
+  .form-input {
+    width: 100%;
+    height: 55px;
+    padding: 0 16px 0 48px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background: #fff;
+    font-family: 'Archivo', sans-serif;
+  }
+
+  .form-input::placeholder {
+    color: #a0aec0;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #7e1dfa;
+    box-shadow: 0 0 0 3px rgba(126, 29, 250, 0.1);
+  }
+
+  select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 48px;
+  }
+
+  .textarea-input {
+    height: auto;
+    min-height: 120px;
+    padding: 16px 16px 16px 48px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .checkbox-group {
+    margin-bottom: 32px;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox-input {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    cursor: pointer;
+    accent-color: #7e1dfa;
+  }
+
+  .checkbox-text {
+    color: #2d3748;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .submit-button {
+    width: 100%;
+    height: 52px;
+    background: #7e1dfa;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+    font-family: 'Archivo', sans-serif;
+  }
+
+  .submit-button:hover {
+    background: #6a18d4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(126, 29, 250, 0.3);
+  }
+
+  .submit-button:active {
+    transform: translateY(0);
+  }
+
+  @media screen and (max-width: 768px) {
+    .container-wide {
+      padding: 30px 20px;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .sign-in-title {
+      font-size: 26px;
+    }
+  }
+
+  @media screen and (max-width: 479px) {
+    .container-wide {
+      padding: 20px 15px;
+    }
+
+    .sign-in-title {
+      font-size: 24px;
+    }
+  }
+</style>
+
+{%endblock%}

@@ -1,0 +1,10 @@
+<form method="POST">
+    {% csrf_token %}
+    <input name="full_name" value="{{ address.full_name }}">
+    <input name="phone" value="{{ address.phone }}">
+    <textarea name="street">{{ address.street }}</textarea>
+    <input name="city" value="{{ address.city }}">
+    <input name="state" value="{{ address.state }}">
+    <input name="pincode" value="{{ address.pincode }}">
+    <button type="submit">Update Address</button>
+</form>

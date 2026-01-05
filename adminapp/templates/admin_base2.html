@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+{%load static%}
+<!-- saved from url=(0042)https://www.wow-dash.com/demo/index-3.html -->
+<html lang="en" data-theme="light">
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+        /* Hide dashboard statistics on mobile devices */
+        @media (max-width: 767px) {
+            .row.gy-4.mt-1 {
+                display: none !important;
+            }
+        }
+
+        /* Alternative: If you want more specific targeting */
+        @media (max-width: 767px) {
+
+            /* Hide Sales Statistic card */
+            .row.gy-4.mt-1>.col-xxl-6.col-xl-12,
+            /* Hide Total Subscriber card */
+            .row.gy-4.mt-1>.col-xxl-3.col-xl-6 {
+                display: none !important;
+            }
+        }
+
+        body {
+            transition: opacity ease-in 0.2s;
+        }
+
+        body[unresolved] {
+            opacity: 0;
+            display: block;
+            overflow: hidden;
+            position: relative;
+        }
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{%block title%} {%endblock%}</title>
+    <link rel="icon" type="image/png" href="https://www.wow-dash.com/demo/assets/images/favicon.png" sizes="16x16">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* vietnamese */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLySOxK-vA.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLyTOxK-vA.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLySOxK-vA.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLyTOxK-vA.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLySOxK-vA.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLyTOxK-vA.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLySOxK-vA.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLyTOxK-vA.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLySOxK-vA.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLyTOxK-vA.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+    </style>
+
+    <!-- remix icon font css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/remixicon.css' %}">
+
+    <!-- BootStrap css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/bootstrap.min.css' %}">
+
+    <!-- Apex Chart css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/apexcharts.css' %}">
+
+    <!-- Data Table css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/dataTables.min.css' %}">
+
+    <!-- Text Editor css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/editor-katex.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_css/editor.atom-one-dark.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_css/editor.quill.snow.css' %}">
+
+    <!-- Date picker css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/flatpickr.min.css' %}">
+
+    <!-- Calendar css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/full-calendar.css' %}">
+
+    <!-- Vector Map css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/jquery-jvectormap-2.0.5.css' %}">
+
+    <!-- Popup css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/magnific-popup.css' %}">
+
+    <!-- Slick Slider css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/slick.css' %}">
+
+    <!-- prism css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/prism.css' %}">
+
+    <!-- file upload css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/file-upload.css' %}">
+
+    <!-- Audio player css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/audioplayer.css' %}">
+
+    <!-- main css -->
+    <link rel="stylesheet" href="{% static 'css/admin_css/style.css' %}">
+
+    <style id="apexcharts-css">
+        @keyframes opaque {
+            0% {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes resizeanim {
+
+            0%,
+            to {
+                opacity: 0
+            }
+        }
+
+        .apexcharts-canvas {
+            position: relative;
+            user-select: none
+        }
+
+        .apexcharts-canvas ::-webkit-scrollbar {
+            -webkit-appearance: none;
+            width: 6px
+        }
+
+        .apexcharts-canvas ::-webkit-scrollbar-thumb {
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, .5);
+            box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+            -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5)
+        }
+
+        .apexcharts-inner {
+            position: relative
+        }
+
+        .apexcharts-text tspan {
+            font-family: inherit
+        }
+
+        .legend-mouseover-inactive {
+            transition: .15s ease all;
+            opacity: .2
+        }
+
+        .apexcharts-legend-text {
+            padding-left: 15px;
+            margin-left: -15px;
+        }
+
+        .apexcharts-series-collapsed {
+            opacity: 0
+        }
+
+        .apexcharts-tooltip {
+            border-radius: 5px;
+            box-shadow: 2px 2px 6px -4px #999;
+            cursor: default;
+            font-size: 14px;
+            left: 62px;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 12;
+            transition: .15s ease all
+        }
+
+        .apexcharts-tooltip.apexcharts-active {
+            opacity: 1;
+            transition: .15s ease all
+        }
+
+        .apexcharts-tooltip.apexcharts-theme-light {
+            border: 1px solid #e3e3e3;
+            background: rgba(255, 255, 255, .96)
+        }
+
+        .apexcharts-tooltip.apexcharts-theme-dark {
+            color: #fff;
+            background: rgba(30, 30, 30, .8)
+        }
+
+        .apexcharts-tooltip * {
+            font-family: inherit
+        }
+
+        .apexcharts-tooltip-title {
+            padding: 6px;
+            font-size: 15px;
+            margin-bottom: 4px
+        }
+
+        .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title {
+            background: #eceff1;
+            border-bottom: 1px solid #ddd
+        }
+
+        .apexcharts-tooltip.apexcharts-theme-dark .apexcharts-tooltip-title {
+            background: rgba(0, 0, 0, .7);
+            border-bottom: 1px solid #333
+        }
+
+        .apexcharts-tooltip-text-goals-value,
+        .apexcharts-tooltip-text-y-value,
+        .apexcharts-tooltip-text-z-value {
+            display: inline-block;
+            margin-left: 5px;
+            font-weight: 600
+        }
+
+        .apexcharts-tooltip-text-goals-label:empty,
+        .apexcharts-tooltip-text-goals-value:empty,
+        .apexcharts-tooltip-text-y-label:empty,
+        .apexcharts-tooltip-text-y-value:empty,
+        .apexcharts-tooltip-text-z-value:empty,
+        .apexcharts-tooltip-title:empty {
+            display: none
+        }
+
+        .apexcharts-tooltip-text-goals-label,
+        .apexcharts-tooltip-text-goals-value {
+            padding: 6px 0 5px
+        }
+
+        .apexcharts-tooltip-goals-group,
+        .apexcharts-tooltip-text-goals-label,
+        .apexcharts-tooltip-text-goals-value {
+            display: flex
+        }
+
+        .apexcharts-tooltip-text-goals-label:not(:empty),
+        .apexcharts-tooltip-text-goals-value:not(:empty) {
+            margin-top: -6px
+        }
+
+        .apexcharts-tooltip-marker {
+            width: 12px;
+            height: 12px;
+            position: relative;
+            top: 0;
+            margin-right: 10px;
+            border-radius: 50%
+        }
+
+        .apexcharts-tooltip-series-group {
+            padding: 0 10px;
+            display: none;
+            text-align: left;
+            justify-content: left;
+            align-items: center
+        }
+
+        .apexcharts-tooltip-series-group.apexcharts-active .apexcharts-tooltip-marker {
+            opacity: 1
+        }
+
+        .apexcharts-tooltip-series-group.apexcharts-active,
+        .apexcharts-tooltip-series-group:last-child {
+            padding-bottom: 4px
+        }
+
+        .apexcharts-tooltip-series-group-hidden {
+            opacity: 0;
+            height: 0;
+            line-height: 0;
+            padding: 0 !important
+        }
+
+        .apexcharts-tooltip-y-group {
+            padding: 6px 0 5px
+        }
+
+        .apexcharts-custom-tooltip,
+        .apexcharts-tooltip-box {
+            padding: 4px 8px
+        }
+
+        .apexcharts-tooltip-boxPlot {
+            display: flex;
+            flex-direction: column-reverse
+        }
+
+        .apexcharts-tooltip-box>div {
+            margin: 4px 0
+        }
+
+        .apexcharts-tooltip-box span.value {
+            font-weight: 700
+        }
+
+        .apexcharts-tooltip-rangebar {
+            padding: 5px 8px
+        }
+
+        .apexcharts-tooltip-rangebar .category {
+            font-weight: 600;
+            color: #777
+        }
+
+        .apexcharts-tooltip-rangebar .series-name {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px
+        }
+
+        .apexcharts-xaxistooltip,
+        .apexcharts-yaxistooltip {
+            opacity: 0;
+            pointer-events: none;
+            color: #373d3f;
+            font-size: 13px;
+            text-align: center;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+            background: #eceff1;
+            border: 1px solid #90a4ae
+        }
+
+        .apexcharts-xaxistooltip {
+            padding: 9px 10px;
+            transition: .15s ease all
+        }
+
+        .apexcharts-xaxistooltip.apexcharts-theme-dark {
+            background: rgba(0, 0, 0, .7);
+            border: 1px solid rgba(0, 0, 0, .5);
+            color: #fff
+        }
+
+        .apexcharts-xaxistooltip:after,
+        .apexcharts-xaxistooltip:before {
+            left: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none
+        }
+
+        .apexcharts-xaxistooltip:after {
+            border-color: transparent;
+            border-width: 6px;
+            margin-left: -6px
+        }
+
+        .apexcharts-xaxistooltip:before {
+            border-color: transparent;
+            border-width: 7px;
+            margin-left: -7px
+        }
+
+        .apexcharts-xaxistooltip-bottom:after,
+        .apexcharts-xaxistooltip-bottom:before {
+            bottom: 100%
+        }
+
+        .apexcharts-xaxistooltip-top:after,
+        .apexcharts-xaxistooltip-top:before {
+            top: 100%
+        }
+
+        .apexcharts-xaxistooltip-bottom:after {
+            border-bottom-color: #eceff1
+        }
+
+        .apexcharts-xaxistooltip-bottom:before {
+            border-bottom-color: #90a4ae
+        }
+
+        .apexcharts-xaxistooltip-bottom.apexcharts-theme-dark:after,
+        .apexcharts-xaxistooltip-bottom.apexcharts-theme-dark:before {
+            border-bottom-color: rgba(0, 0, 0, .5)
+        }
+
+        .apexcharts-xaxistooltip-top:after {
+            border-top-color: #eceff1
+        }
+
+        .apexcharts-xaxistooltip-top:before {
+            border-top-color: #90a4ae
+        }
+
+        .apexcharts-xaxistooltip-top.apexcharts-theme-dark:after,
+        .apexcharts-xaxistooltip-top.apexcharts-theme-dark:before {
+            border-top-color: rgba(0, 0, 0, .5)
+        }
+
+        .apexcharts-xaxistooltip.apexcharts-active {
+            opacity: 1;
+            transition: .15s ease all
+        }
+
+        .apexcharts-yaxistooltip {
+            padding: 4px 10px
+        }
+
+        .apexcharts-yaxistooltip.apexcharts-theme-dark {
+            background: rgba(0, 0, 0, .7);
+            border: 1px solid rgba(0, 0, 0, .5);
+            color: #fff
+        }
+
+        .apexcharts-yaxistooltip:after,
+        .apexcharts-yaxistooltip:before {
+            top: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none
+        }
+
+        .apexcharts-yaxistooltip:after {
+            border-color: transparent;
+            border-width: 6px;
+            margin-top: -6px
+        }
+
+        .apexcharts-yaxistooltip:before {
+            border-color: transparent;
+            border-width: 7px;
+            margin-top: -7px
+        }
+
+        .apexcharts-yaxistooltip-left:after,
+        .apexcharts-yaxistooltip-left:before {
+            left: 100%
+        }
+
+        .apexcharts-yaxistooltip-right:after,
+        .apexcharts-yaxistooltip-right:before {
+            right: 100%
+        }
+
+        .apexcharts-yaxistooltip-left:after {
+            border-left-color: #eceff1
+        }
+
+        .apexcharts-yaxistooltip-left:before {
+            border-left-color: #90a4ae
+        }
+
+        .apexcharts-yaxistooltip-left.apexcharts-theme-dark:after,
+        .apexcharts-yaxistooltip-left.apexcharts-theme-dark:before {
+            border-left-color: rgba(0, 0, 0, .5)
+        }
+
+        .apexcharts-yaxistooltip-right:after {
+            border-right-color: #eceff1
+        }
+
+        .apexcharts-yaxistooltip-right:before {
+            border-right-color: #90a4ae
+        }
+
+        .apexcharts-yaxistooltip-right.apexcharts-theme-dark:after,
+        .apexcharts-yaxistooltip-right.apexcharts-theme-dark:before {
+            border-right-color: rgba(0, 0, 0, .5)
+        }
+
+        .apexcharts-yaxistooltip.apexcharts-active {
+            opacity: 1
+        }
+
+        .apexcharts-yaxistooltip-hidden {
+            display: none
+        }
+
+        .apexcharts-xcrosshairs,
+        .apexcharts-ycrosshairs {
+            pointer-events: none;
+            opacity: 0;
+            transition: .15s ease all
+        }
+
+        .apexcharts-xcrosshairs.apexcharts-active,
+        .apexcharts-ycrosshairs.apexcharts-active {
+            opacity: 1;
+            transition: .15s ease all
+        }
+
+        .apexcharts-ycrosshairs-hidden {
+            opacity: 0
+        }
+
+        .apexcharts-selection-rect {
+            cursor: move
+        }
+
+        .svg_select_boundingRect,
+        .svg_select_points_rot {
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden
+        }
+
+        .apexcharts-selection-rect+g .svg_select_boundingRect,
+        .apexcharts-selection-rect+g .svg_select_points_rot {
+            opacity: 0;
+            visibility: hidden
+        }
+
+        .apexcharts-selection-rect+g .svg_select_points_l,
+        .apexcharts-selection-rect+g .svg_select_points_r {
+            cursor: ew-resize;
+            opacity: 1;
+            visibility: visible
+        }
+
+        .svg_select_points {
+            fill: #efefef;
+            stroke: #333;
+            rx: 2
+        }
+
+        .apexcharts-svg.apexcharts-zoomable.hovering-zoom {
+            cursor: crosshair
+        }
+
+        .apexcharts-svg.apexcharts-zoomable.hovering-pan {
+            cursor: move
+        }
+
+        .apexcharts-menu-icon,
+        .apexcharts-pan-icon,
+        .apexcharts-reset-icon,
+        .apexcharts-selection-icon,
+        .apexcharts-toolbar-custom-icon,
+        .apexcharts-zoom-icon,
+        .apexcharts-zoomin-icon,
+        .apexcharts-zoomout-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            line-height: 24px;
+            color: #6e8192;
+            text-align: center
+        }
+
+        .apexcharts-menu-icon svg,
+        .apexcharts-reset-icon svg,
+        .apexcharts-zoom-icon svg,
+        .apexcharts-zoomin-icon svg,
+        .apexcharts-zoomout-icon svg {
+            fill: #6e8192
+        }
+
+        .apexcharts-selection-icon svg {
+            fill: #444;
+            transform: scale(.76)
+        }
+
+        .apexcharts-theme-dark .apexcharts-menu-icon svg,
+        .apexcharts-theme-dark .apexcharts-pan-icon svg,
+        .apexcharts-theme-dark .apexcharts-reset-icon svg,
+        .apexcharts-theme-dark .apexcharts-selection-icon svg,
+        .apexcharts-theme-dark .apexcharts-toolbar-custom-icon svg,
+        .apexcharts-theme-dark .apexcharts-zoom-icon svg,
+        .apexcharts-theme-dark .apexcharts-zoomin-icon svg,
+        .apexcharts-theme-dark .apexcharts-zoomout-icon svg {
+            fill: #f3f4f5
+        }
+
+        .apexcharts-canvas .apexcharts-reset-zoom-icon.apexcharts-selected svg,
+        .apexcharts-canvas .apexcharts-selection-icon.apexcharts-selected svg,
+        .apexcharts-canvas .apexcharts-zoom-icon.apexcharts-selected svg {
+            fill: #008ffb
+        }
+
+        .apexcharts-theme-light .apexcharts-menu-icon:hover svg,
+        .apexcharts-theme-light .apexcharts-reset-icon:hover svg,
+        .apexcharts-theme-light .apexcharts-selection-icon:not(.apexcharts-selected):hover svg,
+        .apexcharts-theme-light .apexcharts-zoom-icon:not(.apexcharts-selected):hover svg,
+        .apexcharts-theme-light .apexcharts-zoomin-icon:hover svg,
+        .apexcharts-theme-light .apexcharts-zoomout-icon:hover svg {
+            fill: #333
+        }
+
+        .apexcharts-menu-icon,
+        .apexcharts-selection-icon {
+            position: relative
+        }
+
+        .apexcharts-reset-icon {
+            margin-left: 5px
+        }
+
+        .apexcharts-menu-icon,
+        .apexcharts-reset-icon,
+        .apexcharts-zoom-icon {
+            transform: scale(.85)
+        }
+
+        .apexcharts-zoomin-icon,
+        .apexcharts-zoomout-icon {
+            transform: scale(.7)
+        }
+
+        .apexcharts-zoomout-icon {
+            margin-right: 3px
+        }
+
+        .apexcharts-pan-icon {
+            transform: scale(.62);
+            position: relative;
+            left: 1px;
+            top: 0
+        }
+
+        .apexcharts-pan-icon svg {
+            fill: #fff;
+            stroke: #6e8192;
+            stroke-width: 2
+        }
+
+        .apexcharts-pan-icon.apexcharts-selected svg {
+            stroke: #008ffb
+        }
+
+        .apexcharts-pan-icon:not(.apexcharts-selected):hover svg {
+            stroke: #333
+        }
+
+        .apexcharts-toolbar {
+            position: absolute;
+            z-index: 11;
+            max-width: 176px;
+            text-align: right;
+            border-radius: 3px;
+            padding: 0 6px 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .apexcharts-menu {
+            background: #fff;
+            position: absolute;
+            top: 100%;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 3px;
+            right: 10px;
+            opacity: 0;
+            min-width: 110px;
+            transition: .15s ease all;
+            pointer-events: none
+        }
+
+        .apexcharts-menu.apexcharts-menu-open {
+            opacity: 1;
+            pointer-events: all;
+            transition: .15s ease all
+        }
+
+        .apexcharts-menu-item {
+            padding: 6px 7px;
+            font-size: 12px;
+            cursor: pointer
+        }
+
+        .apexcharts-theme-light .apexcharts-menu-item:hover {
+            background: #eee
+        }
+
+        .apexcharts-theme-dark .apexcharts-menu {
+            background: rgba(0, 0, 0, .7);
+            color: #fff
+        }
+
+        @media screen and (min-width:768px) {
+            .apexcharts-canvas:hover .apexcharts-toolbar {
+                opacity: 1
+            }
+        }
+
+        .apexcharts-canvas .apexcharts-element-hidden,
+        .apexcharts-datalabel.apexcharts-element-hidden,
+        .apexcharts-hide .apexcharts-series-points {
+            opacity: 0
+        }
+
+        .apexcharts-hidden-element-shown {
+            opacity: 1;
+            transition: 0.25s ease all;
+        }
+
+        .apexcharts-datalabel,
+        .apexcharts-datalabel-label,
+        .apexcharts-datalabel-value,
+        .apexcharts-datalabels,
+        .apexcharts-pie-label {
+            cursor: default;
+            pointer-events: none
+        }
+
+        .apexcharts-pie-label-delay {
+            opacity: 0;
+            animation-name: opaque;
+            animation-duration: .3s;
+            animation-fill-mode: forwards;
+            animation-timing-function: ease
+        }
+
+        .apexcharts-annotation-rect,
+        .apexcharts-area-series .apexcharts-area,
+        .apexcharts-area-series .apexcharts-series-markers .apexcharts-marker.no-pointer-events,
+        .apexcharts-gridline,
+        .apexcharts-line,
+        .apexcharts-line-series .apexcharts-series-markers .apexcharts-marker.no-pointer-events,
+        .apexcharts-point-annotation-label,
+        .apexcharts-radar-series path,
+        .apexcharts-radar-series polygon,
+        .apexcharts-toolbar svg,
+        .apexcharts-tooltip .apexcharts-marker,
+        .apexcharts-xaxis-annotation-label,
+        .apexcharts-yaxis-annotation-label,
+        .apexcharts-zoom-rect {
+            pointer-events: none
+        }
+
+        .apexcharts-marker {
+            transition: .15s ease all
+        }
+
+        .resize-triggers {
+            animation: 1ms resizeanim;
+            visibility: hidden;
+            opacity: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden
+        }
+
+        .contract-trigger:before,
+        .resize-triggers,
+        .resize-triggers>div {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0
+        }
+
+        .resize-triggers>div {
+            height: 100%;
+            width: 100%;
+            background: #eee;
+            overflow: auto
+        }
+
+        .contract-trigger:before {
+            overflow: hidden;
+            width: 200%;
+            height: 200%
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Theme Customization Structure Start -->
+    <div class="body-overlay"></div>
+
+    <button type="button"
+        class="theme-customization__button w-48-px h-48-px bg-primary-600 text-white rounded-circle d-flex justify-content-center align-items-center position-fixed end-0 bottom-0 mb-40 me-40 text-2xxl bg-hover-primary-700"
+        fdprocessedid="h3s6w">
+        <i class="ri-settings-3-line animate-spin"></i>
+    </button>
+    <div class="theme-customization-sidebar w-100 bg-base h-100vh overflow-y-auto position-fixed end-0 top-0 shadow-lg">
+        <div class="d-flex align-items-center gap-3 py-16 px-24 justify-content-between border-bottom">
+            <div>
+                <h6 class="text-sm dark:text-white">Theme Settings</h6>
+                <p class="text-xs mb-0 text-neutral-500 dark:text-neutral-200">Customize and preview instantly</p>
+            </div>
+            <button data-slot="button"
+                class="theme-customization-sidebar__close text-neutral-900 bg-transparent text-hover-primary-600 d-flex text-xl">
+                <i class="ri-close-fill"></i>
+            </button>
+        </div>
+
+        <div class="d-flex flex-column gap-48 p-24 overflow-y-auto flex-grow-1">
+
+            <div class="theme-setting-item">
+                <h6 class="fw-medium text-primary-light text-md mb-3">Theme Mode</h6>
+                <div class="d-grid grid-cols-3 gap-3 dark-light-mode">
+                    <button type="button"
+                        class="theme-btn theme-setting-item__btn d-flex align-items-center justify-content-center h-64-px rounded-3 text-xl active"
+                        data-theme="light">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <button type="button"
+                        class="theme-btn theme-setting-item__btn d-flex align-items-center justify-content-center h-64-px rounded-3 text-xl"
+                        data-theme="dark">
+                        <i class="ri-moon-line"></i>
+                    </button>
+                    <button type="button"
+                        class="theme-btn theme-setting-item__btn d-flex align-items-center justify-content-center h-64-px rounded-3 text-xl"
+                        data-theme="system">
+                        <i class="ri-computer-line"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="theme-setting-item">
+                <h6 class="fw-medium text-primary-light text-md mb-3">Page Direction</h6>
+                <div class="d-grid grid-cols-2 gap-3">
+                    <button type="button"
+                        class="theme-setting-item__btn ltr-mode-btn d-flex align-items-center justify-content-center gap-2 h-56-px rounded-3 text-xl">
+                        <span><i class="ri-align-item-left-line"></i></span>
+                        <span class="h6 text-sm font-medium mb-0">LTR</span>
+                    </button>
+
+                    <button type="button"
+                        class="theme-setting-item__btn rtl-mode-btn d-flex align-items-center justify-content-center gap-2 h-56-px rounded-3 text-xl">
+                        <span class="h6 text-sm font-medium mb-0">RTL</span>
+                        <span><i class="ri-align-item-right-line"></i></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="theme-setting-item">
+                <h6 class="fw-medium text-primary-light text-md mb-3">Color Schema</h6>
+                <div class="d-grid grid-cols-3 gap-3">
+                    <button type="button"
+                        class="color-picker-btn d-flex flex-column justify-content-center align-items-center active"
+                        data-color="blue">
+                        <span class="color-picker-btn__box h-40-px w-100 rounded-3"
+                            style="background-color: #2563eb;"></span>
+                        <span class="fw-medium mt-1" style="color: #2563eb;">Blue</span>
+                    </button>
+                    <button type="button"
+                        class="color-picker-btn d-flex flex-column justify-content-center align-items-center"
+                        data-color="red">
+                        <span class="color-picker-btn__box h-40-px w-100 rounded-3"
+                            style="background-color: #dc2626;"></span>
+                        <span class="fw-medium mt-1" style="color: #dc2626;">Red</span>
+                    </button>
+                    <button type="button"
+                        class="color-picker-btn d-flex flex-column justify-content-center align-items-center"
+                        data-color="green">
+                        <span class="color-picker-btn__box h-40-px w-100 rounded-3"
+                            style="background-color: #16a34a;"></span>
+                        <span class="fw-medium mt-1" style="color: #16a34a;">Green</span>
+                    </button>
+                    <button type="button"
+                        class="color-picker-btn d-flex flex-column justify-content-center align-items-center"
+                        data-color="yellow">
+                        <span class="color-picker-btn__box h-40-px w-100 rounded-3"
+                            style="background-color: #ff9f29;"></span>
+                        <span class="fw-medium mt-1" style="color: #ff9f29;">Yellow</span>
+                    </button>
+                    <button type="button"
+                        class="color-picker-btn d-flex flex-column justify-content-center align-items-center"
+                        data-color="cyan">
+                        <span class="color-picker-btn__box h-40-px w-100 rounded-3"
+                            style="background-color: #00b8f2;"></span>
+                        <span class="fw-medium mt-1" style="color: #00b8f2;">Cyan</span>
+                    </button>
+                    <button type="button"
+                        class="color-picker-btn d-flex flex-column justify-content-center align-items-center"
+                        data-color="violet">
+                        <span class="color-picker-btn__box h-40-px w-100 rounded-3"
+                            style="background-color: #7c3aed;"></span>
+                        <span class="fw-medium mt-1" style="color: #7c3aed;">Violet</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Theme Customization Structure End -->
+    <aside class="sidebar">
+        <button type="button" class="sidebar-close-btn">
+            <iconify-icon icon="radix-icons:cross-2"><template shadowrootmode="open">
+                    <style data-style="data-style">
+                        :host {
+                            display: inline-block;
+                            vertical-align: 0
+                        }
+
+                        span,
+                        svg {
+                            display: block
+                        }
+                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 15 15">
+                        <path fill="currentColor"
+                            d="M10.969 3.219a.574.574 0 1 1 .812.812L8.313 7.5l3.468 3.469l.074.09a.575.575 0 0 1-.796.796l-.09-.074L7.5 8.312l-3.469 3.47a.574.574 0 1 1-.812-.813L6.688 7.5l-3.47-3.469l-.073-.09a.575.575 0 0 1 .796-.797l.09.075L7.5 6.687z">
+                        </path>
+                    </svg>
+                </template></iconify-icon>
+        </button>
+        <div>
+            <a href="{%url 'dashboard'%}" class="sidebar-logo">
+                <img src="{% static 'img/wrs_longlogo.png' %}" alt="site logo"  class="light-logo">
+                <img src="{% static 'img/wrs_longlogo.png' %}" alt="site logo" class="dark-logo">
+                <img src="{% static 'img/wrs_longlogo.png' %}" alt="site logo" class="logo-icon">
+            </a>
+
+        </div>
+        <div class="sidebar-menu-area open">
+            <ul class="sidebar-menu show" id="sidebar-menu">
+                <li class=" ">
+                    <a href="{%url 'dashboard'%}">
+                        <iconify-icon icon="solar:home-smile-angle-outline" class="menu-icon"><template
+                                shadowrootmode="open">
+                                <style data-style="data-style">
+                                    :host {
+                                        display: inline-block;
+                                        vertical-align: 0
+                                    }
+
+                                    span,
+                                    svg {
+                                        display: block
+                                    }
+                                </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                    viewBox="0 0 24 24">
+                                    <path fill="currentColor"
+                                        d="M9.447 15.397a.75.75 0 1 0-.894 1.205A5.77 5.77 0 0 0 12 17.75a5.77 5.77 0 0 0 3.447-1.148a.75.75 0 1 0-.893-1.205A4.27 4.27 0 0 1 12 16.25a4.27 4.27 0 0 1-2.553-.853">
+                                    </path>
+                                    <path fill="currentColor" fill-rule="evenodd"
+                                        d="M12 1.25c-.725 0-1.387.2-2.11.537c-.702.327-1.512.81-2.528 1.415l-1.456.867c-1.119.667-2.01 1.198-2.686 1.706C2.523 6.3 2 6.84 1.66 7.551c-.342.711-.434 1.456-.405 2.325c.029.841.176 1.864.36 3.146l.293 2.032c.237 1.65.426 2.959.707 3.978c.29 1.05.702 1.885 1.445 2.524c.742.64 1.63.925 2.716 1.062c1.056.132 2.387.132 4.066.132h2.316c1.68 0 3.01 0 4.066-.132c1.086-.137 1.974-.422 2.716-1.061c.743-.64 1.155-1.474 1.445-2.525c.281-1.02.47-2.328.707-3.978l.292-2.032c.185-1.282.332-2.305.36-3.146c.03-.87-.062-1.614-.403-2.325S21.477 6.3 20.78 5.775c-.675-.508-1.567-1.039-2.686-1.706l-1.456-.867c-1.016-.605-1.826-1.088-2.527-1.415c-.724-.338-1.386-.537-2.111-.537M8.096 4.511c1.057-.63 1.803-1.073 2.428-1.365c.609-.284 1.047-.396 1.476-.396s.867.112 1.476.396c.625.292 1.37.735 2.428 1.365l1.385.825c1.165.694 1.986 1.184 2.59 1.638c.587.443.91.809 1.11 1.225c.199.416.282.894.257 1.626c-.026.75-.16 1.691-.352 3.026l-.28 1.937c-.246 1.714-.422 2.928-.675 3.845c-.247.896-.545 1.415-.977 1.787c-.433.373-.994.593-1.925.71c-.951.119-2.188.12-3.93.12h-2.213c-1.743 0-2.98-.001-3.931-.12c-.93-.117-1.492-.337-1.925-.71c-.432-.372-.73-.891-.977-1.787c-.253-.917-.43-2.131-.676-3.845l-.279-1.937c-.192-1.335-.326-2.277-.352-3.026c-.025-.732.058-1.21.258-1.626s.521-.782 1.11-1.225c.603-.454 1.424-.944 2.589-1.638z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </template></iconify-icon>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-group-title">Application</li>
+
+                                <li class="dropdown">
+                                    <a href="javascript:void(0)">
+                                        <iconify-icon icon="mdi:view-grid-outline" class="menu-icon"></iconify-icon>
+                                        <span>Category</span>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li>
+                                            <a href="{%url 'category_list'%}"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
+                                                List</a>
+                                        </li>
+                                
+                                        <li>
+                                            <a href="{%url 'category_create'%}"><i class="ri-circle-fill circle-icon text-danger-main w-auto"></i> Add
+                                                new</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="javascript:void(0)">
+                                        <iconify-icon icon="lucide:layers" class="menu-icon"></iconify-icon>
+
+                                        <span>Sub Category</span>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li>
+                                            <a href="{%url 'subcategory_list'%}"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
+                                                List</a>
+                                        </li>
+                                
+                                        <li>
+                                            <a href="{%url 'subcategory_create'%}"><i class="ri-circle-fill circle-icon text-danger-main w-auto"></i> Add
+                                                new</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="javascript:void(0)">
+                                        <iconify-icon icon="mdi:label-outline" class="menu-icon"></iconify-icon>
+                                        <span>Brand</span>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li>
+                                            <a href="{%url 'brand_list'%}"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
+                                                List</a>
+                                        </li>
+                                
+                                        <li>
+                                            <a href="{%url 'brand_create'%}"><i class="ri-circle-fill circle-icon text-danger-main w-auto"></i> Add
+                                                new</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="javascript:void(0)">
+                                        <iconify-icon icon="mdi:tag-outline" class="menu-icon"></iconify-icon>
+                                        <span>Products</span>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li>
+                                            <a href="{%url 'product_list'%}"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
+                                                List</a>
+                                        </li>
+                                
+                                        <li>
+                                            <a href="{%url 'product_create'%}"><i class="ri-circle-fill circle-icon text-danger-main w-auto"></i> Add
+                                                new</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li >
+                                    <a href="{%url 'order_list'%}">
+                                       <iconify-icon icon="material-symbols:orders-outline-rounded" class="menu-icon"></iconify-icon>
+
+                                        <span>Orders</span>
+                                    </a>
+                                </li>
+                                <li >
+                                    <a href="{%url 'coupon_list'%}">
+                                       <iconify-icon icon="material-symbols:orders-outline-rounded" class="menu-icon"></iconify-icon>
+
+                                        <span>Coupons</span>
+                                    </a>
+                                </li>
+
+                                <li >
+                                    <a href="{%url 'homepage_sections_manage'%}">
+                                       <iconify-icon icon="material-symbols:orders-outline-rounded" class="menu-icon"></iconify-icon>
+
+                                        <span>Home Section Manage</span>
+                                    </a>
+                                </li>
+
+
+                <li class="sidebar-menu-group-title">UI Elements</li>
+
+
+                                                <li class="">
+                                    <a href="{%url 'user_list'%}">
+                                       <i class="ri-user-settings-line text-xl me-14 d-flex w-auto"></i>
+
+                                        <span>Users</span>
+                                    </a>
+                                </li>
+                
+
+
+            </ul>
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="navbar-header">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-auto">
+                    <div class="d-flex flex-wrap align-items-center gap-4">
+                        <button type="button" class="sidebar-toggle" fdprocessedid="a28kd">
+                            <iconify-icon icon="heroicons:bars-3-solid" class="icon text-2xl non-active"><template
+                                    shadowrootmode="open">
+                                    <style data-style="data-style">
+                                        :host {
+                                            display: inline-block;
+                                            vertical-align: 0
+                                        }
+
+                                        span,
+                                        svg {
+                                            display: block
+                                        }
+                                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                        viewBox="0 0 24 24">
+                                        <path fill="currentColor" fill-rule="evenodd"
+                                            d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75M3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12m0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </template></iconify-icon>
+                            <iconify-icon icon="iconoir:arrow-right" class="icon text-2xl active"><template
+                                    shadowrootmode="open">
+                                    <style data-style="data-style">
+                                        :host {
+                                            display: inline-block;
+                                            vertical-align: 0
+                                        }
+
+                                        span,
+                                        svg {
+                                            display: block
+                                        }
+                                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                        viewBox="0 0 24 24">
+                                        <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.5"
+                                            d="M3 12h18m0 0l-8.5-8.5M21 12l-8.5 8.5"></path>
+                                    </svg>
+                                </template></iconify-icon>
+                        </button>
+                        <button type="button" class="sidebar-mobile-toggle">
+                            <iconify-icon icon="heroicons:bars-3-solid" class="icon"><template shadowrootmode="open">
+                                    <style data-style="data-style">
+                                        :host {
+                                            display: inline-block;
+                                            vertical-align: 0
+                                        }
+
+                                        span,
+                                        svg {
+                                            display: block
+                                        }
+                                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                        viewBox="0 0 24 24">
+                                        <path fill="currentColor" fill-rule="evenodd"
+                                            d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75M3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12m0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </template></iconify-icon>
+                        </button>
+                        <form class="navbar-search">
+                            <input type="text" name="search" placeholder="Search" fdprocessedid="ra6qqf">
+                            <iconify-icon icon="ion:search-outline" class="icon"><template shadowrootmode="open">
+                                    <style data-style="data-style">
+                                        :host {
+                                            display: inline-block;
+                                            vertical-align: 0
+                                        }
+
+                                        span,
+                                        svg {
+                                            display: block
+                                        }
+                                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                        viewBox="0 0 512 512">
+                                        <path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"
+                                            d="M221.09 64a157.09 157.09 0 1 0 157.09 157.09A157.1 157.1 0 0 0 221.09 64Z">
+                                        </path>
+                                        <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                            stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"></path>
+                                    </svg>
+                                </template></iconify-icon>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <button type="button" data-theme-toggle=""
+                            class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"
+                            aria-label="light" fdprocessedid="f5f0mn">light</button>
+                        <!-- <div class="dropdown">
+                            
+                            <button
+                                class="has-indicator w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"
+                                type="button" data-bs-toggle="dropdown" fdprocessedid="bjfn29">
+                                <iconify-icon icon="mage:email" class="text-primary-light text-xl"><template
+                                        shadowrootmode="open">
+                                        <style data-style="data-style">
+                                            :host {
+                                                display: inline-block;
+                                                vertical-align: 0
+                                            }
+
+                                            span,
+                                            svg {
+                                                display: block
+                                            }
+                                        </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                            viewBox="0 0 24 24">
+                                            <g fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <rect width="18.5" height="17" x="2.682" y="3.5" rx="4"></rect>
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m2.729 7.59l7.205 4.13a3.96 3.96 0 0 0 3.975 0l7.225-4.13">
+                                                </path>
+                                            </g>
+                                        </svg>
+                                    </template></iconify-icon>
+                            </button>
+                            <div class="dropdown-menu to-top dropdown-menu-lg p-0">
+                                <div
+                                    class="m-16 py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
+                                    <div>
+                                        <h6 class="text-lg text-primary-light fw-semibold mb-0">Message</h6>
+                                    </div>
+                                    <span
+                                        class="text-primary-600 fw-semibold text-lg w-40-px h-40-px rounded-circle bg-base d-flex justify-content-center align-items-center">05</span>
+                                </div>
+
+                                <div class="max-h-400-px overflow-y-auto scroll-sm pe-4">
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
+                                                <img src="./index_files/profile-3.png" alt="">
+                                                <span
+                                                    class="w-8-px h-8-px bg-success-main rounded-circle position-absolute end-0 bottom-0"></span>
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Kathryn Murphy</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-100-px">hey! there
+                                                    i’m...</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-sm text-secondary-light flex-shrink-0">12:30 PM</span>
+                                            <span
+                                                class="mt-4 text-xs text-base w-16-px h-16-px d-flex justify-content-center align-items-center bg-warning-main rounded-circle">8</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
+                                                <img src="./index_files/profile-4.png" alt="">
+                                                <span
+                                                    class="w-8-px h-8-px  bg-neutral-300 rounded-circle position-absolute end-0 bottom-0"></span>
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Robiul Hasan</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-100-px">hey! there
+                                                    i’m...</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-sm text-secondary-light flex-shrink-0">12:30 PM</span>
+                                            <span
+                                                class="mt-4 text-xs text-base w-16-px h-16-px d-flex justify-content-center align-items-center bg-warning-main rounded-circle">2</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between bg-neutral-50">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
+                                                <img src="./index_files/profile-5.png" alt="">
+                                                <span
+                                                    class="w-8-px h-8-px bg-success-main rounded-circle position-absolute end-0 bottom-0"></span>
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Kathryn Murphy</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-100-px">hey! there
+                                                    i’m...</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-sm text-secondary-light flex-shrink-0">12:30 PM</span>
+                                            <span
+                                                class="mt-4 text-xs text-base w-16-px h-16-px d-flex justify-content-center align-items-center bg-neutral-400 rounded-circle">0</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between bg-neutral-50">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
+                                                <img src="./index_files/profile-6.png" alt="">
+                                                <span
+                                                    class="w-8-px h-8-px bg-neutral-300 rounded-circle position-absolute end-0 bottom-0"></span>
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Kathryn Murphy</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-100-px">hey! there
+                                                    i’m...</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-sm text-secondary-light flex-shrink-0">12:30 PM</span>
+                                            <span
+                                                class="mt-4 text-xs text-base w-16-px h-16-px d-flex justify-content-center align-items-center bg-neutral-400 rounded-circle">0</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
+                                                <img src="./index_files/profile-7.png" alt="">
+                                                <span
+                                                    class="w-8-px h-8-px bg-success-main rounded-circle position-absolute end-0 bottom-0"></span>
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Kathryn Murphy</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-100-px">hey! there
+                                                    i’m...</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-sm text-secondary-light flex-shrink-0">12:30 PM</span>
+                                            <span
+                                                class="mt-4 text-xs text-base w-16-px h-16-px d-flex justify-content-center align-items-center bg-warning-main rounded-circle">8</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                                <div class="text-center py-12 px-16">
+                                    <a href="javascript:void(0)" class="text-primary-600 fw-semibold text-md">See All
+                                        Message</a>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="dropdown">
+                            <button
+                                class="has-indicator w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"
+                                type="button" data-bs-toggle="dropdown" fdprocessedid="yvt93r">
+                                <iconify-icon icon="iconoir:bell" class="text-primary-light text-xl"><template
+                                        shadowrootmode="open">
+                                        <style data-style="data-style">
+                                            :host {
+                                                display: inline-block;
+                                                vertical-align: 0
+                                            }
+
+                                            span,
+                                            svg {
+                                                display: block
+                                            }
+                                        </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                            viewBox="0 0 24 24">
+                                            <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="1.5"
+                                                d="M18 8.4c0-1.697-.632-3.325-1.757-4.525S13.59 2 12 2s-3.117.674-4.243 1.875C6.632 5.075 6 6.703 6 8.4C6 15.867 3 18 3 18h18s-3-2.133-3-9.6M13.73 21a2 2 0 0 1-3.46 0">
+                                            </path>
+                                        </svg>
+                                    </template></iconify-icon>
+                            </button>
+                            <div class="dropdown-menu to-top dropdown-menu-lg p-0">
+                                <div
+                                    class="m-16 py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
+                                    <div>
+                                        <h6 class="text-lg text-primary-light fw-semibold mb-0">Notifications</h6>
+                                    </div>
+                                    <span
+                                        class="text-primary-600 fw-semibold text-lg w-40-px h-40-px rounded-circle bg-base d-flex justify-content-center align-items-center">05</span>
+                                </div>
+
+                                <div class="max-h-400-px overflow-y-auto scroll-sm pe-4">
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
+                                                <iconify-icon icon="bitcoin-icons:verify-outline"
+                                                    class="icon text-xxl"><template shadowrootmode="open">
+                                                        <style data-style="data-style">
+                                                            :host {
+                                                                display: inline-block;
+                                                                vertical-align: 0
+                                                            }
+
+                                                            span,
+                                                            svg {
+                                                                display: block
+                                                            }
+                                                        </style><svg xmlns="http://www.w3.org/2000/svg" width="1em"
+                                                            height="1em" viewBox="0 0 24 24">
+                                                            <g fill="none" stroke="currentColor">
+                                                                <path
+                                                                    d="M14.049 5.54a1 1 0 0 1 1.071.443l.994 1.587a1 1 0 0 0 .316.316l1.587.994a1 1 0 0 1 .444 1.072l-.42 1.824a1 1 0 0 0 0 .448l.42 1.825a1 1 0 0 1-.444 1.07l-1.587.995a1 1 0 0 0-.316.316l-.994 1.587a1 1 0 0 1-1.071.444l-1.825-.42a1 1 0 0 0-.447 0l-1.825.42a1 1 0 0 1-1.071-.444l-.994-1.587a1 1 0 0 0-.317-.316l-1.586-.994a1 1 0 0 1-.444-1.071l.419-1.825a1 1 0 0 0 0-.448l-.42-1.824a1 1 0 0 1 .445-1.072l1.586-.994a1 1 0 0 0 .317-.316l.994-1.587a1 1 0 0 1 1.07-.443l1.826.419a1 1 0 0 0 .447 0z">
+                                                                </path>
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="m9.515 12.536l2.035 1.949l2.935-4.97"></path>
+                                                            </g>
+                                                        </svg>
+                                                    </template></iconify-icon>
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Congratulations</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-200-px">Your profile
+                                                    has been Verified. Your
+                                                    profile has been Verified</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm text-secondary-light flex-shrink-0">23 Mins ago</span>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between bg-neutral-50">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
+                                                <img src="./index_files/profile-1.png" alt="">
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Ronald Richards</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-200-px">You can
+                                                    stitch between artboards</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm text-secondary-light flex-shrink-0">23 Mins ago</span>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-44-px h-44-px bg-info-subtle text-info-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
+                                                AM
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Arlene McCoy</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-200-px">Invite you to
+                                                    prototyping</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm text-secondary-light flex-shrink-0">23 Mins ago</span>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between bg-neutral-50">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
+                                                <img src="./index_files/profile-2.png" alt="">
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Robiul Hasan</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-200-px">Invite you to
+                                                    prototyping</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm text-secondary-light flex-shrink-0">23 Mins ago</span>
+                                    </a>
+
+                                    <a href="javascript:void(0)"
+                                        class="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between">
+                                        <div
+                                            class="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
+                                            <span
+                                                class="w-44-px h-44-px bg-info-subtle text-info-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
+                                                DR
+                                            </span>
+                                            <div>
+                                                <h6 class="text-md fw-semibold mb-4">Darlene Robertson</h6>
+                                                <p class="mb-0 text-sm text-secondary-light text-w-200-px">Invite you to
+                                                    prototyping</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm text-secondary-light flex-shrink-0">23 Mins ago</span>
+                                    </a>
+                                </div>
+
+                                <div class="text-center py-12 px-16">
+                                    <a href="javascript:void(0)" class="text-primary-600 fw-semibold text-md">See All
+                                        Notification</a>
+                                </div>
+
+                            </div>
+                        </div> -->
+
+                        <div class="dropdown">
+                            <button class="d-flex justify-content-center align-items-center rounded-circle"
+                                type="button" data-bs-toggle="dropdown" fdprocessedid="a6zhl">
+                                <img src="{%static 'img/admin_img/user.png'%}" alt="image"
+                                    class="w-40-px h-40-px object-fit-cover rounded-circle">
+                            </button>
+                            <div class="dropdown-menu to-top dropdown-menu-sm">
+                                <div
+                                    class="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
+                                    <div>
+                                        <h6 class="text-lg text-primary-light fw-semibold mb-2">WRS Ecommerce</h6>
+                                        <span class="text-secondary-light fw-medium text-sm">Admin</span>
+                                    </div>
+                                    <button type="button" class="hover-text-danger">
+                                        <iconify-icon icon="radix-icons:cross-1" class="icon text-xl"><template
+                                                shadowrootmode="open">
+                                                <style data-style="data-style">
+                                                    :host {
+                                                        display: inline-block;
+                                                        vertical-align: 0
+                                                    }
+
+                                                    span,
+                                                    svg {
+                                                        display: block
+                                                    }
+                                                </style><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                                    viewBox="0 0 15 15">
+                                                    <path fill="currentColor"
+                                                        d="M12.225 2.082a.5.5 0 0 1 .693.694l-.064.078L8.207 7.5l4.647 4.647l.064.078a.5.5 0 0 1-.693.693l-.078-.064L7.5 8.207l-4.646 4.647a.5.5 0 1 1-.707-.707L6.793 7.5L2.147 2.854l-.065-.078a.5.5 0 0 1 .694-.694l.078.065L7.5 6.793l4.647-4.646z">
+                                                    </path>
+                                                </svg>
+                                            </template></iconify-icon>
+                                    </button>
+                                </div>
+                                <ul class="to-top-list">
+                                    <li>
+                                        <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
+                                            href="">
+                                            <iconify-icon icon="solar:user-linear" class="icon text-xl"><template
+                                                    shadowrootmode="open">
+                                                    <style data-style="data-style">
+                                                        :host {
+                                                            display: inline-block;
+                                                            vertical-align: 0
+                                                        }
+
+                                                        span,
+                                                        svg {
+                                                            display: block
+                                                        }
+                                                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em"
+                                                        height="1em" viewBox="0 0 24 24">
+                                                        <g fill="none" stroke="currentColor" stroke-width="1.5">
+                                                            <circle cx="12" cy="6" r="4"></circle>
+                                                            <path
+                                                                d="M20 17.5c0 2.485 0 4.5-8 4.5s-8-2.015-8-4.5S7.582 13 12 13s8 2.015 8 4.5Z">
+                                                            </path>
+                                                        </g>
+                                                    </svg>
+                                                </template></iconify-icon> My Profile</a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
+                                            href="{%url 'logout'%}">
+                                            <iconify-icon icon="lucide:power" class="icon text-xl"><template
+                                                    shadowrootmode="open">
+                                                    <style data-style="data-style">
+                                                        :host {
+                                                            display: inline-block;
+                                                            vertical-align: 0
+                                                        }
+
+                                                        span,
+                                                        svg {
+                                                            display: block
+                                                        }
+                                                    </style><svg xmlns="http://www.w3.org/2000/svg" width="1em"
+                                                        height="1em" viewBox="0 0 24 24">
+                                                        <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                                            stroke-linejoin="round" stroke-width="2"
+                                                            d="M12 2v10m6.4-5.4a9 9 0 1 1-12.77.04"></path>
+                                                    </svg>
+                                                </template></iconify-icon> Log Out</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div><!-- Profile dropdown end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+{%block content%} 
+
+{%endblock%}
+
+        <!-- <footer class="d-footer">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-auto">
+                    <p class="mb-0">© 2024 WowDash. All Rights Reserved.</p>
+                </div>
+                <div class="col-auto">
+                    <p class="mb-0">Made by <span class="text-primary-600">wowtheme7</span></p>
+                </div>
+            </div>
+        </footer> -->
+    </main>
+
+    {% load static %}
+
+    <!-- jQuery library js -->
+    <script src="{% static 'js/admin_js/jquery-3.7.1.min.js' %}"></script>
+
+    <!-- Bootstrap js -->
+    <script src="{% static 'js/admin_js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Apex Chart js -->
+    <script src="{% static 'js/admin_js/apexcharts.min.js' %}"></script>
+
+    <!-- Data Table js -->
+    <script src="{% static 'js/admin_js/dataTables.min.js' %}"></script>
+
+    <!-- Iconify Font js -->
+    <script src="{% static 'js/admin_js/iconify-icon.min.js' %}"></script>
+
+    <!-- jQuery UI js -->
+    <script src="{% static 'js/admin_js/jquery-ui.min.js' %}"></script>
+
+    <!-- Vector Map js -->
+    <script src="{% static 'js/admin_js/jquery-jvectormap-2.0.5.min.js' %}"></script>
+    <script src="{% static 'js/admin_js/jquery-jvectormap-world-mill-en.js' %}"></script>
+
+    <!-- Popup js -->
+    <script src="{% static 'js/admin_js/magnifc-popup.min.js' %}"></script>
+
+    <!-- Slick Slider js -->
+    <script src="{% static 'js/admin_js/slick.min.js' %}"></script>
+
+    <!-- prism js -->
+    <script src="{% static 'js/admin_js/prism.js' %}"></script>
+
+    <!-- file upload js -->
+    <script src="{% static 'js/admin_js/file-upload.js' %}"></script>
+
+    <!-- Audio player -->
+    <script src="{% static 'js/admin_js/audioplayer.js' %}"></script>
+
+    <!-- main js -->
+    <script src="{% static 'js/admin_js/app.js' %}"></script>
+
+    <!-- Home three chart js -->
+    <!-- <script src="{% static 'js/admin_js/homeThreeChart.js' %}"></script> -->
+
+    <div class="jvectormap-tip"></div>
+
+
+
+    <svg id="SvgjsSvg1253" width="2" height="0" xmlns="http://www.w3.org/2000/svg" version="1.1"
+        xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev"
+        style="overflow: hidden; top: -100%; left: -100%; position: absolute; opacity: 0;">
+        <defs id="SvgjsDefs1254"></defs>
+        <polyline id="SvgjsPolyline1255" points="0,0"></polyline>
+        <path id="SvgjsPath1256"
+            d="M-1 394.9344L-1 394.9344C-1 394.9344 38.80474853515625 394.9344 38.80474853515625 394.9344C38.80474853515625 394.9344 77.6094970703125 394.9344 77.6094970703125 394.9344C77.6094970703125 394.9344 116.41424560546875 394.9344 116.41424560546875 394.9344C116.41424560546875 394.9344 155.218994140625 394.9344 155.218994140625 394.9344C155.218994140625 394.9344 194.02374267578125 394.9344 194.02374267578125 394.9344C194.02374267578125 394.9344 232.8284912109375 394.9344 232.8284912109375 394.9344C232.8284912109375 394.9344 271.63323974609375 394.9344 271.63323974609375 394.9344C271.63323974609375 394.9344 310.43798828125 394.9344 310.43798828125 394.9344C310.43798828125 394.9344 310.43798828125 394.9344 310.43798828125 394.9344 ">
+        </path>
+    </svg><span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span>
+</body>
+
+</html>

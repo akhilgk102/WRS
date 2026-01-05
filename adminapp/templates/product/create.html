@@ -1,0 +1,249 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+{% block title %}{% if edit %}Update Product{% else %}Create Product{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+  <div class="card">
+
+    <!-- Card Header -->
+    <div class="card-header">
+      <h5 class="card-title mb-0">
+        {% if edit %}Update Product{% else %}Create New Product{% endif %}
+      </h5>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+          {{ message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- FORM -->
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="row gy-3">
+
+          <!-- Product Name -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Product Name</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:tag-outline"></iconify-icon>
+              </span>
+
+              <input 
+                type="text" 
+                name="name" 
+                class="form-control" 
+                placeholder="Enter Product Name"
+                value="{{ product.name|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Category</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="solar:tag-outline"></iconify-icon>
+              </span>
+
+              <select name="category" class="form-control" required>
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                  {% if edit and product.category.id == cat.id %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- SubCategory -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">SubCategory (Optional)</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="solar:tag-outline"></iconify-icon>
+              </span>
+
+              <select name="subcategory" class="form-control">
+                <option value="">Optional</option>
+                {% for sub in subcategories %}
+                <option value="{{ sub.id }}"
+                  {% if edit and product.subcategory and product.subcategory.id == sub.id %}selected{% endif %}>
+                  {{ sub.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Brand -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Brand (Optional)</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:tag-outline"></iconify-icon>
+              </span>
+
+              <select name="brand" class="form-control">
+                <option value="">Optional</option>
+                {% for b in brands %}
+                <option value="{{ b.id }}"
+                  {% if edit and product.brand and product.brand.id == b.id %}selected{% endif %}>
+                  {{ b.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Price</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:currency-inr"></iconify-icon>
+              </span>
+
+              <input 
+                type="number"
+                name="price"
+                step="0.01"
+                class="form-control"
+                placeholder="0.00"
+                value="{{ product.price|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- Offer Price -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Offer Price</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:currency-inr"></iconify-icon>
+              </span>
+
+              <input 
+                type="number"
+                name="offer_price"
+                step="0.01"
+                class="form-control"
+                placeholder="0.00"
+                value="{{ product.offer_price|default:'' }}">
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">Stock</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:database-outline"></iconify-icon>
+              </span>
+
+              <input 
+                type="number"
+                name="stock"
+                class="form-control"
+                placeholder="Enter stock quantity"
+                value="{{ product.stock|default:'' }}"
+                required>
+            </div>
+          </div>
+
+          <!-- SKU -->
+          <div class="col-md-6 col-12">
+            <label class="form-label">SKU</label>
+            <div class="icon-field">
+              <span class="icon">
+                <iconify-icon icon="mdi:barcode-scan"></iconify-icon>
+              </span>
+
+              <input 
+                type="text"
+                name="sku"
+                class="form-control"
+                placeholder="Enter SKU code"
+                value="{{ product.sku|default:'' }}">
+            </div>
+          </div>
+
+          <!-- Featured Checkbox -->
+          <div class="col-md-6 col-12 d-flex align-items-end">
+            <label class="d-flex align-items-center gap-2">
+              <input 
+                type="checkbox"
+                name="is_featured"
+                class="form-check-input"
+                {% if edit and product.is_featured %}checked{% endif %}>
+              <span>Featured Product</span>
+            </label>
+          </div>
+
+          <!-- Description (Full Width) -->
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea 
+              name="description"
+              class="form-control"
+              rows="3"
+              placeholder="Enter Product Description">{{ product.description|default:'' }}</textarea>
+          </div>
+
+          <!-- Buttons -->
+<!-- Buttons -->
+<div class="col-12">
+  <div class="row mt-3">
+
+    <!-- Left Button -->
+    <div class="col-6">
+      {% if edit %}
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="fa-regular fa-circle-check"></i>
+        Update Product
+      </button>
+      {% else %}
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="fa-regular fa-circle-check"></i>
+        Create Product
+      </button>
+      {% endif %}
+    </div>
+
+    <!-- Right Button -->
+    <div class="col-6">
+      <a href="{% url 'product_list' %}" class="btn btn-outline-secondary w-100">
+        <i class="fa-regular fa-circle-xmark"></i>
+        Cancel
+      </a>
+    </div>
+
+  </div>
+</div>
+
+
+        </div> <!-- row -->
+
+      </form>
+
+    </div> <!-- card-body -->
+
+  </div> <!-- card -->
+</div> <!-- dashboard-main-body -->
+
+{% endblock %}

@@ -1,0 +1,20 @@
+<h2>Edit Attribute for {{ product.name }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Key:</label>
+    <input type="text" name="key" value="{{ attribute.key }}">
+
+    <br><br>
+
+    <label>Value:</label>
+    <input type="text" name="value" value="{{ attribute.value }}">
+
+    <br><br>
+
+    <button type="submit">Update</button>
+</form>
+
+<br>
+<a href="{% url 'attribute_list' product.id %}">⬅ Back</a>

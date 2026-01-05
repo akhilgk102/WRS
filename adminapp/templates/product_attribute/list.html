@@ -1,0 +1,417 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+{% block title %}Product Attributes - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main-body">
+  
+  <!-- Breadcrumb Header -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">Product Attributes</h6>
+    <ul class="d-flex align-items-center gap-2">
+      <li class="fw-medium">
+        <a href="{% url 'product_list' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+          Products
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">{{ product.name }}</li>
+      <li>-</li>
+      <li class="fw-medium">Attributes</li>
+    </ul>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="row mb-24">
+    <div class="col-12">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        <iconify-icon icon="{% if message.tags == 'success' %}mdi:check-circle{% elif message.tags == 'error' %}mdi:alert-circle{% else %}mdi:information{% endif %}" class="icon text-xl"></iconify-icon>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Stats Cards Row -->
+  <div class="row gy-4 mb-24">
+    <div class="col-xxl-4 col-md-4 col-sm-6">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2">
+            <div class="w-48-px h-48-px bg-primary-600 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              <iconify-icon icon="solar:clipboard-list-bold" class="text-white text-xxl"></iconify-icon>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <span class="d-block fw-medium text-secondary-light text-sm text-truncate">Total Attributes</span>
+              <h6 class="fw-semibold mb-0">{{ attributes|length }}</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xxl-4 col-md-4 col-sm-6">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2">
+            <div class="w-48-px h-48-px bg-success-600 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              <iconify-icon icon="solar:box-bold" class="text-white text-xxl"></iconify-icon>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <span class="d-block fw-medium text-secondary-light text-sm text-truncate">Product</span>
+              <h6 class="fw-semibold mb-0 text-truncate" title="{{ product.name }}">{{ product.name }}</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xxl-4 col-md-4 col-sm-12">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center justify-content-end">
+          <a href="{% url 'attribute_add' product.id %}" class="btn btn-primary-600 px-90 py-11 radius-8 d-flex align-items-center gap-2 flex-nowrap">
+            <iconify-icon icon="ic:baseline-plus" class="text-xl flex-shrink-0"></iconify-icon>
+            <span class="text-nowrap">Add New Attribute</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attributes Table Card -->
+  <div class="card basic-data-table">
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <h5 class="card-title mb-0">Attributes for "{{ product.name }}"</h5>
+      <a href="{% url 'product_list' %}" class="btn btn-outline-primary-600 radius-8 px-20 py-11 d-flex align-items-center gap-2 flex-nowrap">
+        <iconify-icon icon="ic:round-arrow-back" class="text-xl flex-shrink-0"></iconify-icon>
+        <span class="text-nowrap">Back to Products</span>
+      </a>
+    </div>
+    <div class="card-body">
+      {% if attributes %}
+      <div class="table-responsive">
+        <table class="table bordered-table mb-0" id="dataTable">
+          <thead>
+            <tr>
+              <th scope="col">
+                <div class="form-check style-check d-flex align-items-center">
+                  <input class="form-check-input" type="checkbox" id="selectAll">
+                  <label class="form-check-label" for="selectAll">
+                    S.L
+                  </label>
+                </div>
+              </th>
+              <th scope="col">Attribute Key</th>
+              <th scope="col">Attribute Value</th>
+              <!-- <th scope="col">Date Added</th> -->
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for attr in attributes %}
+            <tr>
+              <td>
+                <div class="form-check style-check d-flex align-items-center">
+                  <input class="form-check-input" type="checkbox">
+                  <label class="form-check-label">
+                    {{ forloop.counter|stringformat:"02d" }}
+                  </label>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <iconify-icon icon="mdi:key" class="text-primary-600 text-xl me-2"></iconify-icon>
+                  <span class="fw-semibold text-primary-light">{{ attr.key }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="bg-neutral-200 text-neutral-600 px-16 py-4 rounded-pill fw-medium text-sm">
+                  {{ attr.value }}
+                </span>
+              </td>
+              <!-- <td>
+                <span class="text-secondary-light">
+                  {% if attr.created_at %}
+                    {{ attr.created_at|date:"d M Y" }}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </span>
+              </td> -->
+              <td>
+                <a href="{% url 'attribute_update' attr.id %}" 
+                   class="w-40-px h-40-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center me-2"
+                   title="Edit Attribute">
+                  <iconify-icon  width="20" height="20" icon="lucide:edit"></iconify-icon>
+                </a>
+                <a href="{% url 'attribute_delete' attr.id %}" 
+                   class="w-40-px h-40-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                   onclick="return confirm('Are you sure you want to delete this attribute?');"
+                   title="Delete Attribute">
+                  <iconify-icon  width="20" height="20" icon="mingcute:delete-2-line"></iconify-icon>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-5">
+        <div class="mb-4">
+          <iconify-icon icon="solar:clipboard-remove-outline" class="text-secondary-light" style="font-size: 80px;"></iconify-icon>
+        </div>
+        <h5 class="mb-2">No Attributes Found</h5>
+        <p class="text-secondary-light mb-4">This product doesn't have any attributes yet. Add your first attribute to get started.</p>
+        <a href="{% url 'attribute_add' product.id %}" class="btn btn-primary-600 radius-8 px-20 py-11">
+          <iconify-icon icon="ic:baseline-plus" class="text-xl"></iconify-icon>
+          Add First Attribute
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+  
+  .alert-error,
+  .alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+  
+  .alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+  }
+
+  .hover-text-primary:hover {
+    color: #487fff !important;
+  }
+
+  .card {
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .w-48-px {
+    width: 48px;
+  }
+
+  .h-48-px {
+    height: 48px;
+  }
+
+  .rounded-circle {
+    border-radius: 50% !important;
+  }
+
+  .bg-primary-600 {
+    background-color: #487fff;
+  }
+
+  .bg-success-600 {
+    background-color: #10b981;
+  }
+
+  .text-secondary-light {
+    color: #64748b;
+  }
+
+  .btn-primary-600 {
+    background-color: #487fff;
+    border-color: #487fff;
+    color: white;
+  }
+
+  .btn-primary-600:hover {
+    background-color: #3b6eeb;
+    border-color: #3b6eeb;
+  }
+
+  .btn-outline-primary-600 {
+    border: 1px solid #487fff;
+    color: #487fff;
+    background-color: transparent;
+  }
+
+  .btn-outline-primary-600:hover {
+    background-color: #487fff;
+    color: white;
+  }
+
+  .radius-8 {
+    border-radius: 8px;
+  }
+
+  .px-20 {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .py-11 {
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+
+  .px-16 {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .py-4 {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .text-xl {
+    font-size: 1.25rem;
+  }
+
+  .text-xxl {
+    font-size: 1.5rem;
+  }
+
+  .gap-2 {
+    gap: 8px;
+  }
+
+  .bg-neutral-200 {
+    background-color: #e5e7eb;
+  }
+
+  .text-neutral-600 {
+    color: #4b5563;
+  }
+
+  .bg-success-focus {
+    background-color: #d1fae5;
+  }
+
+  .text-success-main {
+    color: #059669;
+  }
+
+  .bg-danger-focus {
+    background-color: #fee2e2;
+  }
+
+  .text-danger-main {
+    color: #dc2626;
+  }
+
+  .w-32-px {
+    width: 32px;
+  }
+
+  .h-32-px {
+    height: 32px;
+  }
+
+  .text-primary-light {
+    color: #487fff;
+  }
+
+  .text-primary-600 {
+    color: #487fff;
+  }
+
+  .me-2 {
+    margin-right: 8px;
+  }
+
+  .flex-shrink-0 {
+    flex-shrink: 0;
+  }
+
+  .flex-grow-1 {
+    flex-grow: 1;
+  }
+
+  .min-w-0 {
+    min-width: 0;
+  }
+
+  .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .text-nowrap {
+    white-space: nowrap;
+  }
+
+  .flex-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+
+    .card-header .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .col-xxl-4:last-child .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .w-48-px {
+      width: 40px;
+    }
+
+    .h-48-px {
+      height: 40px;
+    }
+
+    .text-xxl {
+      font-size: 1.25rem;
+    }
+
+    .px-20 {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .py-11 {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
+</style>
+{% endblock %}

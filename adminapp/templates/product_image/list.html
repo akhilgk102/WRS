@@ -1,0 +1,402 @@
+{%extends 'admin_base2.html'%}
+{%load static%}
+{%block title%}Product Images{%endblock%}
+
+{%block content%}
+
+<div class="dashboard-main-body">
+  
+  <!-- Breadcrumb -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">Images for {{ product.name }}</h6>
+    <ul class="d-flex align-items-center gap-2">
+      <li class="fw-medium">
+        <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+          Dashboard
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">
+        <a href="{% url 'product_list' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+          Products
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">Images</li>
+    </ul>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="mb-24">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row gy-4">
+    
+    <!-- Upload Card -->
+    <div class="col-md-12">
+      <div class="card h-100 p-0">
+        <div class="card-header border-bottom bg-base py-16 px-24">
+          <h6 class="text-lg fw-semibold mb-0">Upload With Image Preview</h6>
+        </div>
+        <div class="card-body p-24">
+          <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            {% csrf_token %}
+            
+            <div class="upload-image-wrapper d-flex align-items-center gap-3 flex-wrap">
+              <!-- Preview Container -->
+              <div class="uploaded-imgs-container d-flex gap-3 flex-wrap" id="previewContainer">
+                <!-- Previews will be added here dynamically -->
+              </div>
+              
+              <!-- Upload Button -->
+              <label class="upload-file-multiple h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1 cursor-pointer" for="upload-file-multiple">
+                <iconify-icon icon="solar:camera-outline" class="text-xl text-secondary-light"></iconify-icon>
+                <span class="fw-semibold text-secondary-light text-sm">Upload</span>
+                <input id="upload-file-multiple" name="images" type="file" hidden multiple accept="image/*">
+              </label>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-24" id="uploadActions" style="display: none !important;">
+              <button type="button" class="btn btn-outline-secondary" id="cancelUpload">Cancel</button>
+              <button type="submit" class="btn btn-primary">
+                <iconify-icon icon="solar:upload-outline" class="text-xl"></iconify-icon>
+                Upload Images
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing Images Grid -->
+    <div class="col-md-12">
+      <div class="card h-100 p-0">
+        <div class="card-header border-bottom bg-base py-16 px-24">
+          <h6 class="text-lg fw-semibold mb-0">Uploaded Images</h6>
+        </div>
+        <div class="card-body p-24">
+          
+          {% if images %}
+          <div class="row g-3">
+            {% for img in images %}
+            <div class="col-xl-2 col-lg-3 col-sm-4 col-6">
+              <div class="position-relative h-200-px w-100 border input-form-light radius-8 overflow-hidden">
+                <img src="{{ img.image.url }}" alt="{{ product.name }}" class="w-100 h-100 object-fit-cover">
+                
+                {% if img.is_primary %}
+<span class="primary-badge">
+  <iconify-icon icon="solar:star-bold"></iconify-icon>
+  Primary
+</span>
+
+<style>
+  .primary-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.primary-badge iconify-icon {
+  font-size: 14px;
+}
+
+</style>
+
+                {% endif %}
+
+                <div class="image-overlay position-absolute bottom-0 start-0 end-0 p-2 d-flex gap-1 justify-content-center">
+                  {% if not img.is_primary %}
+                  <a href="{% url 'product_image_make_primary' img.id %}" 
+                     class="w-32-px h-32-px bg-success-600 text-white rounded d-flex align-items-center justify-content-center" 
+                     title="Make Primary">
+                    <iconify-icon icon="solar:star-outline" class="text-lg"></iconify-icon>
+                  </a>
+                  {% endif %}
+                  
+                  <a href="{% url 'product_image_delete' img.id %}" 
+                     class="w-32-px h-32-px bg-danger-600 text-white rounded d-flex align-items-center justify-content-center" 
+                     title="Delete"
+                     onclick="return confirm('Are you sure you want to delete this image?');">
+                    <iconify-icon icon="mingcute:delete-2-line" class="text-lg"></iconify-icon>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <iconify-icon icon="solar:gallery-outline" class="text-neutral-400" style="font-size: 64px;"></iconify-icon>
+            </div>
+            <h5 class="mb-2">No images uploaded yet</h5>
+            <p class="text-secondary-light mb-0">Upload your first product image to get started</p>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Back Button -->
+  <div class="mt-24">
+    <a href="{% url 'product_list' %}" class="btn btn-outline-primary">
+      <iconify-icon icon="solar:arrow-left-outline" class="text-xl"></iconify-icon>
+      Back to Products
+    </a>
+  </div>
+
+</div>
+
+<style>
+
+  .btn {
+  white-space: nowrap;
+}
+
+/* OR more specifically */
+.btn iconify-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+/* Upload Styles */
+.h-120-px {
+  height: 120px;
+}
+
+.w-120-px {
+  width: 120px;
+}
+
+.w-32-px {
+  width: 32px;
+}
+
+.h-32-px {
+  height: 32px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.bg-neutral-50 {
+  background-color: #f9fafb;
+}
+
+.bg-hover-neutral-200:hover {
+  background-color: #e5e7eb;
+}
+
+.input-form-light {
+  border-color: #e5e7eb;
+}
+
+.radius-8 {
+  border-radius: 8px;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.bg-success-600 {
+  background-color: #22c55e;
+}
+
+.bg-danger-600 {
+  background-color: #ef4444;
+}
+
+.uploaded-img__remove {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.2s;
+}
+
+.uploaded-img__remove:hover {
+  transform: scale(1.1);
+}
+
+.text-danger-600 {
+  color: #ef4444;
+}
+
+/* Image Overlay */
+.image-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.position-relative:hover .image-overlay {
+  opacity: 1;
+}
+
+/* Hover Effects */
+.hover-text-primary:hover {
+  color: #487fff !important;
+}
+
+/* Card Improvements */
+.card {
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #ffffff;
+}
+
+.bg-base {
+  background-color: #ffffff;
+}
+
+/* Preview Item Styles */
+.preview-item {
+  position: relative;
+  height: 120px;
+  width: 120px;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f9fafb;
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('upload-file-multiple');
+  const previewContainer = document.getElementById('previewContainer');
+  const uploadActions = document.getElementById('uploadActions');
+  const cancelUpload = document.getElementById('cancelUpload');
+  const uploadForm = document.getElementById('uploadForm');
+
+  let selectedFiles = [];
+
+  // File input change event
+  fileInput.addEventListener('change', function(e) {
+    handleFiles(this.files);
+  });
+
+  // Cancel upload
+  cancelUpload.addEventListener('click', function() {
+    selectedFiles = [];
+    previewContainer.innerHTML = '';
+    fileInput.value = '';
+    uploadActions.style.display = 'none';
+  });
+
+  function handleFiles(files) {
+    selectedFiles = Array.from(files);
+    displayPreviews();
+    
+    if (selectedFiles.length > 0) {
+      uploadActions.style.display = 'flex !important';
+      uploadActions.style.setProperty('display', 'flex', 'important');
+    }
+  }
+
+  function displayPreviews() {
+    previewContainer.innerHTML = '';
+    
+    selectedFiles.forEach((file, index) => {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'position-relative h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50';
+        previewDiv.innerHTML = `
+          <button type="button" class="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex" onclick="removePreview(${index})">
+            <iconify-icon icon="radix-icons:cross-2" class="text-xl text-danger-600"></iconify-icon>
+          </button>
+          <img class="w-100 h-100 object-fit-cover" src="${e.target.result}" alt="Preview">
+        `;
+        previewContainer.appendChild(previewDiv);
+      };
+      
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Remove preview function (global scope)
+  window.removePreview = function(index) {
+    selectedFiles.splice(index, 1);
+    
+    // Update file input
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
+    
+    displayPreviews();
+    
+    if (selectedFiles.length === 0) {
+      uploadActions.style.display = 'none';
+    }
+  };
+
+  // Form submit - update the file input with selected files
+  uploadForm.addEventListener('submit', function(e) {
+    if (selectedFiles.length === 0) {
+      e.preventDefault();
+      alert('Please select at least one image to upload.');
+      return false;
+    }
+    
+    // Create new DataTransfer to update file input
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
+  });
+});
+</script>
+
+{%endblock%}

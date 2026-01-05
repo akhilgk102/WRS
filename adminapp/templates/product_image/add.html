@@ -1,0 +1,14 @@
+<h2>Upload Images for {{ product.name }}</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Select Images (you can choose multiple):</label><br>
+    <input type="file" name="images" multiple required>
+
+    <br><br>
+    <button type="submit">Upload</button>
+</form>
+
+<br>
+<a href="{% url 'product_image_list' product.id %}">⬅ Back to Images</a>

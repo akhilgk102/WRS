@@ -1,0 +1,904 @@
+{% extends "user_base.html" %}
+{%block title%} Order Details {%endblock%}
+{% block content %}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    .order-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+        background: #fafafa;
+        min-height: 100vh;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 24px;
+    }
+    
+    .order-card {
+        background: white;
+        border: 1px solid #e8e8e8;
+        border-radius: 16px;
+        padding: 36px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: box-shadow 0.3s;
+    }
+    
+    .order-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    
+    .order-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: -0.5px;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1565c0;
+        border-radius: 24px;
+        font-size: 15px;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(33,150,243,0.1);
+        text-transform: capitalize;
+    }
+    
+    .status-icon {
+        width: 8px;
+        height: 8px;
+        background: #1565c0;
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+        box-shadow: 0 0 0 0 rgba(21,101,192,0.7);
+    }
+    
+    @keyframes pulse {
+        0%, 100% { 
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(21,101,192,0.7);
+        }
+        50% { 
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(21,101,192,0);
+        }
+    }
+    
+    .order-date {
+        color: #757575;
+        font-size: 16px;
+        margin-bottom: 24px;
+        font-weight: 400;
+    }
+    
+    .delivery-estimate {
+        text-align: right;
+        background: #f8f9fa;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid #e8e8e8;
+    }
+    
+    .delivery-label {
+        color: #757575;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+    
+    .delivery-date {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: -0.3px;
+    }
+    
+    /* Progress Tracker Styles */
+    .progress-tracker {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 32px;
+        padding-top: 32px;
+        border-top: 1px solid #f0f0f0;
+        position: relative;
+    }
+    
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .step-circle {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+        color: #bdbdbd;
+    }
+    
+    .progress-step.active .step-circle {
+        background: #4caf50;
+        border-color: #4caf50;
+        color: white;
+    }
+    
+    .progress-step.completed .step-circle {
+        background: #4caf50;
+        border-color: #4caf50;
+        color: white;
+    }
+    
+    .step-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #9e9e9e;
+        text-align: center;
+        margin-top: 4px;
+    }
+    
+    .progress-step.active .step-label,
+    .progress-step.completed .step-label {
+        color: #4caf50;
+        font-weight: 600;
+    }
+    
+    .progress-line {
+        flex: 1;
+        height: 2px;
+        background: #e0e0e0;
+        margin: 0 -8px;
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 1;
+        transition: background 0.3s;
+    }
+    
+    .progress-line.active {
+        background: #4caf50;
+    }
+    
+    .items-section {
+        margin-top: 48px;
+    }
+    
+    .items-header {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+    }
+    
+    .items-count {
+        color: #757575;
+        font-size: 17px;
+        margin-bottom: 24px;
+    }
+    
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .items-table thead {
+        background: #fafafa;
+        border-radius: 8px;
+    }
+    
+    .items-table th {
+        text-align: left;
+        padding: 14px 8px;
+        color: #757575;
+        font-weight: 600;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .items-table th:first-child {
+        padding-left: 16px;
+        border-radius: 8px 0 0 8px;
+    }
+    
+    .items-table th:last-child {
+        padding-right: 16px;
+        text-align: right;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .items-table td:last-child {
+        text-align: right;
+    }
+    
+    .items-table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+    
+    .items-table tbody tr:hover {
+        background: #fafafa;
+    }
+    
+    .items-table tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .items-table td {
+        padding: 24px 8px;
+    }
+    
+    .items-table td:first-child {
+        padding-left: 16px;
+    }
+    
+    .items-table td:last-child {
+        padding-right: 16px;
+    }
+    
+    .product-cell {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .product-image {
+        width: 94px;
+        height: 94px;
+        object-fit: cover;
+        border-radius: 10px;
+        background: #f5f5f5;
+        border: 1px solid #e8e8e8;
+    }
+    
+    .product-name {
+        font-weight: 500;
+        color: #1a1a1a;
+        font-size: 17px;
+        line-height: 1.4;
+    }
+    
+    .price-text {
+        font-weight: 500;
+        color: #1a1a1a;
+        font-size: 17px;
+    }
+    
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .summary-card {
+        background: white;
+        border: 1px solid #e8e8e8;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .summary-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1a1a1a;
+    }
+    
+    .summary-icon {
+        font-size: 25px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        font-size: 18px;
+    }
+    
+    .summary-label {
+        color: #616161;
+        font-weight: 400;
+    }
+    
+    .summary-value {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .summary-value.free {
+        color: #4caf50;
+        font-size: 18px;
+    }
+    
+    .summary-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+        margin: 20px 0;
+    }
+    
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
+        font-weight: 700;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+        color: #1a1a1a;
+    }
+    
+    .payment-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-radius: 10px;
+        color: #2e7d32;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    
+    .payment-dot {
+        width: 8px;
+        height: 8px;
+        background: #4caf50;
+        border-radius: 50%;
+        animation: pulse-green 2s infinite;
+    }
+    
+    @keyframes pulse-green {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+        50% { box-shadow: 0 0 0 4px rgba(76,175,80,0); }
+    }
+    
+    .delivery-card {
+        background: white;
+        border: 1px solid #e8e8e8;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .delivery-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1a1a1a;
+    }
+    
+    .address-name {
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+        font-size: 17px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .address-details {
+        color: #616161;
+        font-size: 15px;
+        line-height: 1.7;
+        padding-left: 28px;
+    }
+    
+    .address-phone {
+        color: #616161;
+        font-size: 15px;
+        margin-top: 12px;
+        padding-left: 28px;
+        font-weight: 500;
+    }
+    
+    .return-policy {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .return-policy::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(50%, -50%);
+    }
+    
+    .return-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .return-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .return-title {
+        font-size: 18px;
+        font-weight: 700;
+    }
+    
+    .return-text {
+        font-size: 15px;
+        color: rgba(255,255,255,0.85);
+        margin-bottom: 16px;
+        line-height: 1.6;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .return-link {
+        color: white;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        border-bottom: 1.5px solid rgba(255,255,255,0.5);
+        padding-bottom: 2px;
+        transition: all 0.2s;
+        position: relative;
+        z-index: 1;
+        display: inline-block;
+    }
+    
+    .return-link:hover {
+        border-bottom-color: white;
+        padding-left: 4px;
+    }
+
+    @media (max-width: 968px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .order-container {
+            padding: 12px;
+        }
+        
+        .order-card {
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .order-header {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .order-number {
+            font-size: 22px;
+        }
+        
+        .order-date {
+            font-size: 14px;
+        }
+        
+        .delivery-estimate {
+            width: 100%;
+            text-align: left;
+        }
+        
+        .delivery-date {
+            font-size: 18px;
+        }
+        
+        .status-badge {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        
+        /* Progress Tracker Mobile */
+        .progress-tracker {
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .step-label {
+            font-size: 12px;
+        }
+        
+        .progress-line {
+            min-width: 40px;
+        }
+        
+        /* Items Section Mobile */
+        .items-section {
+            margin-top: 32px;
+        }
+        
+        .items-header {
+            font-size: 20px;
+        }
+        
+        .items-count {
+            font-size: 15px;
+        }
+        
+        .items-table {
+            font-size: 13px;
+        }
+        
+        .items-table th {
+            font-size: 12px;
+            padding: 12px 6px;
+        }
+        
+        .items-table th:first-child {
+            padding-left: 12px;
+        }
+        
+        .items-table th:last-child {
+            padding-right: 12px;
+        }
+        
+        .items-table td {
+            padding: 16px 6px;
+        }
+        
+        .items-table td:first-child {
+            padding-left: 12px;
+        }
+        
+        .items-table td:last-child {
+            padding-right: 12px;
+        }
+        
+        .product-cell {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .product-image {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            line-height: 1.3;
+        }
+        
+        .price-text {
+            font-size: 14px;
+        }
+        
+        /* Sidebar Mobile */
+        .sidebar {
+            gap: 16px;
+        }
+        
+        .summary-card,
+        .delivery-card {
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .summary-title,
+        .delivery-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            font-size: 16px;
+            margin-bottom: 14px;
+        }
+        
+        .summary-total {
+            font-size: 18px;
+        }
+        
+        .payment-status {
+            font-size: 14px;
+            padding: 10px 14px;
+        }
+        
+        .address-name {
+            font-size: 16px;
+        }
+        
+        .address-details,
+        .address-phone {
+            font-size: 14px;
+            padding-left: 24px;
+        }
+        
+        .return-policy {
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .return-title {
+            font-size: 16px;
+        }
+        
+        .return-text,
+        .return-link {
+            font-size: 14px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .order-container {
+            padding: 8px;
+        }
+        
+        .order-card {
+            padding: 16px;
+        }
+        
+        .order-number {
+            font-size: 20px;
+        }
+        
+        .step-circle {
+            width: 44px;
+            height: 44px;
+        }
+        
+        .step-circle svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .step-label {
+            font-size: 11px;
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+        }
+        
+        .summary-card,
+        .delivery-card,
+        .return-policy {
+            padding: 16px;
+        }
+    }
+
+
+
+
+    
+</style>
+
+<div class="order-container">
+    <div class="content-grid">
+        <div>
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <h2 class="order-number">Order #{{ order.id }}</h2>
+                        <p class="order-date">Placed on {{ order.created_at|date:"d F, Y" }} at {{ order.created_at|date:"H:i A" }}</p>
+                    </div>
+                    <div class="delivery-estimate">
+                        <div class="delivery-label">Estimated Delivery</div>
+                        <div class="delivery-date">{{ expected_delivery|date:"d M, Y" }}</div>
+                    </div>
+                </div>
+                
+                <span class="status-badge">
+                    <span class="status-icon"></span>
+                    {{ order.get_status_display }}
+                </span>
+                
+                <!-- Order Progress Tracker -->
+                <div class="progress-tracker">
+                    <div class="progress-step {% if order.status == 'PLACED' or order.status == 'PROCESSING' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="step-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="step-label">Order Placed</span>
+                    </div>
+
+                    <div class="progress-line {% if order.status == 'PROCESSING' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}active{% endif %}"></div>
+
+                    <div class="progress-step {% if order.status == 'PROCESSING' %}active{% elif order.status == 'SHIPPED' or order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="step-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="step-label">In Transit</span>
+                    </div>
+
+                    <div class="progress-line {% if order.status == 'SHIPPED' or order.status == 'DELIVERED' %}active{% endif %}"></div>
+
+                    <div class="progress-step {% if order.status == 'SHIPPED' %}active{% elif order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="step-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect x="1" y="3" width="15" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M16 8h2.5c1.1 0 2 .9 2 2v3.5" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="5.5" cy="18.5" r="2.5" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="18.5" cy="18.5" r="2.5" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <span class="step-label">Out for Delivery</span>
+                    </div>
+
+                    <div class="progress-line {% if order.status == 'DELIVERED' %}active{% endif %}"></div>
+
+                    <div class="progress-step {% if order.status == 'DELIVERED' %}active completed{% endif %}">
+                        <div class="step-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="step-label">Delivered</span>
+                    </div>
+                </div>
+                
+                <div class="items-section">
+                    <h3 class="items-header">Items</h3>
+                    <p class="items-count">You have {{ items|length }} item{{ items|length|pluralize }} in this order</p>
+                    
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="product-cell">
+                                        {% if item.product.primary_image %}
+                                            <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" class="product-image">
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/64" alt="{{ item.product.name }}" class="product-image">
+                                        {% endif %}
+                                        <span class="product-name">{{ item.product.name }}</span>
+                                    </div>
+                                </td>
+                                <td class="price-text">₹{{ item.price|floatformat:2 }}</td>
+                                <td class="price-text">{{ item.quantity }}</td>
+                                <td class="price-text">₹{{ item.get_total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="summary-card">
+                <h3 class="summary-title">
+                    <span class="summary-icon">💳</span> Payment Summary
+                </h3>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal</span>
+                    <span class="summary-value">₹{{ order.subtotal|floatformat:2 }}</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Shipping</span>
+                    <span class="summary-value free">{% if order.shipping_fee == 0 %}Free{% else %}₹{{ order.shipping_fee }}{% endif %}</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Tax</span>
+                    <span class="summary-value">₹{{ order.tax|floatformat:2 }}</span>
+                </div>
+                
+                <div class="summary-divider"></div>
+                
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>₹{{ order.total_price|floatformat:2 }}</span>
+                </div>
+                
+                <div class="payment-status">
+                    <span class="payment-dot"></span>
+                    Payment Status: {{ order.get_payment_status_display }}
+                </div>
+            </div>
+            
+            <div class="delivery-card">
+                <h3 class="delivery-title">
+                    <span class="summary-icon">📦</span> Delivery Details
+                </h3>
+                
+                <div class="address-name">📍 {{ order.address.full_name }}</div>
+                <div class="address-details">
+                    {{ order.address.street }}<br>
+                    {{ order.address.city }}, {{ order.address.state }}<br>
+                    {{ order.address.pincode }}
+                </div>
+                <div class="address-phone">{{ order.address.phone }}</div>
+            </div>
+            
+            <div class="return-policy">
+                <div class="return-header">
+                    <div class="return-icon"><i class="fas fa-undo-alt"></i></div>
+                    <div class="return-title">Return Policy</div>
+                </div>
+                <p class="return-text">You can return items within 30 days of delivery.</p>
+                <a href="#" class="return-link">Read full policy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

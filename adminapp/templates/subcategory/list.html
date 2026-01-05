@@ -1,0 +1,299 @@
+{%extends 'admin_base2.html'%}
+
+{%block title%} SubCategory List {%endblock%}
+
+{%block content%}
+
+<div class="dashboard-main-body">
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">Sub Category Management</h6>
+    <ul class="d-flex align-items-center gap-2">
+      <li class="fw-medium">
+        <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+          Dashboard
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">Sub Category List</li>
+    </ul>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="mb-24">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card basic-data-table">
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <h5 class="card-title mb-0">Sub Categories List</h5>
+      <div class="d-flex align-items-center gap-3">
+        <div class="position-relative">
+          <input type="text" id="subcategorySearch" class="form-control form-control-sm" placeholder="Search subcategories..." style="padding-left: 35px; min-width: 200px;">
+          <iconify-icon icon="ion:search-outline" class="position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></iconify-icon>
+        </div>
+        <a href="{% url 'subcategory_create' %}" class="btn btn-primary btn-sm d-flex align-items-center gap-2">
+          <iconify-icon icon="ion:add-outline" class="text-xl"></iconify-icon>
+          Add SubCategory
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table bordered-table mb-0" id="subcategoryTable">
+          <thead>
+            <tr>
+              <th scope="col">
+                <div class="form-check style-check d-flex align-items-center">
+                  <input class="form-check-input" type="checkbox" id="checkAll">
+                  <label class="form-check-label" for="checkAll">
+                    S.L
+                  </label>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:tag-outline" class="text-xl"></iconify-icon>
+                  SubCategory Name
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:layers-outline" class="text-xl"></iconify-icon>
+                  Category
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:link-outline" class="text-xl"></iconify-icon>
+                  Slug
+                </div>
+              </th>
+              <th scope="col" class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <iconify-icon icon="solar:settings-outline" class="text-xl"></iconify-icon>
+                  Action
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="subcategoryTableBody">
+            {% for sub in subcategories %}
+            <tr class="subcategory-row" data-subcategory-name="{{ sub.name|lower }}" data-category-name="{{ sub.category.name|lower }}" data-subcategory-slug="{{ sub.slug|lower }}">
+              <td>
+                <div class="form-check style-check d-flex align-items-center">
+                  <input class="form-check-input" type="checkbox">
+                  <label class="form-check-label">
+                    {{ forloop.counter }}
+                  </label>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="flex-shrink-0">
+                    <div class="w-40-px h-40-px d-flex align-items-center justify-content-center rounded-circle bg-success-50">
+                      <iconify-icon icon="solar:tag-bold" class="text-success-600 text-xl"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="text-md mb-0 fw-semibold">{{ sub.name }}</h6>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-primary-100 text-primary-600 px-3 py-3">{{ sub.category.name }}</span>
+              </td>
+              <td>
+                <span class="badge bg-neutral-200 text-neutral-900 px-3 py-3">{{ sub.slug }}</span>
+              </td>
+              <td class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <a href="{% url 'subcategory_update' sub.id %}" class="w-40-px h-40-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center" title="Edit">
+                    <iconify-icon icon="lucide:edit" width="20" height="20"></iconify-icon>
+                  </a>
+                  <a href="{% url 'subcategory_delete' sub.id %}" class="w-40-px h-40-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center" title="Delete" onclick="return confirm('Are you sure you want to delete this subcategory?');">
+                    <iconify-icon icon="mingcute:delete-2-line" width="22" height="22"></iconify-icon>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-5">
+                <div class="d-flex flex-column align-items-center gap-3">
+                  <div class="w-80-px h-80-px bg-neutral-100 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:inbox-outline" class="text-neutral-400" style="font-size: 48px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <h5 class="mb-1">No SubCategories Found</h5>
+                    <p class="text-secondary-light mb-3">Start by adding your first subcategory</p>
+                    <a href="{% url 'subcategory_create' %}" class="btn btn-primary btn-sm">
+                      <iconify-icon icon="ion:add-outline" class="text-lg"></iconify-icon>
+                      Add SubCategory
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if subcategories.has_other_pages %}
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-24">
+        <div class="text-secondary-light">
+          Showing {{ subcategories.start_index }} to {{ subcategories.end_index }} of {{ subcategories.paginator.count }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination d-flex align-items-center gap-2 mb-0">
+            {% if subcategories.has_previous %}
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page=1">
+                <iconify-icon icon="ep:d-arrow-left" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ subcategories.previous_page_number }}">
+                <iconify-icon icon="solar:arrow-left-linear" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            {% endif %}
+
+            <li class="page-item">
+              <a class="page-link bg-primary-600 text-white fw-medium radius-8 border-0 px-3 py-2" href="javascript:void(0)">{{ subcategories.number }}</a>
+            </li>
+
+            {% if subcategories.has_next %}
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ subcategories.next_page_number }}">
+                <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ subcategories.paginator.num_pages }}">
+                <iconify-icon icon="ep:d-arrow-right" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Search Functionality Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('subcategorySearch');
+  const subcategoryRows = document.querySelectorAll('.subcategory-row');
+  const checkAll = document.getElementById('checkAll');
+  
+  // Search functionality
+  if (searchInput && subcategoryRows.length > 0) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      let visibleCount = 0;
+      
+      subcategoryRows.forEach(function(row) {
+        const name = row.getAttribute('data-subcategory-name') || '';
+        const category = row.getAttribute('data-category-name') || '';
+        const slug = row.getAttribute('data-subcategory-slug') || '';
+        
+        if (name.includes(searchTerm) || category.includes(searchTerm) || slug.includes(searchTerm)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Check all functionality
+  if (checkAll) {
+    checkAll.addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('.subcategory-row input[type="checkbox"]');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = checkAll.checked;
+      });
+    });
+  }
+});
+</script>
+
+<style>
+/* Additional custom styles */
+.hover-text-primary:hover {
+  color: #487fff !important;
+}
+
+.bg-primary-50 {
+  background-color: rgba(72, 127, 255, 0.1);
+}
+
+.bg-success-50 {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.bg-primary-100 {
+  background-color: rgba(72, 127, 255, 0.15);
+}
+
+.text-primary-600 {
+  color: #487fff;
+}
+
+.text-success-600 {
+  color: #22c55e;
+}
+
+.w-40-px {
+  width: 40px;
+}
+
+.h-40-px {
+  height: 40px;
+}
+
+.w-80-px {
+  width: 80px;
+}
+
+.h-80-px {
+  height: 80px;
+}
+
+.subcategory-row {
+  transition: background-color 0.2s ease;
+}
+
+.subcategory-row:hover {
+  background-color: #f9fafb;
+}
+
+.form-control:focus {
+  border-color: #487fff;
+  box-shadow: 0 0 0 0.2rem rgba(72, 127, 255, 0.25);
+}
+
+.badge {
+  font-weight: 500;
+  font-size: 15px;
+}
+</style>
+
+{%endblock%}

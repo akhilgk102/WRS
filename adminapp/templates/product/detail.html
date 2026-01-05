@@ -1,0 +1,464 @@
+{% extends "admin_base2.html" %}
+{% load static %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+
+  <!-- PRODUCT HEADER -->
+  <div class="d-flex align-items-center justify-content-between mb-24 flex-wrap gap-3">
+    <h4 class="fw-semibold mb-0">Product Details</h4>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <a href="{% url 'product_update' product.id %}" class="btn btn-primary btn-sm">
+        <i class="fa-regular fa-pen-to-square"></i> Edit
+      </a>
+
+      <a href="{% url 'product_image_list' product.id %}" class="btn btn-info btn-sm text-white">
+        <i class="fa-regular fa-image"></i> Images
+      </a>
+
+      <a href="{% url 'attribute_list' product.id %}" class="btn btn-warning btn-sm">
+        <i class="fa-solid fa-list"></i> Attributes
+      </a>
+
+      <a href="{% url 'product_delete' product.id %}" onclick="return confirm('Delete this product?')" 
+         class="btn btn-danger btn-sm">
+        <i class="fa-regular fa-trash-can"></i> Delete
+      </a>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL CARD -->
+  <div class="card mb-24">
+    <div class="card-body">
+
+      <div class="row gy-4">
+
+        <!-- Product Image -->
+        <div class="col-md-4">
+          <div class="border rounded p-3 bg-light">
+            {% if product.primary_image %}
+            <img src="{{ product.primary_image.image.url }}" style="min-height: 300px; max-height: 400px;" class="img-fluid rounded" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'img/placeholder.jpg' %}" class="img-fluid rounded" alt="No image">
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Product Data -->
+        <div class="col-md-8">
+          <h5 class="fw-semibold mb-3">{{ product.name }}</h5>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <p class="text-secondary mb-2 small">SKU</p>
+              <span class="info-badge">
+                <i class="fa-solid fa-barcode"></i>
+                {{ product.sku|default:"N/A" }}
+              </span>
+            </div>
+
+            <div class="col-md-6">
+              <p class="text-secondary mb-2 small">Category</p>
+              <span class="info-badge badge-category">
+                <i class="fa-solid fa-layer-group"></i>
+                {% if product.category %}{{ product.category.name }}{% else %}-{% endif %}
+              </span>
+            </div>
+
+            <div class="col-md-6">
+              <p class="text-secondary mb-2 small">SubCategory</p>
+              <span class="info-badge badge-subcategory">
+                <i class="fa-solid fa-folder-tree"></i>
+                {% if product.subcategory %}{{ product.subcategory.name }}{% else %}-{% endif %}
+              </span>
+            </div>
+
+            <div class="col-md-6">
+              <p class="text-secondary mb-2 small">Brand</p>
+              <span class="info-badge badge-brand">
+                <i class="fa-solid fa-tag"></i>
+                {% if product.brand %}{{ product.brand.name }}{% else %}-{% endif %}
+              </span>
+            </div>
+
+            <div class="col-md-6">
+              <p class="text-secondary mb-2 small">Stock</p>
+              <span class="info-badge badge-stock">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                {{ product.stock }} units
+              </span>
+            </div>
+
+            <div class="col-md-6">
+              <p class="text-secondary mb-2 small">Status</p>
+              {% if product.is_featured %}
+              <span class="info-badge badge-featured">
+                <i class="fa-solid fa-star"></i>
+                Featured
+              </span>
+              {% else %}
+              <span class="info-badge badge-regular">
+                <i class="fa-solid fa-circle"></i>
+                Regular
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <h4 class="text-primary mt-4 mb-3">₹{{ product.price }}</h4>
+
+          <div class="mt-3">
+            <p class="text-secondary mb-1 small">Description</p>
+            <p class="mb-0">{{ product.description|default:"No description available." }}</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ATTRIBUTES CARD -->
+  <div class="card mb-24">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Specifications</h5>
+
+      <a href="{% url 'attribute_add' product.id %}" class="btn btn-primary btn-sm">
+        <i class="fa-regular fa-plus"></i> Add Attribute
+      </a>
+    </div>
+
+    <div class="card-body">
+
+      {% if product.attributes.all %}
+      <ul class="list-group">
+
+        {% for attr in product.attributes.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ attr.key }}</strong>
+            <span class="text-secondary"> - {{ attr.value }}</span>
+          </div>
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'attribute_update' attr.id %}" class="btn btn-sm btn-success">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+            <a href="{% url 'attribute_delete' attr.id %}" onclick="return confirm('Delete attribute?')" 
+               class="btn btn-sm btn-danger">
+              <i class="fa-regular fa-trash-can"></i>
+            </a>
+          </div>
+        </li>
+        {% endfor %}
+
+      </ul>
+
+      {% else %}
+      <p class="text-secondary mt-2 mb-0">No attributes added yet.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+  /* Info Badge Styles */
+  .info-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: #f0f4f8;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .info-badge i {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+
+  .info-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Specific badge colors */
+  .badge-category {
+    background: #ede9fe;
+    color: #7c3aed;
+    border-color: #ddd6fe;
+  }
+
+  .badge-category i {
+    color: #7c3aed;
+  }
+
+  .badge-subcategory {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #bfdbfe;
+  }
+
+  .badge-subcategory i {
+    color: #1e40af;
+  }
+
+  .badge-brand {
+    background: #fce7f3;
+    color: #be185d;
+    border-color: #fbcfe8;
+  }
+
+  .badge-brand i {
+    color: #be185d;
+  }
+
+  .badge-stock {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #a7f3d0;
+  }
+
+  .badge-stock i {
+    color: #065f46;
+  }
+
+  .badge-featured {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+  }
+
+  .badge-featured i {
+    color: #f59e0b;
+  }
+
+  .badge-regular {
+    background: #f3f4f6;
+    color: #4b5563;
+    border-color: #e5e7eb;
+  }
+
+  .badge-regular i {
+    color: #6b7280;
+  }
+
+  /* Dark mode badge styles */
+  [data-theme="dark"] .info-badge {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+  }
+
+  [data-theme="dark"] .badge-category {
+    background: #4c1d95;
+    color: #ddd6fe;
+    border-color: #5b21b6;
+  }
+
+  [data-theme="dark"] .badge-category i {
+    color: #c4b5fd;
+  }
+
+  [data-theme="dark"] .badge-subcategory {
+    background: #1e3a8a;
+    color: #bfdbfe;
+    border-color: #1e40af;
+  }
+
+  [data-theme="dark"] .badge-subcategory i {
+    color: #93c5fd;
+  }
+
+  [data-theme="dark"] .badge-brand {
+    background: #831843;
+    color: #fbcfe8;
+    border-color: #9f1239;
+  }
+
+  [data-theme="dark"] .badge-brand i {
+    color: #f9a8d4;
+  }
+
+  [data-theme="dark"] .badge-stock {
+    background: #064e3b;
+    color: #a7f3d0;
+    border-color: #065f46;
+  }
+
+  [data-theme="dark"] .badge-stock i {
+    color: #6ee7b7;
+  }
+
+  [data-theme="dark"] .badge-featured {
+    background: #78350f;
+    color: #fde68a;
+    border-color: #92400e;
+  }
+
+  [data-theme="dark"] .badge-featured i {
+    color: #fbbf24;
+  }
+
+  [data-theme="dark"] .badge-regular {
+    background: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+
+  [data-theme="dark"] .badge-regular i {
+    color: #9ca3af;
+  }
+
+  /* Card improvements */
+  .card {
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  /* Dark mode styles */
+  [data-theme="dark"] .card {
+    border-color: #374151;
+    background: #1f2937;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme="dark"] .card-header {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+
+  [data-theme="dark"] .card-body {
+    background: #1f2937;
+  }
+
+  [data-theme="dark"] .border.rounded.p-3.bg-light {
+    background: #111827 !important;
+    border-color: #374151 !important;
+  }
+
+  [data-theme="dark"] .list-group-item {
+    background: #1f2937;
+    border-color: #374151;
+    color: #e5e7eb;
+  }
+
+  [data-theme="dark"] .list-group-item:hover {
+    background: #374151;
+  }
+
+  [data-theme="dark"] .text-secondary {
+    color: #9ca3af !important;
+  }
+
+  [data-theme="dark"] h4,
+  [data-theme="dark"] h5,
+  [data-theme="dark"] .fw-semibold,
+  [data-theme="dark"] .fw-medium {
+    color: #f9fafb;
+  }
+
+  /* Button improvements */
+  .btn {
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+  }
+
+  .btn-info:hover {
+    box-shadow: 0 4px 12px rgba(13, 202, 240, 0.3);
+  }
+
+  .btn-warning:hover {
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  }
+
+  .btn-danger:hover {
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+
+  .btn-success:hover {
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+  }
+
+  /* Image improvements */
+  .border.rounded.p-3.bg-light {
+    background: #f8f9fa !important;
+    border: 2px solid #e2e8f0 !important;
+  }
+
+  /* List group improvements */
+  .list-group-item {
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+  }
+
+  .list-group-item:hover {
+    background: #f8f9fa;
+  }
+
+  /* Typography improvements */
+  .small {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  /* Badge improvements */
+  .badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .d-flex.gap-2 {
+      gap: 0.5rem !important;
+    }
+    
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .info-badge {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+    }
+
+    .info-badge i {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+{% endblock %}

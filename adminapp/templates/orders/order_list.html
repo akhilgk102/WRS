@@ -1,0 +1,643 @@
+{% extends 'admin_base2.html' %}
+{% load static %}
+
+{% block title %} Orders Management {% endblock %}
+
+{% block content %}
+
+<div class="dashboard-main-body">
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">Orders Management</h6>
+    <ul class="d-flex align-items-center gap-2">
+      <li class="fw-medium">
+        <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+          Dashboard
+        </a>
+      </li>
+      <li>-</li>
+      <li class="fw-medium">Orders</li>
+    </ul>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="mb-24">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card basic-data-table">
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <h5 class="card-title mb-0">All Orders</h5>
+      <div class="d-flex align-items-center gap-3">
+        <div class="position-relative">
+          <input type="text" id="orderSearch" class="form-control form-control-sm" placeholder="Search orders..." style="padding-left: 35px; min-width: 200px;">
+          <iconify-icon icon="ion:search-outline" class="position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></iconify-icon>
+        </div>
+        <select id="statusFilter" class="form-select form-select-sm">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table bordered-table mb-0" id="orderTable">
+          <thead>
+            <tr>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:document-text-outline" class="text-xl"></iconify-icon>
+                  Order ID
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:user-outline" class="text-xl"></iconify-icon>
+                  Customer
+                </div>
+              </th>
+              <th scope="col" style="min-width: 200px;">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:box-outline" class="text-xl"></iconify-icon>
+                  Products
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:dollar-outline" class="text-xl"></iconify-icon>
+                  Total Price
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:clock-circle-outline" class="text-xl"></iconify-icon>
+                  Status
+                </div>
+              </th>
+              <th scope="col">
+                <div class="d-flex align-items-center gap-2">
+                  <iconify-icon icon="solar:calendar-outline" class="text-xl"></iconify-icon>
+                  Order Date
+                </div>
+              </th>
+              <th scope="col" class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <iconify-icon icon="solar:settings-outline" class="text-xl"></iconify-icon>
+                  Action
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody">
+            {% for o in orders %}
+            <tr class="order-row" data-order-id="{{ o.id }}" data-customer-name="{{ o.user.full_name|lower }}" data-status="{{ o.status|lower }}">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="flex-shrink-0 w-40-px h-40-px bg-primary-100 text-primary-600 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:document-text-bold" style="font-size: 20px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <h6 class="text-md mb-0 fw-semibold">#{{ o.id }}</h6>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="flex-shrink-0 w-40-px h-40-px bg-info-100 text-info-600 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:user-bold" style="font-size: 20px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <h6 class="text-md mb-0 fw-semibold">{{ o.user.full_name }}</h6>
+                    <span class="text-sm text-secondary-light">{{ o.user.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <!-- Product Images Stack -->
+                  <div class="product-images-stack">
+                    {% for item in o.items.all|slice:":4" %}
+                      {% if item.product and item.product.primary_image %}
+                      <img src="{{ item.product.primary_image.image.url }}" 
+                           alt="{{ item.product.name }}" 
+                           class="product-stack-image"
+                           style="z-index: {{ forloop.counter }};"
+                           title="{{ item.product.name }} (Qty: {{ item.quantity }})">
+                      {% else %}
+                      <div class="product-stack-image product-stack-placeholder"
+                           style="z-index: {{ forloop.counter }};"
+                           title="No image available">
+                        <iconify-icon icon="solar:gallery-outline" style="font-size: 14px;"></iconify-icon>
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+                    {% if o.items.count > 4 %}
+                    <div class="product-stack-image product-stack-more" style="z-index: 5;">
+                      +{{ o.items.count|add:"-4" }}
+                    </div>
+                    {% endif %}
+                  </div>
+                  <!-- Product Count -->
+                  <div class="d-flex flex-column">
+                    <span class="fw-semibold text-md">{{ o.items.count }} Item{{ o.items.count|pluralize }}</span>
+                    <span class="text-sm text-secondary-light">
+                      {% with total_qty=0 %}
+                        {% for item in o.items.all %}
+                          {% if forloop.first %}
+                            {% widthratio item.quantity 1 1 as total_qty %}
+                          {% endif %}
+                        {% endfor %}
+                      {% endwith %}
+                      Total Qty: 
+                      <span class="total-quantity" data-order-id="{{ o.id }}">
+                        {% widthratio o.items.all.0.quantity 1 0 as sum %}
+                        {% for item in o.items.all %}
+                          {{ sum|add:item.quantity }}
+                          {% if not forloop.last %}{% widthratio sum|add:item.quantity 1 1 as sum %}{% endif %}
+                        {% endfor %}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="fw-semibold order-price" data-price="{{ o.total_price }}"></span>
+              </td>
+              <td>
+                {% if o.status == 'Pending' %}
+                <span class="badge bg-warning-100 text-warning-600 px-3 py-3">
+                  <iconify-icon icon="solar:clock-circle-bold" class="me-1"></iconify-icon>
+                  Pending
+                </span>
+                {% elif o.status == 'Shipped' %}
+                <span class="badge bg-info-100 text-info-600 px-3 py-3">
+                  <iconify-icon icon="solar:delivery-bold" class="me-1"></iconify-icon>
+                  Shipped
+                </span>
+                {% elif o.status == 'Delivered' %}
+                <span class="badge bg-success-100 text-success-600 px-3 py-3">
+                  <iconify-icon icon="solar:check-circle-bold" class="me-1"></iconify-icon>
+                  Delivered
+                </span>
+                {% elif o.status == 'Cancelled' %}
+                <span class="badge bg-danger-100 text-danger-600 px-3 py-3">
+                  <iconify-icon icon="solar:close-circle-bold" class="me-1"></iconify-icon>
+                  Cancelled
+                </span>
+                {% else %}
+                <span class="badge bg-neutral-100 text-neutral-600 px-3 py-3">
+                  {{ o.status }}
+                </span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <span class="fw-medium">{{ o.created_at|date:"d M Y" }}</span>
+                  <span class="text-sm text-secondary-light">{{ o.created_at|date:"h:i A" }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <a href="{% url 'order_detail' o.id %}" class="w-40-px h-40-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center" title="View Details">
+                    <iconify-icon icon="solar:eye-outline" width="20" height="20"></iconify-icon>
+                  </a>
+                  <a href="{% url 'order_delete' o.id %}" class="w-40-px h-40-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center" title="Delete Order" onclick="return confirm('Are you sure you want to delete this order?');">
+                    <iconify-icon icon="mingcute:delete-2-line" width="22" height="22"></iconify-icon>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <div class="d-flex flex-column align-items-center gap-3">
+                  <div class="w-80-px h-80-px bg-neutral-100 rounded-circle d-flex align-items-center justify-content-center">
+                    <iconify-icon icon="solar:inbox-outline" class="text-neutral-400" style="font-size: 48px;"></iconify-icon>
+                  </div>
+                  <div>
+                    <h5 class="mb-1">No Orders Found</h5>
+                    <p class="text-secondary-light mb-0">Orders will appear here once customers place them</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if orders.has_other_pages %}
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-24">
+        <div class="text-secondary-light">
+          Showing {{ orders.start_index }} to {{ orders.end_index }} of {{ orders.paginator.count }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination d-flex align-items-center gap-2 mb-0">
+            {% if orders.has_previous %}
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page=1">
+                <iconify-icon icon="ep:d-arrow-left" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ orders.previous_page_number }}">
+                <iconify-icon icon="solar:arrow-left-linear" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            {% endif %}
+
+            <li class="page-item">
+              <a class="page-link bg-primary-600 text-white fw-medium radius-8 border-0 px-3 py-2" href="javascript:void(0)">{{ orders.number }}</a>
+            </li>
+
+            {% if orders.has_next %}
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ orders.next_page_number }}">
+                <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-neutral-200 text-secondary-light fw-medium radius-8 border-0 px-3 py-2" href="?page={{ orders.paginator.num_pages }}">
+                <iconify-icon icon="ep:d-arrow-right" class="text-xl"></iconify-icon>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Search and Filter Functionality Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('orderSearch');
+  const statusFilter = document.getElementById('statusFilter');
+  const orderRows = document.querySelectorAll('.order-row');
+  
+  // Calculate total quantities for each order
+  orderRows.forEach(function(row) {
+    const orderId = row.getAttribute('data-order-id');
+    const qtyElement = row.querySelector('.total-quantity[data-order-id="' + orderId + '"]');
+    
+    if (qtyElement) {
+      // Get all quantity values from the order items
+      let totalQty = 0;
+      // This will be calculated server-side, but we can also do client-side if needed
+      // For now, we'll keep the server-side calculation
+    }
+  });
+  
+  // Search functionality
+  function filterOrders() {
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const statusValue = statusFilter ? statusFilter.value.toLowerCase() : '';
+    let visibleCount = 0;
+    
+    orderRows.forEach(function(row) {
+      const orderId = row.getAttribute('data-order-id') || '';
+      const customerName = row.getAttribute('data-customer-name') || '';
+      const status = row.getAttribute('data-status') || '';
+      
+      const matchesSearch = orderId.includes(searchTerm) || customerName.includes(searchTerm);
+      const matchesStatus = statusValue === '' || status === statusValue;
+      
+      if (matchesSearch && matchesStatus) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', filterOrders);
+  }
+  
+  if (statusFilter) {
+    statusFilter.addEventListener('change', filterOrders);
+  }
+
+  // Format prices in Indian Rupee format
+  const prices = document.querySelectorAll(".order-price");
+  prices.forEach((priceElement) => {
+    let amount = priceElement.getAttribute("data-price");
+    if (amount) {
+      let num = parseFloat(amount);
+      let formatted = num.toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      priceElement.innerHTML = "₹" + formatted;
+    }
+  });
+});
+</script>
+
+<style>
+/* Additional custom styles */
+.hover-text-primary:hover {
+  color: #487fff !important;
+}
+
+.bg-primary-100 {
+  background-color: rgba(72, 127, 255, 0.15);
+}
+
+.bg-warning-100 {
+  background-color: rgba(251, 191, 36, 0.15);
+}
+
+.bg-success-100 {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+
+.bg-danger-100 {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.bg-info-100 {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.bg-neutral-100 {
+  background-color: rgba(156, 163, 175, 0.15);
+}
+
+.text-primary-600 {
+  color: #487fff;
+}
+
+.text-warning-600 {
+  color: #f59e0b;
+}
+
+.text-success-600 {
+  color: #22c55e;
+}
+
+.text-danger-600 {
+  color: #ef4444;
+}
+
+.text-info-600 {
+  color: #3b82f6;
+}
+
+.text-neutral-600 {
+  color: #6b7280;
+}
+
+.text-neutral-700 {
+  color: #4b5563;
+}
+
+.text-neutral-800 {
+  color: #1f2937;
+}
+
+.w-40-px {
+  width: 40px;
+}
+
+.h-40-px {
+  height: 40px;
+}
+
+.w-80-px {
+  width: 80px;
+}
+
+.h-80-px {
+  height: 80px;
+}
+
+.order-row {
+  transition: background-color 0.2s ease;
+}
+
+.order-row:hover {
+  background-color: #f9fafb;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #487fff;
+  box-shadow: 0 0 0 0.2rem rgba(72, 127, 255, 0.25);
+}
+
+/* Status Badge Styles - Replace existing badge styles with these */
+
+.badge {
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px !important;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Pending Status */
+.bg-warning-100.text-warning-600 {
+  background-color: #fef3c7;
+  color: #d97706;
+  border-color: #fbbf24;
+}
+
+.bg-warning-100.text-warning-600:hover {
+  background-color: #fde68a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
+/* Shipped Status */
+.bg-info-100.text-info-600 {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border-color: #60a5fa;
+}
+
+.bg-info-100.text-info-600:hover {
+  background-color: #bfdbfe;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Delivered Status */
+.bg-success-100.text-success-600 {
+  background-color: #d1fae5;
+  color: #059669;
+  border-color: #34d399;
+}
+
+.bg-success-100.text-success-600:hover {
+  background-color: #a7f3d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Cancelled Status */
+.bg-danger-100.text-danger-600 {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #f87171;
+}
+
+.bg-danger-100.text-danger-600:hover {
+  background-color: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Neutral/Other Status */
+.bg-neutral-100.text-neutral-600 {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border-color: #d1d5db;
+}
+
+.bg-neutral-100.text-neutral-600:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3);
+}
+
+/* Icon styling within badges */
+.badge iconify-icon {
+  font-size: 17px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .badge {
+    font-size: 14px;
+    padding: 8px 12px !important;
+    gap: 4px;
+  }
+  
+  .badge iconify-icon {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .badge {
+    font-size: 14px;
+    padding: 7px 10px !important;
+  }
+  
+  .badge iconify-icon {
+    font-size: 15px;
+  }
+}
+
+.rounded-circle {
+  border-radius: 50% !important;
+}
+
+.text-secondary-light {
+  color: #9ca3af;
+}
+
+/* Product Images Stack */
+.product-images-stack {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 40px;
+  min-width: 80px;
+}
+
+.product-stack-image {
+  width: 60px;
+  height: 55px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  object-fit: cover;
+  position: absolute;
+  transition: transform 0.2s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-stack-image:nth-child(1) {
+  left: 0;
+}
+
+.product-stack-image:nth-child(2) {
+  left: 20px;
+}
+
+.product-stack-image:nth-child(3) {
+  left: 40px;
+}
+
+.product-stack-image:nth-child(4) {
+  left: 60px;
+}
+
+.product-stack-image:nth-child(5) {
+  left: 80px;
+}
+
+.product-images-stack:hover .product-stack-image {
+  transform: translateX(5px);
+}
+
+.product-images-stack:hover .product-stack-image:nth-child(1) {
+  transform: translateX(0);
+}
+
+.product-stack-placeholder {
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.product-stack-more {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+</style>
+
+<!-- Add Iconify Script if not already included in base template -->
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+{% endblock %}
