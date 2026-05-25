@@ -221,7 +221,7 @@
   //   green: "#16a34a",
   //   yellow: "#ff9f29",
   //   cyan: "#00b8f2",
-  //   violet: "#7c3aed",
+  //   violet: "#7c3AED ",
   // };
 
   // function applyColor(color) {
@@ -264,7 +264,7 @@
     green: "#16a34a",
     yellow: "#ff9f29",
     cyan: "#00b8f2",
-    violet: "#7c3aed",
+    violet: "#7c3AED ",
   };
 
   function applyColor(color) {

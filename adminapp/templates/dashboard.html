@@ -107,7 +107,7 @@
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                     <div>
                                         <p class="fw-medium text-primary-light mb-1">Total Revenue</p>
-                                        <h6 class="mb-0 format-currency">₹{{ total_revenue|floatformat:2 }}</h6>
+                                        <h6 class="mb-0 format-currency">AED {{ total_revenue|floatformat:2 }}</h6>
                                     </div>
                                     <div
                                         class="w-50-px h-50-px bg-success-main rounded-circle d-flex justify-content-center align-items-center">
@@ -119,7 +119,7 @@
                                     class="fw-medium text-sm text-primary-light mt-12 mb-0 d-flex align-items-center gap-2">
                                     <span class="d-inline-flex align-items-center gap-1 text-success-main">
                                         <iconify-icon icon="bxs:up-arrow" class="text-xs"></iconify-icon> 
-                                        +₹{{ revenue_30_days|floatformat:2 }}
+                                        +AED {{ revenue_30_days|floatformat:2 }}
                                     </span>
                                     Last 30 days revenue
                                 </p>
@@ -168,7 +168,7 @@
                                     </select>
                                 </div>
                                 <div class="d-flex flex-wrap align-items-center gap-2 mt-8">
-                                    <h6 class="mb-0 format-currency">₹{{ total_revenue|floatformat:2 }}</h6>
+                                    <h6 class="mb-0 format-currency">AED {{ total_revenue|floatformat:2 }}</h6>
                                     <span
                                         class="text-sm fw-semibold rounded-pill bg-success-focus text-success-main border br-success px-8 py-4 line-height-1 d-flex align-items-center gap-1">
                                         10% <iconify-icon icon="bxs:up-arrow" class="text-xs"></iconify-icon>
@@ -283,7 +283,7 @@
                                             </td>
                                             <td>#{{ order.id }}</td>
                                             <td>{{ order.items.count }} item(s)</td>
-                                            <td class="format-currency">₹{{ order.total_price|floatformat:2 }}</td>
+                                            <td class="format-currency">AED {{ order.total_price|floatformat:2 }}</td>
                                             <td class="text-center">
                                                 <span
                                                     class="bg-{% if order.status == 'delivered' or order.status == 'completed' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %}-focus text-{% if order.status == 'delivered' or order.status == 'completed' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %}-main px-24 py-4 rounded-pill fw-medium text-sm">{{ order.get_status_display }}</span>
@@ -374,7 +374,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="format-currency">₹{{ product.price|floatformat:2 }}</td>
+                                            <td class="format-currency">AED {{ product.price|floatformat:2 }}</td>
                                             <td>{{ product.stock }}</td>
                                             <td>{{ product.category.name }}</td>
                                             <td class="text-center">
@@ -423,7 +423,7 @@
                                         {% with stock_percent=product.stock|add:"0"|floatformat:0|add:"0" %}
                                         <tr>
                                             <td>{{ product.name|truncatechars:20 }}</td>
-                                            <td class="format-currency">₹{{ product.price|floatformat:2 }}</td>
+                                            <td class="format-currency">AED {{ product.price|floatformat:2 }}</td>
                                             <td>
                                                 <div class="max-w-112 mx-auto">
                                                     <div class="w-100">
@@ -469,7 +469,7 @@
 <script>
     // Indian Currency Formatter Function
 function formatIndianCurrency(amount) {
-    if (!amount || amount === 0) return "₹0";
+    if (!amount || amount === 0) return "AED 0";
     
     // Check if amount has decimal values
     const hasDecimals = amount % 1 !== 0;
@@ -491,17 +491,17 @@ function formatIndianCurrency(amount) {
     
     // Return with or without decimals
     if (hasDecimals && decimalPart) {
-        return "₹" + formatted + "." + decimalPart.substring(0, 2);
+        return "AED " + formatted + "." + decimalPart.substring(0, 2);
     }
     
-    return "₹" + formatted;
+    return "AED " + formatted;
 }
 
 // Format all currency values on page load
 function formatAllCurrencyElements() {
     // Format all elements with class 'format-currency'
     document.querySelectorAll('.format-currency').forEach(element => {
-        const value = parseFloat(element.textContent.replace('₹', '').replace(/,/g, ''));
+        const value = parseFloat(element.textContent.replace('AED ', '').replace(/,/g, ''));
         if (!isNaN(value)) {
             element.textContent = formatIndianCurrency(value);
         }
@@ -550,20 +550,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 yaxis: {
                     labels: {
                         formatter: function (value) {
-                            if (!value || value === 0) return "₹0";
+                            if (!value || value === 0) return "AED 0";
                             
                             // Format in lakhs/crores for Y-axis
                             if (value >= 10000000) {
                                 const crores = value / 10000000;
-                                return "₹" + (crores % 1 !== 0 ? crores.toFixed(1) : crores) + "Cr";
+                                return "AED " + (crores % 1 !== 0 ? crores.toFixed(1) : crores) + "Cr";
                             } else if (value >= 100000) {
                                 const lakhs = value / 100000;
-                                return "₹" + (lakhs % 1 !== 0 ? lakhs.toFixed(1) : lakhs) + "L";
+                                return "AED " + (lakhs % 1 !== 0 ? lakhs.toFixed(1) : lakhs) + "L";
                             } else if (value >= 1000) {
                                 const thousands = value / 1000;
-                                return "₹" + (thousands % 1 !== 0 ? thousands.toFixed(1) : thousands) + "K";
+                                return "AED " + (thousands % 1 !== 0 ? thousands.toFixed(1) : thousands) + "K";
                             }
-                            return "₹" + value;
+                            return "AED " + value;
                         }
                     }
                 },

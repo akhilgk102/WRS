@@ -11,15 +11,7 @@
       <p class="alternative-details">Update product information</p>
     </div>
 
-    {% if messages %}
-    <div class="messages-wrapper">
-      {% for message in messages %}
-      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
-        {{ message }}
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
+
 
     <form method="POST" class="product-form">
       {% csrf_token %}

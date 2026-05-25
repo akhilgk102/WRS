@@ -1,0 +1,735 @@
+{% extends "user_base.html" %}
+{% load static %}
+
+{% block title %}Request Replacement{% endblock %}
+
+{% block content %}
+
+<div class="section after-banner">
+  <div class="container">
+    
+    <!-- Main Replacement Card -->
+    <div class="replacement-order-wrapper">
+      
+      <!-- Header Section -->
+      <div class="replacement-order-header">
+        <div class="replacement-header-content">
+          <h2 class="replacement-order-title">Request Replacement</h2>
+          <p class="replacement-order-subtitle">
+            Order ID: <span class="order-id-badge">#{{ order.id }}</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Order Summary Section -->
+      <div class="order-summary-section">
+        <div class="section-header">
+          <h3 class="section-header-title">Order Details</h3>
+          <span class="section-header-line"></span>
+        </div>
+
+        <div class="order-items-list">
+          <div class="order-item-card">
+            <div class="item-image-wrapper">
+              {% if item.product.primary_image %}
+                <img src="{{ item.product.primary_image.image.url }}" 
+                     alt="{{ item.product.name }}" 
+                     class="item-image">
+              {% else %}
+                <img src="{% static 'img/no-image.png' %}" 
+                     alt="No Image" 
+                     class="item-image">
+              {% endif %}
+              <div class="item-quantity-badge">{{ item.quantity }}x</div>
+            </div>
+
+            <div class="item-details">
+              <h4 class="item-name">{{ item.product.name }}</h4>
+              <p class="item-quantity-text">Quantity: {{ item.quantity }}</p>
+              <p class="item-quantity-text">Delivered On: {{ order.updated_at|date:"d M Y" }}</p>
+            </div>
+
+            <div class="item-price-wrapper">
+              <span class="item-price">AED  {{ item.price }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deadline Info -->
+        <div class="deadline-info-section">
+          <div class="deadline-row">
+            <span class="deadline-label">Replacement Deadline</span>
+            <span class="deadline-date">{{ replacement_deadline|date:"d M Y" }}</span>
+          </div>
+        </div>
+
+        <!-- Warning Alert -->
+        <div class="alert-box alert-warning">
+          <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 6V11M10 14H10.01M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="alert-content">
+            <p class="alert-title">Important Notice</p>
+            <p class="alert-text">Replacement requests must be submitted before the deadline. Please provide detailed information about the issue to expedite processing.</p>
+          </div>
+        </div>
+      </div>
+
+ 
+
+      <!-- Replacement Form -->
+      <form method="post" class="replacement-order-form">
+        {% csrf_token %}
+
+        <!-- Reason Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3 class="section-header-title">Replacement Reason</h3>
+            <span class="section-header-line"></span>
+          </div>
+
+          <div class="form-field-group">
+            <label for="reason" class="form-label">
+              Why do you need a replacement? <span class="required">*</span>
+            </label>
+            <textarea 
+              name="reason" 
+              id="reason" 
+              rows="5"
+              class="form-textarea" 
+              placeholder="Explain the issue (damaged, wrong item, defective, etc.)"
+              required></textarea>
+            <p class="form-hint">Please provide detailed information about the issue to help us process your request faster.</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+                    <button type="submit" class="btn-primary btn-warning">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1V8M8 8V15M8 8H15M8 8H1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Submit Replacement Request
+          </button>
+          <a href="{% url 'user_order_detail' order.id %}" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 14L2 8L8 2M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Cancel
+          </a>
+
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* ==================== REPLACEMENT ORDER STYLES ==================== */
+
+.replacement-order-wrapper {
+  background: #ffffff;
+  border: 1px solid rgba(6, 28, 42, 0.1);
+  border-radius: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(6, 28, 42, 0.08);
+}
+
+/* Header Section */
+.replacement-order-header {
+  background: linear-gradient(135deg, #061c2a 0%, #04141f 100%);
+  padding: 30px 60px;
+  border-bottom: 3px solid #0a2d45;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.replacement-order-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.replacement-order-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.replacement-header-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.replacement-order-title {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.replacement-order-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.order-id-badge {
+  display: inline-block;
+  background: #ffffff;
+  color: #061c2a;
+  padding: 6px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-left: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.section-header-title {
+  color: #061c2a;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.section-header-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(6, 28, 42, 0.2) 0%, rgba(6, 28, 42, 0) 100%);
+}
+
+/* Order Summary Section */
+.order-summary-section {
+  padding: 50px 60px;
+  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.order-item-card {
+  background: #ffffff;
+  border: 2px solid rgba(6, 28, 42, 0.08);
+  border-radius: 18px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.order-item-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #061c2a;
+  transform: scaleY(0);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.order-item-card:hover::before {
+  transform: scaleY(1);
+}
+
+.order-item-card:hover {
+  border-color: #061c2a;
+  box-shadow: 0 12px 32px rgba(6, 28, 42, 0.15);
+  transform: translateX(8px);
+}
+
+.item-image-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.item-image {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 15px;
+  border: 2px solid rgba(6, 28, 42, 0.1);
+  transition: all 0.4s ease;
+}
+
+.order-item-card:hover .item-image {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(6, 28, 42, 0.15);
+}
+
+.item-quantity-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: linear-gradient(135deg, #061c2a 0%, #04141f 100%);
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(6, 28, 42, 0.3);
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  color: #061c2a;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+}
+
+.item-quantity-text {
+  color: #5a6c7d;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.item-price-wrapper {
+  text-align: right;
+}
+
+.item-price {
+  color: #061c2a;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Deadline Info */
+.deadline-info-section {
+  background: #e8f4f8;
+  border: 2px solid #c5e3ef;
+  border-radius: 15px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.deadline-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deadline-label {
+  color: #061c2a;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.deadline-date {
+  color: #0a2d45;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Alert Box */
+.alert-box {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.alert-warning {
+  background: #e8f4f8;
+  border-color: #c5e3ef;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  color: #061c2a;
+  margin-top: 2px;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  color: #04141f;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.alert-text {
+  color: #5a6c7d;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Messages Section */
+.messages-section {
+  padding: 0 60px 30px 60px;
+}
+
+/* Form Sections */
+.replacement-order-form {
+  padding: 40px 60px;
+}
+
+.form-section {
+  margin-bottom: 40px;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-field-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  color: #061c2a;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.required {
+  color: #dc3545;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid rgba(6, 28, 42, 0.2);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #061c2a;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #061c2a;
+  box-shadow: 0 0 0 3px rgba(6, 28, 42, 0.1);
+}
+
+.form-textarea::placeholder {
+  color: #8a9aa8;
+}
+
+.form-hint {
+  color: #5a6c7d;
+  font-size: 13px;
+  font-weight: 400;
+  margin: 8px 0 0 0;
+  line-height: 1.5;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(6, 28, 42, 0.1);
+}
+
+.btn-secondary,
+.btn-primary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 30px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #f1f3f5;
+  color: #061c2a;
+  border: 1px solid rgba(6, 28, 42, 0.2);
+}
+
+.btn-secondary:hover {
+  background: #e1e5e9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(6, 28, 42, 0.1);
+}
+
+.btn-primary {
+  background: #061c2a;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #04141f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(6, 28, 42, 0.3);
+}
+
+.btn-warning {
+  background: #061c2a;
+}
+
+.btn-warning:hover {
+  background: #04141f;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 991px) {
+  .replacement-order-header {
+    padding: 25px 30px;
+    gap: 16px;
+  }
+
+  .replacement-order-title {
+    font-size: 26px;
+    margin: 0 0 8px 0;
+  }
+
+  .replacement-order-subtitle {
+    font-size: 15px;
+  }
+
+  .replacement-order-header::before {
+    width: 250px;
+    height: 250px;
+  }
+
+  .replacement-order-header::after {
+    width: 180px;
+    height: 180px;
+  }
+
+  .order-id-badge {
+    padding: 5px 14px;
+    font-size: 15px;
+  }
+
+  .order-summary-section,
+  .replacement-order-form {
+    padding: 30px;
+  }
+
+  .messages-section {
+    padding: 0 30px 30px 30px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .replacement-order-header {
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .replacement-order-title {
+    font-size: 20px;
+    margin: 0 0 6px 0;
+  }
+
+  .replacement-order-subtitle {
+    font-size: 14px;
+  }
+
+  .order-id-badge {
+    padding: 4px 12px;
+    font-size: 14px;
+  }
+
+  .replacement-order-header::before {
+    width: 200px;
+    height: 200px;
+  }
+
+  .replacement-order-header::after {
+    width: 150px;
+    height: 150px;
+  }
+
+  .section-header-title {
+    font-size: 18px;
+  }
+
+  .order-summary-section,
+  .replacement-order-form {
+    padding: 25px;
+  }
+
+  .messages-section {
+    padding: 0 25px 25px 25px;
+  }
+
+  .order-item-card {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .item-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .item-name {
+    font-size: 16px;
+  }
+
+  .item-price {
+    font-size: 18px;
+  }
+
+  .deadline-date {
+    font-size: 18px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .replacement-order-header {
+    padding: 16px;
+    gap: 0;
+  }
+
+  .replacement-order-title {
+    font-size: 18px;
+    margin: 0 0 5px 0;
+  }
+
+  .replacement-order-subtitle {
+    font-size: 13px;
+  }
+
+  .order-id-badge {
+    display: block;
+    margin-left: 0;
+    margin-top: 6px;
+    width: fit-content;
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+
+  .replacement-order-header::before {
+    width: 150px;
+    height: 150px;
+  }
+
+  .replacement-order-header::after {
+    width: 100px;
+    height: 100px;
+  }
+
+  .section-header-title {
+    font-size: 16px;
+  }
+
+  .order-summary-section,
+  .replacement-order-form {
+    padding: 20px;
+  }
+
+  .messages-section {
+    padding: 0 20px 20px 20px;
+  }
+
+  .order-item-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .item-details {
+    text-align: center;
+  }
+
+  .item-price-wrapper {
+    text-align: center;
+  }
+
+  .deadline-row {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .alert-box {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-textarea {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    padding: 14px 25px;
+    font-size: 15px;
+  }
+}
+</style>
+
+{% endblock %}

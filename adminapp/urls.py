@@ -65,7 +65,16 @@ urlpatterns = [
     path("coupons/update/<int:id>/", views.coupon_update, name="coupon_update"),
     path("coupons/delete/<int:id>/", views.coupon_delete, name="coupon_delete"),
 
+    path("orders/cancelled/", views.cancelled_orders_list, name="cancelled_orders_list"),
+    path("orders/cancelled/<int:pk>/", views.cancelled_order_detail, name="cancelled_order_detail"),
+    path("orders/cancelled/<int:pk>/delete/", views.cancelled_order_delete, name="cancelled_order_delete"),
+    path("replacements/",views.replacement_requests_list,name="replacement_requests_list"),
+    path("replacements/<int:item_id>/",views.replacement_request_detail,name="replacement_request_detail"),
+    path("replacement-orders/",views.admin_replacement_orders,name="admin_replacement_orders"),
+    path("replacement-orders/<int:pk>/",views.replacement_order_manage,name="replacement_order_manage"),
+    path('homepage/section/<int:section_id>/reorder-products/', 
+         views.homepage_section_reorder_products, 
+         name='homepage_section_reorder_products'),
 
-    
 
 ]

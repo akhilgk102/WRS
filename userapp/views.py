@@ -10,8 +10,187 @@ from django.http import JsonResponse
 from django.db.models import Avg
 from decimal import Decimal
 from django.db import transaction
-
+from django.urls import reverse
 from django.db.models import Avg, Count, Q
+from decimal import Decimal
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import HttpResponse
+from .models import Cart, Address, Order, OrderItem
+from decimal import Decimal
+from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
+from django.db import transaction
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from .models import (Cart,Order,OrderItem,Address,)
+from adminapp.models import Coupon, Product,CouponUsage
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from datetime import timedelta
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth import login  # keep this import
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.core.paginator import Paginator
+from django.db.models import Q, Count
+from adminapp.models import Product, Category
+from django.shortcuts import render
+from decimal import Decimal
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from adminapp.models import Coupon
+from .models import Cart
+from adminapp.models import CouponUsage
+from adminapp.models import Category
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import OrderItem
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import ReplacementOrder
+from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.decorators import login_required
+from .models import ReplacementOrder
+from .email_utils import send_order_confirmation_email
+from userapp.email_utils import send_order_shipped_email
+from userapp.email_utils import send_order_delivered_email
+from userapp.email_utils import send_order_cancelled_email
+
+
+
+
+
+def user_index(request):
+    sections = HomepageSection.objects.filter(is_active=True).prefetch_related(
+        'homepage_products__product__images',
+        'homepage_products__product__category',
+        'categories'
+    )
+
+    homepage_data = {}
+
+    # -----------------------------
+    # Build homepage section data
+    # -----------------------------
+    for section in sections:
+        if section.display_type == 'manual':
+            products = [
+                hp.product
+                for hp in section.homepage_products.all().order_by('display_order')
+            ]
+        else:
+            products = Product.objects.filter(
+                category__in=section.categories.all()
+            ).distinct().order_by('-created_at')
+
+        homepage_data[section.section_type] = {
+            'name': section.name,
+            'products': products,
+            'categories': section.categories.all()
+        }
+
+    # -----------------------------
+    # Featured Products
+    # -----------------------------
+    featured_section = homepage_data.get('featured', {})
+    featured_products = featured_section.get('products', [])
+
+    # -----------------------------
+    # Deals of the Day
+    # -----------------------------
+    deals_section = homepage_data.get('deals', {})
+    deals_products = deals_section.get('products', [])
+
+    # -----------------------------
+    # Best Sellers (grouped by category)
+    # -----------------------------
+    best_seller_categories = homepage_data.get('best_seller', {}).get('categories', [])
+    best_seller_products = homepage_data.get('best_seller', {}).get('products', [])
+
+    best_sellers_by_category = {
+        category.id: [
+            p for p in best_seller_products
+            if p.category_id == category.id
+        ]
+        for category in best_seller_categories
+    }
+
+    # -----------------------------
+    # New Arrivals (grouped by category)
+    # -----------------------------
+    new_arrival_categories = homepage_data.get('new_arrival', {}).get('categories', [])
+    new_arrival_products = homepage_data.get('new_arrival', {}).get('products', [])
+
+    new_arrivals_by_category = {
+        category.id: [
+            p for p in new_arrival_products
+            if p.category_id == category.id
+        ]
+        for category in new_arrival_categories
+    }
+
+    # -----------------------------
+    # Final Context
+    # -----------------------------
+
+    categories = Category.objects.all()
+
+    context = {
+        'homepage_data': homepage_data,
+
+        # Featured Products
+        'featured_products': featured_products,
+
+        # Deals of the Day
+        'deals_products': deals_products,
+
+        # New Arrivals
+        'new_arrivals': new_arrival_products,
+        'new_arrival_categories': new_arrival_categories,
+        'new_arrivals_by_category': new_arrivals_by_category,
+
+        # Best Sellers
+        'best_seller_categories': best_seller_categories,
+        'best_sellers_by_category': best_sellers_by_category,
+        'categories': categories
+    }
+
+    return render(request, 'userapp/user_index.html', context)
+
+
+
 
 def home(request):
     products = Product.objects.filter(stock__gt=0).annotate(
@@ -77,18 +256,31 @@ def home(request):
 
 
 def contact_view(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("dashboard")
+        return redirect("user_home")
     return render(request, 'userapp/static_pages/contact.html')
 
 def about_view(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("dashboard")
+        return redirect("user_home")
     return render(request, 'userapp/static_pages/about.html')
 
 def service_view(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("dashboard")
+        return redirect("user_home")
     return render(request, 'userapp/static_pages/services.html')
 
 
 
-@login_required
+@login_required(login_url="/login/")
 def product_detail(request, slug):
+
     product = get_object_or_404(Product, slug=slug)
 
     # Check if user has bought this product
@@ -98,41 +290,125 @@ def product_detail(request, slug):
         order__payment_status="PAID"
     ).exists()
 
-    # Handle review submit
-    if request.method == "POST" and user_can_review:
-        title = request.POST.get("title")
-        content = request.POST.get("content")
-        rating = request.POST.get("rating")
+    # =====================================
+    # HANDLE REVIEW SUBMISSION
+    # =====================================
+    if request.method == "POST":
 
-        if title and content and rating:
-            Review.objects.create(
-                product=product,
-                user=request.user,
-                title=title,
-                content=content,
-                rating=int(rating),
+        # User must purchase product
+        if not user_can_review:
+            messages.error(
+                request,
+                "You can review only purchased products."
             )
-            messages.success(request, "Thank you! Your review has been submitted.")
             return redirect("product_detail", slug=slug)
 
-    # Categories for sidebar
+        # Prevent duplicate reviews
+        already_reviewed = Review.objects.filter(
+            product=product,
+            user=request.user
+        ).exists()
+
+        if already_reviewed:
+            messages.warning(
+                request,
+                "You already submitted a review for this product."
+            )
+            return redirect("product_detail", slug=slug)
+
+        # Get form data safely
+        title = request.POST.get("title", "").strip()
+        content = request.POST.get("content", "").strip()
+        rating = request.POST.get("rating", "").strip()
+
+        # Validate required fields
+        if not title or not content or not rating:
+            messages.error(
+                request,
+                "All review fields are required."
+            )
+            return redirect("product_detail", slug=slug)
+
+        # Validate rating
+        try:
+            rating = int(rating)
+
+            if rating < 1 or rating > 5:
+                messages.error(
+                    request,
+                    "Rating must be between 1 and 5."
+                )
+                return redirect("product_detail", slug=slug)
+
+        except ValueError:
+            messages.error(
+                request,
+                "Invalid rating value."
+            )
+            return redirect("product_detail", slug=slug)
+
+        # Optional content length validation
+        if len(content) < 5:
+            messages.error(
+                request,
+                "Review content is too short."
+            )
+            return redirect("product_detail", slug=slug)
+
+        # Create review
+        Review.objects.create(
+            product=product,
+            user=request.user,
+            title=title,
+            content=content,
+            rating=rating,
+        )
+
+        messages.success(
+            request,
+            "Thank you! Your review has been submitted."
+        )
+
+        return redirect("product_detail", slug=slug)
+
+    # =====================================
+    # CATEGORIES
+    # =====================================
     categories = Category.objects.all()
+
     for category in categories:
-        category.product_count = Product.objects.filter(category=category, stock__gt=0).count()
+        category.product_count = Product.objects.filter(
+            category=category,
+            stock__gt=0
+        ).count()
 
-    related_products = Product.objects.exclude(id=product.id).filter(stock__gt=0)[:4]
-    
+    # =====================================
+    # RELATED PRODUCTS
+    # =====================================
+    related_products = Product.objects.exclude(
+        id=product.id
+    ).filter(
+        stock__gt=0
+    )[:4]
 
-        # Calculate review stats
+    # =====================================
+    # REVIEW STATS
+    # =====================================
     reviews = product.reviews.all()
+
     total_reviews = reviews.count()
 
     if total_reviews > 0:
-        average_rating = round(reviews.aggregate(Avg("rating"))["rating__avg"], 1)
+        average_rating = round(
+            reviews.aggregate(
+                Avg("rating")
+            )["rating__avg"],
+            1
+        )
     else:
         average_rating = 0
 
-    # Count each rating
+    # Rating counts
     rating_counts = {
         5: reviews.filter(rating=5).count(),
         4: reviews.filter(rating=4).count(),
@@ -141,38 +417,42 @@ def product_detail(request, slug):
         1: reviews.filter(rating=1).count(),
     }
 
-    # Percentages
+    # Rating percentages
     rating_percent = {
-        star: (rating_counts[star] / total_reviews * 100) if total_reviews else 0
+        star: (
+            rating_counts[star] / total_reviews * 100
+        ) if total_reviews else 0
         for star in rating_counts
     }
 
+    return render(
+        request,
+        "userapp/product_detail.html",
+        {
+            "product": product,
+            "categories": categories,
+            "related_products": related_products,
+            "user_can_review": user_can_review,
 
-    return render(request, "userapp/product_detail.html", {
-        "product": product,
-        "categories": categories,
-        "related_products": related_products,
-        "user_can_review": user_can_review,
             # Review stats
-        "total_reviews": total_reviews,
-        "average_rating": average_rating,
+            "total_reviews": total_reviews,
+            "average_rating": average_rating,
 
-        # Counts
-        "rating_5_count": rating_counts[5],
-        "rating_4_count": rating_counts[4],
-        "rating_3_count": rating_counts[3],
-        "rating_2_count": rating_counts[2],
-        "rating_1_count": rating_counts[1],
+            # Counts
+            "rating_5_count": rating_counts[5],
+            "rating_4_count": rating_counts[4],
+            "rating_3_count": rating_counts[3],
+            "rating_2_count": rating_counts[2],
+            "rating_1_count": rating_counts[1],
 
-        # Percents
-        "rating_5_percent": rating_percent[5],
-        "rating_4_percent": rating_percent[4],
-        "rating_3_percent": rating_percent[3],
-        "rating_2_percent": rating_percent[2],
-        "rating_1_percent": rating_percent[1],
-    })
-
-
+            # Percentages
+            "rating_5_percent": rating_percent[5],
+            "rating_4_percent": rating_percent[4],
+            "rating_3_percent": rating_percent[3],
+            "rating_2_percent": rating_percent[2],
+            "rating_1_percent": rating_percent[1],
+        }
+    )
 
 @login_required
 def add_to_cart(request, id):
@@ -203,10 +483,36 @@ def add_to_cart(request, id):
     item.save()
     messages.success(request, f"{product.name} added to cart!")
     return redirect("view_cart")  # send user to cart page
-from decimal import Decimal
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+
+@login_required
+def get_available_coupons(request):
+    from django.utils import timezone
+    from adminapp.models import Coupon, CouponUsage
+
+    now = timezone.now()
+
+    # Coupons already used by this user
+    used_ids = CouponUsage.objects.filter(
+        user=request.user
+    ).values_list('coupon_id', flat=True)
+
+    coupons = Coupon.objects.filter(
+        is_active=True,
+        valid_from__lte=now,
+        valid_to__gte=now,
+    ).exclude(id__in=used_ids)
+
+    data = []
+    for c in coupons:
+        if c.usage_limit is None or c.used_count < c.usage_limit:
+            data.append({
+                'code': c.code,
+                'discount': float(c.discount),
+                'valid_to': c.valid_to.strftime('%d %b %Y'),
+            })
+
+    return JsonResponse({'coupons': data})
+
 
 @login_required
 def view_cart(request):
@@ -240,7 +546,9 @@ def view_cart(request):
     cart_product_ids = cart.items.values_list("product_id", flat=True)
     related_products = Product.objects.exclude(
         id__in=cart_product_ids
-    ).filter(stock__gt=0)[:4]
+    ).filter(stock__gt=0)[:4].annotate(
+        avg_rating=Avg("reviews__rating")
+    )
 
     # ✅ AJAX SUPPORT (KEPT)
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -282,133 +590,158 @@ def view_cart(request):
 
 @login_required
 def remove_from_cart(request, item_id):
-    """Remove an item from the cart"""
-    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
-    product_name = cart_item.product.name
-    cart_item.delete()
-    
-    # If AJAX request, return JSON
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if request.method == "POST":
+        cart_item = get_object_or_404(
+            CartItem,
+            id=item_id,
+            cart__user=request.user
+        )
+
+        cart = cart_item.cart
+        cart_item.delete()
+
+        item_count = cart.items.count()
+        subtotal = sum(
+            item.product.price * item.quantity
+            for item in cart.items.all()
+        )
+
         return JsonResponse({
-            'success': True,
-            'message': f'{product_name} has been removed from your cart.'
+            "success": True,
+            "item_id": item_id,
+            "item_count": item_count,
+            "subtotal": float(subtotal),
         })
-    
-    messages.success(request, f'{product_name} has been removed from your cart.')
-    return redirect('view_cart')
+
+    return JsonResponse({"success": False}, status=400)
 
 
 @login_required
 def update_cart_quantity(request, item_id):
-    """Update cart item quantity via AJAX"""
     if request.method == 'POST':
         try:
             cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
             data = json.loads(request.body)
             quantity = int(data.get('quantity', 1))
-            
-            # Validate quantity
+
             if quantity < 1:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Quantity must be at least 1'
-                })
-            
-            # Check stock availability
+                return JsonResponse({'success': False, 'message': 'Quantity must be at least 1'})
+
             if quantity > cart_item.product.stock:
-                return JsonResponse({
-                    'success': False,
-                    'message': f'Only {cart_item.product.stock} items available in stock'
-                })
-            
-            # Update quantity
+                return JsonResponse({'success': False, 'message': f'Only {cart_item.product.stock} in stock'})
+
             cart_item.quantity = quantity
             cart_item.save()
-            
+
+            # Recalculate cart totals
+            cart = cart_item.cart
+            subtotal = sum(
+                Decimal(str(item.product.final_price)) * item.quantity
+                for item in cart.items.all()
+            )
+
             return JsonResponse({
                 'success': True,
-                'message': 'Cart updated successfully'
+                'item_count': cart.items.count(),
+                'subtotal': float(subtotal),
+                'item_total': float(Decimal(str(cart_item.product.final_price)) * quantity),
             })
-            
-        except CartItem.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'message': 'Cart item not found'
-            })
+
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': f'Error: {str(e)}'
-            })
-    
-    return JsonResponse({
-        'success': False,
-        'message': 'Invalid request method'
-    })
+            return JsonResponse({'success': False, 'message': str(e)})
 
-
-import razorpay
-from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import HttpResponse
-
-from .models import Cart, Address, Order, OrderItem
-
-from decimal import Decimal
-
+    return JsonResponse({'success': False, 'message': 'Invalid method'})
 
 
 @login_required
 def checkout(request):
+
     user = request.user
     cart, _ = Cart.objects.get_or_create(user=user)
+
+    if not cart.items.exists():
+        messages.error(
+            request,
+            "Your cart is empty"
+        )
+        return redirect("view_cart")
+
     addresses = Address.objects.filter(user=user)
 
-    # ===============================
-    # 🔒 SAME PRICE LOGIC AS view_cart
-    # ===============================
     subtotal = sum(
         Decimal(item.product.final_price) * item.quantity
         for item in cart.items.all()
     )
 
-    discount = Decimal(request.session.get("coupon_discount", "0"))
+    discount = Decimal(
+        request.session.get(
+            "coupon_discount",
+            "0"
+        )
+    )
+
     if discount > subtotal:
         discount = subtotal
 
-    shipping_cost = Decimal("50") if subtotal > 0 and subtotal < 500 else Decimal("0")
+    shipping_cost = (
+        Decimal("50")
+        if subtotal > 0 and subtotal < 500
+        else Decimal("0")
+    )
 
     tax_rate = Decimal("5")
-    tax = (subtotal - discount) * tax_rate / Decimal("100")
 
-    total = subtotal - discount + shipping_cost + tax
-    if total < 0:
-        total = Decimal("0")
+    tax = (
+        (subtotal - discount)
+        * tax_rate
+        / Decimal("100")
+    )
 
-    # Razorpay requires paise
-    amount_paise = max(int(total * 100), 100)
+    total = (
+        subtotal
+        - discount
+        + shipping_cost
+        + tax
+    )
 
-    # ===============================
-    # ADDRESS HANDLING
-    # ===============================
+    amount_paise = int(total * 100)
+
     if request.method == "POST":
+
         address_id = request.POST.get("address_id")
 
         if address_id:
+            # Use saved address
             address = get_object_or_404(Address, id=address_id, user=user)
+
         else:
-            full_name = request.POST.get("full_name")
-            phone = request.POST.get("phone")
-            street = request.POST.get("street")
-            city = request.POST.get("city")
-            state = request.POST.get("state")
-            pincode = request.POST.get("pincode")
+            # Validate new address fields
+            full_name = request.POST.get("full_name", "").strip()
+            phone     = request.POST.get("phone", "").strip()
+            street    = request.POST.get("street", "").strip()
+            city      = request.POST.get("city", "").strip()
+            state     = request.POST.get("state", "").strip()
+            pincode   = request.POST.get("pincode", "").strip()
 
             if not all([full_name, phone, street, city, state, pincode]):
-                messages.error(request, "Please enter a full address.")
-                return redirect("checkout")
+                messages.error(
+                    request,
+                    "Please select a saved address or fill in all address fields."
+                )
+                return render(
+                    request,
+                    "userapp/checkout.html",
+                    {
+                        "cart": cart,
+                        "addresses": addresses,
+                        "subtotal": subtotal,
+                        "discount": discount,
+                        "shipping_cost": shipping_cost,
+                        "tax": tax,
+                        "tax_rate": tax_rate,
+                        "total": total,
+                    }
+                )
 
             address = Address.objects.create(
                 user=user,
@@ -420,148 +753,215 @@ def checkout(request):
                 pincode=pincode,
             )
 
-        request.session["selected_address"] = address.id
+        request.session[
+            "selected_address"
+        ] = address.id
 
-    # ===============================
-    # RAZORPAY ORDER
-    # ===============================
-    client = razorpay.Client(
-        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+        checkout_session = stripe.checkout.Session.create(
+
+            payment_method_types=["card"],
+
+            line_items=[{
+
+                "price_data": {
+
+                    "currency": "inr",
+
+                    "product_data": {
+                        "name": f"Order #{user.id}"
+                    },
+
+                    "unit_amount": amount_paise,
+                },
+
+                "quantity": 1
+
+            }],
+
+            mode="payment",
+
+            success_url=request.build_absolute_uri(
+                reverse(
+                    "order_success"
+                )
+            ) + "?session_id={CHECKOUT_SESSION_ID}",
+
+            cancel_url=request.build_absolute_uri(
+                reverse(
+                    "checkout"
+                )
+            )
+        )
+
+        return redirect(
+            checkout_session.url,
+            code=303
+        )
+
+    return render(
+        request,
+        "userapp/checkout.html",
+        {
+            "cart": cart,
+            "addresses": addresses,
+            "subtotal": subtotal,
+            "discount": discount,
+            "shipping_cost": shipping_cost,
+            "tax": tax,
+            "tax_rate": tax_rate,
+            "total": total,
+        }
     )
 
-    razorpay_order = client.order.create({
-        "amount": amount_paise,
-        "currency": "INR",
-        "payment_capture": 1,
-        "notes": {
-            "user_id": user.id,
-            "address_id": request.session.get("selected_address"),
-            "coupon": request.session.get("coupon_code"),
-        }
-    })
 
-    return render(request, "userapp/checkout.html", {
-        "cart": cart,
-        "addresses": addresses,
-
-        # ✅ SAME VALUES AS CART
-        "subtotal": subtotal,
-        "discount": discount,
-        "shipping_cost": shipping_cost,
-        "tax": tax,
-        "tax_rate": tax_rate,
-        "total": total,
-
-        # Razorpay
-        "razorpay_key": settings.RAZORPAY_KEY_ID,
-        "razorpay_order_id": razorpay_order["id"],
-        "amount": amount_paise,
-        "address_id": request.session.get("selected_address"),
-    })
-
-from django.views.decorators.csrf import csrf_exempt
-
-
-
-@csrf_exempt
+@csrf_protect
 @login_required
 def payment_success(request):
 
-    if request.method != "POST":
-        return HttpResponse("Invalid method", status=400)
+    session_id = request.GET.get("session_id")
 
-    payment_id = request.POST.get("razorpay_payment_id")
-    order_id = request.POST.get("razorpay_order_id")
-    signature = request.POST.get("razorpay_signature")
-
-    if not all([payment_id, order_id, signature]):
-        return HttpResponse("Missing payment details", status=400)
-
-    address_id = request.session.get("selected_address")
-    if not address_id:
-        return HttpResponse("Address missing", status=400)
-
-    client = razorpay.Client(
-        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
-    )
+    if not session_id:
+        return HttpResponse("Session missing")
 
     try:
-        client.utility.verify_payment_signature({
-            "razorpay_order_id": order_id,
-            "razorpay_payment_id": payment_id,
-            "razorpay_signature": signature,
-        })
-    except:
-        return HttpResponse("Signature verification failed", status=400)
+        session = stripe.checkout.Session.retrieve(session_id)
+
+    except Exception as e:
+        return HttpResponse(str(e))
+
+    # Payment check
+    if session.payment_status != "paid":
+        return HttpResponse("Payment failed")
 
     user = request.user
-    cart = get_object_or_404(Cart, user=user)
 
-    # SAME PRICE LOGIC
+    cart = get_object_or_404(
+        Cart,
+        user=user
+    )
+
+    address_id = request.session.get(
+        "selected_address"
+    )
+
+    address = get_object_or_404(
+        Address,
+        id=address_id
+    )
+
     subtotal = sum(
         Decimal(item.product.final_price) * item.quantity
         for item in cart.items.all()
     )
 
-    discount = Decimal(request.session.get("coupon_discount", "0"))
-    if discount > subtotal:
-        discount = subtotal
-
-    shipping_fee = Decimal("50") if subtotal > 0 and subtotal < 500 else Decimal("0")
-    tax_rate = Decimal("5")
-    tax = (subtotal - discount) * tax_rate / Decimal("100")
-    total = subtotal - discount + shipping_fee + tax
-
-    address = get_object_or_404(Address, id=address_id, user=user)
-
-    order = Order.objects.create(
-        user=user,
-        address=address,
-        subtotal=subtotal,
-        tax=tax,
-        shipping_fee=shipping_fee,
-        discount_amount=discount,
-        total_price=total,
-        status="PLACED",
-        payment_status="PAID",
-        razorpay_order_id=order_id,
-        razorpay_payment_id=payment_id,
-        razorpay_signature=signature,
+    discount = Decimal(
+        request.session.get(
+            "coupon_discount",
+            "0"
+        )
     )
 
-    coupon_id = request.session.get("coupon_id")
+    shipping_fee = (
+        Decimal("50")
+        if subtotal > 0 and subtotal < 500
+        else Decimal("0")
+    )
 
-    if coupon_id:
-        coupon = Coupon.objects.filter(id=coupon_id, is_active=True).first()
-        if coupon:
-            coupon.used_count += 1
-            coupon.save()
+    tax = (
+        (subtotal - discount)
+        * Decimal("5")
+        / Decimal("100")
+    )
 
+    total = (
+        subtotal
+        - discount
+        + shipping_fee
+        + tax
+    )
 
-    for item in cart.items.all():
-        OrderItem.objects.create(
-            order=order,
-            product=item.product,
-            price=item.product.final_price,
-            quantity=item.quantity,
-        )
+    with transaction.atomic():
 
-        item.product.stock -= item.quantity
-        item.product.save()
+        from django.db import IntegrityError
 
-    cart.items.all().delete()
+        try:
+            order = Order.objects.create(
+                user=user,
+                address=address,
+
+                subtotal=subtotal,
+                tax=tax,
+                shipping_fee=shipping_fee,
+                discount_amount=discount,
+                total_price=total,
+
+                payment_status="PAID",
+
+                stripe_session_id=session.id,
+                stripe_payment_intent=session.payment_intent
+            )
+
+        except IntegrityError:
+            return redirect("order_history")
+
+        # SAVE COUPON USAGE
+        coupon_id = request.session.get("coupon_id")
+
+        if coupon_id:
+            try:
+                coupon = Coupon.objects.get(id=coupon_id)
+
+                # Save user coupon usage
+                CouponUsage.objects.get_or_create(
+                    user=user,
+                    coupon=coupon,
+                    order=order
+                )
+
+                # Increase coupon used count
+                coupon.used_count += 1
+                coupon.save()
+
+                # Save coupon in order
+                order.coupon = coupon
+                order.save()
+
+            except Coupon.DoesNotExist:
+                pass
+
+        # CREATE ORDER ITEMS + UPDATE STOCK
+        for item in cart.items.select_related("product"):
+
+            product = Product.objects.select_for_update().get(
+                id=item.product.id
+            )
+
+            if product.stock < item.quantity:
+                return HttpResponse(
+                    f"{product.name} out of stock"
+                )
+
+            product.stock -= item.quantity
+            product.save()
+
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                price=product.final_price,
+                quantity=item.quantity
+            )
+
+        cart.items.all().delete()
+
+        send_order_confirmation_email(order)
 
     # CLEAR SESSION
-    request.session.pop("coupon_discount", None)
+    request.session.pop("coupon_id", None)
     request.session.pop("coupon_code", None)
+    request.session.pop("coupon_discount", None)
     request.session.pop("selected_address", None)
 
     return redirect("order_history")
-
-
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from datetime import timedelta
 
 @login_required
 def order_history(request):
@@ -575,17 +975,24 @@ def order_history(request):
 
 
 
+
 @login_required
 def user_order_detail(request, pk):
-    order = get_object_or_404(
-        Order,
-        pk=pk,
-        user=request.user   # 🔒 security
-    )
-
+    order = get_object_or_404(Order, pk=pk, user=request.user)
     items = order.items.select_related("product")
 
     expected_delivery = order.created_at + timedelta(days=3)
+
+    # ✅ REAL replacement logic
+    replacement_allowed = False
+
+    if order.status == "DELIVERED":
+        delivered_at = order.updated_at   # or delivered_at if you add later
+        replacement_deadline = delivered_at + timedelta(days=7)
+
+        replacement_allowed = timezone.now() <= replacement_deadline
+    else:
+        replacement_deadline = None
 
     return render(
         request,
@@ -594,8 +1001,11 @@ def user_order_detail(request, pk):
             "order": order,
             "items": items,
             "expected_delivery": expected_delivery,
+            "replacement_allowed": replacement_allowed,
+            "replacement_deadline": replacement_deadline,
         }
     )
+
 
 
 
@@ -652,16 +1062,7 @@ def address_delete(request, id):
     return render(request, "address_delete.html", {"address": address})
 
 
-from django.contrib.auth import login  # keep this import
 
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
 
 @login_required
 def my_profile(request):
@@ -735,9 +1136,6 @@ def my_profile(request):
     })
 
 
-from django.db.models import Q, Count
-from adminapp.models import Product, Category
-from django.shortcuts import render
 
 def product_search(request):
     query = request.GET.get('query', '')
@@ -827,9 +1225,6 @@ def product_search(request):
     })
 
 
-
-from adminapp.models import Category
-
 def user_home(request):
     categories = Category.objects.all()
     context = {
@@ -840,17 +1235,20 @@ def user_home(request):
 
 
 
-from django.core.paginator import Paginator
 
 
 def all_products(request):
+    if request.user.is_authenticated:
+        return redirect("user_home")  # or logged-in products page
     """
     Display all products without requiring login with filtering and sorting
     """
     # Get all products with stock
     products = Product.objects.filter(
         stock__gt=0
-    ).select_related('category', 'subcategory', 'brand').prefetch_related('images')
+    ).select_related('category', 'subcategory', 'brand').prefetch_related('images').annotate(
+        avg_rating=Avg("reviews__rating")
+    )
     
     # Apply category filter
     category_filter = request.GET.get('category', '')
@@ -929,6 +1327,8 @@ def all_products(request):
 
 
 def product_search_no_login(request):
+    if request.user.is_authenticated:
+        return redirect("user_home")  # or logged-in products page
     """
     Search products without requiring login
     """
@@ -950,7 +1350,9 @@ def product_search_no_login(request):
             Q(brand__name__icontains=query)
         ).filter(stock__gt=0).distinct().select_related(
             'category', 'subcategory', 'brand'
-        ).prefetch_related('images')
+        ).prefetch_related('images').annotate(
+        avg_rating=Avg("reviews__rating")
+    )
 
         # Apply category filter
         if category_filter:
@@ -1055,6 +1457,8 @@ def product_search_no_login(request):
 
 
 def category_products_no_login(request, slug):
+    if request.user.is_authenticated:
+        return redirect("user_home")  # or logged-in products page
     """
     Display products for a specific category without requiring login
     """
@@ -1063,7 +1467,9 @@ def category_products_no_login(request, slug):
     products = Product.objects.filter(
         category=category,
         stock__gt=0
-    ).select_related('category', 'subcategory', 'brand').prefetch_related('images')
+    ).select_related('category', 'subcategory', 'brand').prefetch_related('images').annotate(
+        avg_rating=Avg("reviews__rating")
+    )
     
     # Apply price filter (considering offer_price)
     price_filter = request.GET.get('price', '')
@@ -1223,6 +1629,8 @@ def category_products(request, slug):
 
 
 def product_detail_no_login(request, slug):
+    if request.user.is_authenticated:
+        return redirect("user_home")  # or logged-in products page
     """
     Display product details without requiring login
     """
@@ -1274,6 +1682,7 @@ def product_detail_no_login(request, slug):
     
     context = {
         'product': product,
+        "login_next_url": reverse("product_detail", args=[product.slug]),
         'total_reviews': total_reviews,
         'average_rating': average_rating,
         'rating_5_count': rating_counts[5],
@@ -1293,6 +1702,18 @@ def product_detail_no_login(request, slug):
     return render(request, 'userapp/product_detail_no_login.html', context)
 
 
+def product_page(request, slug):
+
+    product = get_object_or_404(
+        Product,
+        slug=slug
+    )
+
+    if request.user.is_authenticated:
+        return product_detail(request, slug)
+
+    return product_detail_no_login(request, slug)
+
 @login_required
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
@@ -1305,17 +1726,11 @@ def delete_review(request, review_id):
     
     return redirect("product_detail", slug=product_slug)
 
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from decimal import Decimal
-
-from .models import Coupon
 
 
 @login_required
 def apply_coupon(request):
+
     if request.method != "POST":
         return redirect("view_cart")
 
@@ -1325,34 +1740,316 @@ def apply_coupon(request):
         messages.error(request, "Please enter a coupon code")
         return redirect("view_cart")
 
+    # =========================
+    # GET COUPON
+    # =========================
     try:
-        coupon = Coupon.objects.get(code=code)
+        coupon = Coupon.objects.get(
+            code=code,
+            is_active=True
+        )
     except Coupon.DoesNotExist:
         messages.error(request, "Invalid coupon code")
         return redirect("view_cart")
 
+    # =========================
+    # VALIDITY CHECK
+    # =========================
     if not coupon.is_valid():
-        messages.error(request, "Coupon expired or usage limit reached")
+        messages.error(
+            request,
+            "Coupon expired or usage limit reached"
+        )
         return redirect("view_cart")
 
-    # ✅ prevent re-applying same coupon
-    if request.session.get("coupon_code") == coupon.code:
-        messages.warning(request, "Coupon already applied")
+    # =========================
+    # PREVENT SAME USER REUSE
+    # =========================
+    already_used = CouponUsage.objects.filter(
+        user=request.user,
+        coupon=coupon
+    ).exists()
+
+    if already_used:
+        messages.error(
+            request,
+            "You already used this coupon"
+        )
         return redirect("view_cart")
 
-    # ✅ store SAFE values
+    # =========================
+    # GET CART
+    # =========================
+    cart, created = Cart.objects.get_or_create(
+        user=request.user
+    )
+
+    if not cart.items.exists():
+        messages.error(
+            request,
+            "Your cart is empty"
+        )
+        return redirect("view_cart")
+
+    # =========================
+    # CALCULATE SUBTOTAL
+    # =========================
+    subtotal = Decimal("0")
+
+    for item in cart.items.all():
+
+        product_price = (
+            item.product.offer_price
+            if item.product.offer_price
+            else item.product.price
+        )
+
+        subtotal += Decimal(product_price) * item.quantity
+
+    # =========================
+    # PREVENT OVER DISCOUNT
+    # =========================
+    discount = Decimal(coupon.discount)
+
+    if discount > subtotal:
+        discount = subtotal
+
+    # =========================
+    # STORE IN SESSION
+    # =========================
     request.session["coupon_id"] = coupon.id
     request.session["coupon_code"] = coupon.code
-    request.session["coupon_discount"] = str(coupon.discount)
+    request.session["coupon_discount"] = str(discount)
 
+    messages.success(
+        request,
+        f"Coupon {coupon.code} applied successfully"
+    )
 
-    messages.success(request, f"Coupon {coupon.code} applied successfully")
     return redirect("view_cart")
 
 
 @login_required
 def remove_coupon(request):
+    request.session.pop("coupon_id", None)
     request.session.pop("coupon_code", None)
     request.session.pop("coupon_discount", None)
     messages.success(request, "Coupon removed")
     return redirect("view_cart")
+
+
+@login_required
+def cancel_order(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user)
+
+    # ❌ Block cancellation after shipping
+    if order.status in ["SHIPPED", "DELIVERED", "CANCELLED"]:
+        messages.error(request, "This order cannot be cancelled after shipping.")
+        return redirect("order_history")
+
+    if request.method == "POST":
+        order.cancel_reason = request.POST.get("reason")
+        order.refund_account_name = request.POST.get("account_name")
+        order.refund_account_number = request.POST.get("account_number")
+        order.refund_ifsc = request.POST.get("ifsc")
+        order.refund_bank_name = request.POST.get("bank_name")
+
+        order.status = "CANCELLED"
+        order.refund_status = "PENDING"
+        order.cancelled_at = timezone.now()   # ✅ AUTO SET DATE & TIME
+        order.save()
+
+        # 🔄 Restore stock
+        for item in order.items.all():
+            product = item.product
+            product.stock += item.quantity
+            product.save()
+
+        messages.success(
+            request,
+            "Order cancelled successfully before shipping. Refund will be processed."
+        )
+        return redirect("order_history")
+
+    return render(request, "userapp/cancel_order.html", {"order": order})
+
+
+
+User = get_user_model()
+
+def forgot_password(request):
+
+    if request.method == "POST":
+
+        email = request.POST.get("email", "").strip()
+
+        # ==========================================
+        # ALWAYS SHOW SAME MESSAGE
+        # ==========================================
+        success_message = (
+            "If an account exists with this email, "
+            "a password reset link has been sent."
+        )
+
+        try:
+            user = User.objects.get(email=email)
+
+            # ==========================================
+            # BLOCK GOOGLE LOGIN USERS
+            # ==========================================
+            if user.has_usable_password():
+
+                uid = urlsafe_base64_encode(
+                    force_bytes(user.pk)
+                )
+
+                token = default_token_generator.make_token(user)
+
+                reset_link = request.build_absolute_uri(
+                    reverse(
+                        "reset_password",
+                        args=[uid, token]
+                    )
+                )
+
+                # ==========================================
+                # SEND RESET EMAIL
+                # ==========================================
+                send_mail(
+                    subject="Reset your password",
+                    message=(
+                        f"Click the link below to reset "
+                        f"your password:\n\n{reset_link}"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=True,
+                )
+
+        except User.DoesNotExist:
+
+            # ==========================================
+            # IMPORTANT:
+            # DO NOTHING
+            # ==========================================
+            pass
+
+        # ==========================================
+        # SAME RESPONSE FOR EVERY CASE
+        # ==========================================
+        messages.success(request, success_message)
+
+        return redirect("login")
+
+    return render(
+        request,
+        "userapp/forgot_password.html"
+    )
+
+
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is None or not default_token_generator.check_token(user, token):
+        messages.error(request, "Invalid or expired reset link")
+        return redirect("forgot_password")
+
+    if request.method == "POST":
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm_password")
+
+        if password != confirm:
+            messages.error(request, "Passwords do not match")
+            return redirect(request.path)
+
+        user.set_password(password)
+        user.save()
+
+        messages.success(request, "Password reset successful. Please login.")
+        return redirect("login")
+
+    return render(request, "userapp/reset_password.html")
+
+
+@login_required
+def request_replacement(request, item_id):
+    item = get_object_or_404(
+        OrderItem,
+        id=item_id,
+        order__user=request.user
+    )
+
+    order = item.order
+
+    if order.status != "DELIVERED":
+        messages.error(request, "Replacement allowed only after delivery.")
+        return redirect("user_order_detail", pk=order.id)
+
+    replacement_deadline = order.updated_at + timedelta(days=7)
+
+    if timezone.now() > replacement_deadline:
+        messages.error(request, "Replacement window expired.")
+        return redirect("user_order_detail", pk=order.id)
+
+    if item.replacement_requested:
+        messages.warning(request, "Replacement already requested.")
+        return redirect("user_order_detail", pk=order.id)
+
+    if request.method == "POST":
+        reason = request.POST.get("reason", "").strip()
+
+        if not reason:
+            messages.error(request, "Reason is required.")
+            return redirect(request.path)
+
+        item.mark_replacement_requested(reason)
+
+        messages.success(request, "Replacement request submitted.")
+        return redirect("user_order_detail", pk=order.id)
+
+    return render(request, "userapp/request_replacement.html", {
+        "item": item,
+        "order": order,
+        "replacement_deadline": replacement_deadline,
+    })
+
+
+
+
+@login_required
+def replacement_orders(request):
+    orders = ReplacementOrder.objects.filter(
+        user=request.user
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "userapp/replacement_orders.html",
+        {"orders": orders}
+    )
+
+
+
+
+@login_required
+def replacement_order_detail(request, pk):
+    order = get_object_or_404(
+        ReplacementOrder,
+        pk=pk,
+        user=request.user
+    )
+
+    expected_delivery = order.created_at + timedelta(days=3)
+
+    return render(
+        request,
+        "userapp/replacement_order_detail.html",
+        {
+            "order": order,
+            "expected_delivery": expected_delivery
+        }
+    )

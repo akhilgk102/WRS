@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.home, name="user_home"),
+    path("home/", views.user_index, name="user_index"),
     path('contact/', views.contact_view, name='contact'),
     path('about/', views.about_view, name='about'),
     path('services/', views.service_view, name='services'),
@@ -11,7 +12,7 @@ urlpatterns = [
 
 
     path("profile/", views.my_profile, name="profile"),
-    path("product/<slug:slug>/", views.product_detail, name="product_detail"),
+    path("product/<slug:slug>/", views.product_page, name="product_detail"),
     path('search-results/', views.product_search, name='product_search_user'),
     path('category/<slug:slug>/', views.category_products_no_login, name='category_products_no_login'),
     path('category/<slug:slug>/products', views.category_products, name='category_products'),
@@ -24,9 +25,10 @@ urlpatterns = [
     # userapp/urls.py
     path("orders/<int:pk>/", views.user_order_detail, name="user_order_detail"),
 
-    path('user/cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update/<int:item_id>/', views.update_cart_quantity, name='update_cart_quantity'),
     path('products/', views.all_products, name='all_products'),
+    path("order/<int:pk>/cancel/", views.cancel_order, name="cancel_order"),
 
     
     path("address/create/", views.address_create, name="address_create"),
@@ -35,11 +37,30 @@ urlpatterns = [
 
     path('search/', views.product_search_no_login, name='product_search_no_login'),
     path('review/delete/<int:review_id>/', views.delete_review, name='delete_review'),
+    
 
 
-    path('product/<slug:slug>/detail', views.product_detail_no_login, name='product_detail_no_login'),
     path("cart/apply-coupon/", views.apply_coupon, name="apply_coupon"),
     path("cart/remove-coupon/", views.remove_coupon, name="remove_coupon"),  # ✅ ADD THIS
+
+    path("forgot-password/", views.forgot_password, name="forgot_password"),
+    path("reset-password/<uidb64>/<token>/", views.reset_password, name="reset_password"),
+    path("order-item/<int:item_id>/replace/",views.request_replacement,name="request_replacement"),
+    path(
+        "replacement-orders/",
+        views.replacement_orders,
+        name="replacement_orders"
+    ),
+
+    path(
+        "replacement-orders/<int:pk>/",
+        views.replacement_order_detail,
+        name="replacement_order_detail"
+    ),
+
+    path('cart/coupons/', views.get_available_coupons, name='get_available_coupons'),
+
+
 
     
 

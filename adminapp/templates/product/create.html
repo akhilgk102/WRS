@@ -17,15 +17,7 @@
     <!-- Card Body -->
     <div class="card-body">
 
-      {% if messages %}
-      <ul>
-        {% for message in messages %}
-        <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
-          {{ message }}
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+ 
 
       <!-- FORM -->
       <form method="POST">

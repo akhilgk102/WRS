@@ -1,0 +1,56 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}
+Welcome
+{% endblock %}
+
+{% block content %}
+
+<!-- LOGO HEADER -->
+<div style="text-align:center;padding:24px 0 28px 0;border-bottom:1px solid #e5e7eb;margin-bottom:28px;">
+    <img
+        src="http://127.0.0.1:8000/static/img/new-logo.png"
+        alt="WRS Logo"
+        width="200"
+        style="display:inline-block;max-width:100%;height:auto;"
+    >
+</div>
+
+<h2 style="margin-top:0;color:#111827;">
+    Welcome 🎉
+</h2>
+
+<p style="font-size:15px;color:#374151;">
+    Hello {{ user.full_name|default:user.email }},
+</p>
+
+<p style="font-size:15px;color:#374151;">
+    Your account has been created successfully.
+</p>
+
+<p style="font-size:15px;color:#374151;">
+    Welcome to our ecommerce platform.
+</p>
+
+<div style="text-align:center;margin-top:40px;">
+
+    <a href="http://127.0.0.1:8000/shop/"
+       style="
+            background:#7e1dfa;
+            color:white;
+            text-decoration:none;
+            padding:14px 30px;
+            border-radius:8px;
+            display:inline-block;
+            font-weight:600;
+       ">
+        Start Shopping
+    </a>
+
+</div>
+
+<p style="margin-top:40px;color:#6b7280;font-size:14px;">
+    Thank you for joining us.
+</p>
+
+{% endblock %}

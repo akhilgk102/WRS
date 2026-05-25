@@ -179,7 +179,7 @@
     <div class="container">
         <div class="product-single-grid-wrap">
             <div id="w-node-d8eedbf7-4f72-8e4d-bd4a-0a0da0ac42cd-27f240f8" class="product-single-image-grid">
-                <div id="w-node-_34a3fd3a-e645-ca8f-1545-f5ad2855daed-27f240f8" class="more-images-wrapper">
+                <div id="w-node-_34a3fd3a-e645-ca8f-1545-f5ad2855dAED -27f240f8" class="more-images-wrapper">
                     <div class="w-dyn-list w-dyn-items-repeater-ref">
                         <div role="list" class="product-more-images-flex w-dyn-items">
                             {% for image in product.images.all %}
@@ -441,31 +441,60 @@ input.add-to-cart-quantity {
 }
                 </style>
 
-                <div class="social-links-wrapper">
-                    <div class="social-links-title">Share :</div>
-                    <div class="footer-siocial-links-wrap author-single-social-link-wrap">
-                        <a href="https://www.facebook.com/" target="_blank"
-                            class="single-footer-social-link _1 w-inline-block">
-                            <div>
-                                <i style="font-size: 1.7rem;" class="fa-brands fa-facebook-f"></i>
-                            </div>
-                        </a>
-                        <a href="https://twitter.com/" target="_blank" style="background-color: #25d366;"
-                            class="single-footer-social-link _2 w-inline-block">
-                            <div>
+<div class="social-links-wrapper">
+    <div class="social-links-title">Share :</div>
+
+    <div class="footer-siocial-links-wrap author-single-social-link-wrap">
+
+        <!-- Facebook -->
+        <a href="#" onclick="shareFacebook(event)"
+            class="single-footer-social-link _1 w-inline-block">
+            <div>
+                <i style="font-size:1.7rem;"
+                   class="fa-brands fa-facebook-f"></i>
+            </div>
+        </a>
+
+        <!-- WhatsApp -->
+        <a href="#" onclick="shareWhatsapp(event)"
+           style="background-color:#25d366;"
+           class="single-footer-social-link _2 w-inline-block">
+
+            <div>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="26" fill="currentColor"
                                     class="bi bi-whatsapp" viewBox="0 0 16 16">
                                     <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
                                 </svg>
-                            </div>
-                        </a>
-                        <a href="https://www.pinterest.com/" target="_blank" 
-                            style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);"
-                            class="single-footer-social-link _3 w-inline-block">
-                            <div><i style="font-size: 1.7rem;" class="fa-brands fa-instagram"></i></div>
-                        </a>
-                    </div>
-                </div>
+            </div>
+        </a>
+
+    </div>
+</div>
+
+<script>
+
+const productUrl =
+    "https://" + window.location.host + window.location.pathname;
+
+const productName = "{{ product.name|escapejs }}";
+
+function shareFacebook(e){
+    e.preventDefault();
+    window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`,
+        "_blank"
+    );
+}
+
+function shareWhatsapp(e){
+    e.preventDefault();
+    window.open(
+        `https://wa.me/?text=${encodeURIComponent(productName + " " + productUrl)}`,
+        "_blank"
+    );
+}
+
+</script>
             </div>
         </div>
     </div>
@@ -1200,9 +1229,312 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
                                 </div>
                                 {% empty %}
-                                <div class="product-details-reviews-single">
-                                    <p>No reviews yet.</p>
-                                </div>
+<!-- Add this right after the review statistics container and before the write review box -->
+
+{% if product.reviews.all.count == 0 %}
+<div class="no-reviews-card">
+    <!-- Icon -->
+    <div class="icon-container">
+        <div class="icon-bg"></div>
+        <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" 
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Floating Stars -->
+    <div class="floating-stars">
+        <svg class="floating-star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="floating-star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="floating-star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="floating-star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+        <svg class="floating-star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+        </svg>
+    </div>
+
+    <!-- Text Content -->
+    <h3 class="no-reviews-title">No Reviews Yet</h3>
+    <p class="no-reviews-subtitle">Be the first to share your experience with this product and help others make informed decisions!</p>
+
+    <!-- CTA Button -->
+    <button class="cta-button" onclick="document.querySelector('.write-review-box').scrollIntoView({behavior: 'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5v14m-7-7l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Write First Review</span>
+    </button>
+
+</div>
+{% endif %}
+
+<style>
+/* Empty State Card */
+.no-reviews-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px dashed #e0e0e0;
+    border-radius: 20px;
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    margin-bottom: 40px;
+}
+
+.no-reviews-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(123, 29, 250, 0.03) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.no-reviews-card:hover {
+    border-color: #0B3F66;
+    box-shadow: 0 15px 40px rgba(11, 63, 102, 0.1);
+    transform: translateY(-5px);
+}
+
+/* Icon Container */
+.icon-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    z-index: 1;
+}
+
+.icon-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0B3F66 0%, #7e1dfa 100%);
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.icon-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0B3F66 0%, #7e1dfa 100%);
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(11, 63, 102, 0.2);
+}
+
+.icon-wrapper svg {
+    width: 60px;
+    height: 60px;
+    color: #ffffff;
+}
+
+/* Stars Animation */
+.floating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.floating-star {
+    width: 30px;
+    height: 30px;
+    fill: #e0e0e0;
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-star:nth-child(1) { animation-delay: 0s; }
+.floating-star:nth-child(2) { animation-delay: 0.2s; }
+.floating-star:nth-child(3) { animation-delay: 0.4s; }
+.floating-star:nth-child(4) { animation-delay: 0.6s; }
+.floating-star:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Text Content */
+.no-reviews-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.no-reviews-subtitle {
+    font-size: 18px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* CTA Button */
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #0B3F66 0%, #7e1dfa 100%);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.cta-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(11, 63, 102, 0.3);
+}
+
+.cta-button span {
+    position: relative;
+    z-index: 2;
+}
+
+.cta-button svg {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Stats Banner */
+.stats-banner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+    padding-top: 40px;
+    border-top: 1px solid #e5e7eb;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0B3F66 0%, #7e1dfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .no-reviews-card {
+        padding: 40px 25px;
+    }
+
+    .icon-container {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 25px;
+    }
+
+    .icon-wrapper svg {
+        width: 50px;
+        height: 50px;
+    }
+
+    .floating-star {
+        width: 24px;
+        height: 24px;
+    }
+
+    .no-reviews-title {
+        font-size: 26px;
+    }
+
+    .no-reviews-subtitle {
+        font-size: 16px;
+    }
+
+    .stats-banner {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 35px;
+        padding-top: 30px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+    }
+}
+</style>
                                 {% endfor %}
                             </div>
                         </div>
@@ -1306,7 +1638,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const priceElements = document.querySelectorAll('[data-price]');
     priceElements.forEach(element => {
         const price = parseFloat(element.getAttribute('data-price'));
-        element.textContent = '₹' + price.toFixed(2);
+
+        element.textContent = 'AED ' + price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     });
 
     // Discount calculation

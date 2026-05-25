@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load review_tags %}
 {% block title %}{{ category.name }} - Products{% endblock %}
 
 {% block content %}
@@ -264,7 +264,7 @@
                                     class="single-product-wrap">
                                     <div class="product-contents-wrapper">
                                         <div class="product-img-wrapper {% if product.images.all|length > 1 %}has-multiple-images{% endif %}" data-product-id="{{ product.id }}">
-                                            <a href="{% url 'product_detail_no_login' product.slug %}" class="product-img-wrap w-inline-block"
+                                            <a href="{% url 'product_detail' product.slug %}" class="product-img-wrap w-inline-block"
                                                 style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
                                                 <div style="width:100%; height:auto; padding:10px; position: relative;">
                                                     {% if product.primary_image %}
@@ -306,9 +306,24 @@
                                         </div>
                                         <div class="product-details-wrap"
                                             style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
-                                            <a href="{% url 'product_detail_no_login' product.slug %}" class="product-name-wrap w-inline-block">
+                                            <a href="{% url 'product_detail' product.slug %}" class="product-name-wrap w-inline-block">
                                                 <h5 class="product-name">{{ product.name }}</h5>
                                             </a>
+                                                                                        <div class="product-review">
+
+                                            {% for _ in product.avg_rating|full_stars %}
+                                                <img src="{% static 'img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                                                    class="product-review-star" alt="star">
+                                            {% endfor %}
+
+                                            {% for _ in product.avg_rating|empty_stars %}
+                                                <img src="{% static 'img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}"
+                                                    class="product-review-star" alt="star">
+                                            {% endfor %}
+                                        <span class="review-count">
+                                            ({{ product.avg_rating|default:"0.0" }})
+                                        </span>
+                                        </div>
                                             <div class="product-price-wrap">
                                                 {% if product.offer_price %}
                                                     <div class="product-price text-danger fw-bold" data-price="{{ product.offer_price }}"></div>
@@ -319,12 +334,61 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="product-small-buttons-flex">
-                                        <a href="{% url 'product_detail_no_login' product.slug %}" class="product-small-button w-inline-block">
-                                            <img src="{% static 'img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}"
-                                                loading="lazy" alt="" class="product-small-buttons-icon">
-                                        </a>
-                                    </div>
+<!-- STEP 1: Add this CSS to your existing <style> section -->
+<style>
+/* Discount badge styles - Ultra minimal design with perfect borders */
+.discount-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: #1f2937;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 11px;
+    z-index: 10;
+    letter-spacing: 0.3px;
+    /* Anti-aliasing fixes for perfect borders */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Hide the eye icon */
+.product-small-buttons-flex {
+    display: none !important;
+}
+</style>
+
+<!-- STEP 2: Add this JavaScript to your existing <script> section at the bottom -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Calculate and display discount percentage
+    document.querySelectorAll('.single-product-wrap').forEach(productCard => {
+        const priceElement = productCard.querySelector('.product-price[data-price]');
+        const originalPriceElement = productCard.querySelector('.product-original-price[data-price]');
+        
+        if (priceElement && originalPriceElement) {
+            const offerPrice = parseFloat(priceElement.getAttribute('data-price'));
+            const originalPrice = parseFloat(originalPriceElement.getAttribute('data-price'));
+            
+            if (originalPrice > offerPrice) {
+                const discountPercent = Math.round(((originalPrice - offerPrice) / originalPrice) * 100);
+                
+                // Create discount badge
+                const badge = document.createElement('div');
+                badge.className = 'discount-badge';
+                badge.textContent = discountPercent + '% OFF';
+                
+                // Insert badge at the beginning of product card
+                productCard.insertBefore(badge, productCard.firstChild);
+            }
+        }
+    });
+});
+</script>
                                     <div class="product-add-to-cart">
                                         <form method="post" action="{% url 'add_to_cart' product.id %}"
                                             class="w-commerce-commerceaddtocartform add-cart-default-state">
@@ -362,7 +426,7 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                priceElement.innerHTML = "₹" + formatted;
+                priceElement.innerHTML = "AED " + formatted;
             }
         });
 
@@ -375,7 +439,7 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                priceElement.innerHTML = "₹" + formatted;
+                priceElement.innerHTML = "AED " + formatted;
             }
         });
 

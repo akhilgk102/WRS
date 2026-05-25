@@ -1,902 +1,637 @@
 {% extends "user_base.html" %}
 {%block title%} Order Details {%endblock%}
+{% load humanize %}
 {% block content %}
 
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    .order-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 24px;
-        background: #fafafa;
-        min-height: 100vh;
-    }
-    
-    .content-grid {
-        display: grid;
-        grid-template-columns: 1fr 420px;
-        gap: 24px;
-    }
-    
-    .order-card {
-        background: white;
-        border: 1px solid #e8e8e8;
-        border-radius: 16px;
-        padding: 36px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        transition: box-shadow 0.3s;
-    }
-    
-    .order-card:hover {
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    }
-    
-    .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
-    }
-    
-    .order-number {
-        font-size: 28px;
-        font-weight: 700;
-        color: #1a1a1a;
-        letter-spacing: -0.5px;
-    }
-    
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        color: #1565c0;
-        border-radius: 24px;
-        font-size: 15px;
-        font-weight: 600;
-        box-shadow: 0 2px 4px rgba(33,150,243,0.1);
-        text-transform: capitalize;
-    }
-    
-    .status-icon {
-        width: 8px;
-        height: 8px;
-        background: #1565c0;
-        border-radius: 50%;
-        animation: pulse 2s ease-in-out infinite;
-        box-shadow: 0 0 0 0 rgba(21,101,192,0.7);
-    }
-    
-    @keyframes pulse {
-        0%, 100% { 
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(21,101,192,0.7);
-        }
-        50% { 
-            transform: scale(1.1);
-            box-shadow: 0 0 0 4px rgba(21,101,192,0);
-        }
-    }
-    
-    .order-date {
-        color: #757575;
-        font-size: 16px;
-        margin-bottom: 24px;
-        font-weight: 400;
-    }
-    
-    .delivery-estimate {
-        text-align: right;
-        background: #f8f9fa;
-        padding: 12px 16px;
-        border-radius: 10px;
-        border: 1px solid #e8e8e8;
-    }
-    
-    .delivery-label {
-        color: #757575;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 6px;
-        font-weight: 600;
-    }
-    
-    .delivery-date {
-        font-size: 20px;
-        font-weight: 700;
-        color: #1a1a1a;
-        letter-spacing: -0.3px;
-    }
-    
-    /* Progress Tracker Styles */
-    .progress-tracker {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 32px;
-        padding-top: 32px;
-        border-top: 1px solid #f0f0f0;
-        position: relative;
-    }
-    
-    .progress-step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .step-circle {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: white;
-        border: 3px solid #e0e0e0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 12px;
-        transition: all 0.3s;
-        color: #bdbdbd;
-    }
-    
-    .progress-step.active .step-circle {
-        background: #4caf50;
-        border-color: #4caf50;
-        color: white;
-    }
-    
-    .progress-step.completed .step-circle {
-        background: #4caf50;
-        border-color: #4caf50;
-        color: white;
-    }
-    
-    .step-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: #9e9e9e;
-        text-align: center;
-        margin-top: 4px;
-    }
-    
-    .progress-step.active .step-label,
-    .progress-step.completed .step-label {
-        color: #4caf50;
-        font-weight: 600;
-    }
-    
-    .progress-line {
-        flex: 1;
-        height: 2px;
-        background: #e0e0e0;
-        margin: 0 -8px;
-        margin-bottom: 40px;
-        position: relative;
-        z-index: 1;
-        transition: background 0.3s;
-    }
-    
-    .progress-line.active {
-        background: #4caf50;
-    }
-    
-    .items-section {
-        margin-top: 48px;
-    }
-    
-    .items-header {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: #1a1a1a;
-    }
-    
-    .items-count {
-        color: #757575;
-        font-size: 17px;
-        margin-bottom: 24px;
-    }
-    
-    .items-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    .items-table thead {
-        background: #fafafa;
-        border-radius: 8px;
-    }
-    
-    .items-table th {
-        text-align: left;
-        padding: 14px 8px;
-        color: #757575;
-        font-weight: 600;
-        font-size: 15px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .items-table th:first-child {
-        padding-left: 16px;
-        border-radius: 8px 0 0 8px;
-    }
-    
-    .items-table th:last-child {
-        padding-right: 16px;
-        text-align: right;
-        border-radius: 0 8px 8px 0;
-    }
-    
-    .items-table td:last-child {
-        text-align: right;
-    }
-    
-    .items-table tbody tr {
-        border-bottom: 1px solid #f0f0f0;
-        transition: background 0.2s;
-    }
-    
-    .items-table tbody tr:hover {
-        background: #fafafa;
-    }
-    
-    .items-table tbody tr:last-child {
-        border-bottom: none;
-    }
-    
-    .items-table td {
-        padding: 24px 8px;
-    }
-    
-    .items-table td:first-child {
-        padding-left: 16px;
-    }
-    
-    .items-table td:last-child {
-        padding-right: 16px;
-    }
-    
-    .product-cell {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-    
-    .product-image {
-        width: 94px;
-        height: 94px;
-        object-fit: cover;
-        border-radius: 10px;
-        background: #f5f5f5;
-        border: 1px solid #e8e8e8;
-    }
-    
-    .product-name {
-        font-weight: 500;
-        color: #1a1a1a;
-        font-size: 17px;
-        line-height: 1.4;
-    }
-    
-    .price-text {
-        font-weight: 500;
-        color: #1a1a1a;
-        font-size: 17px;
-    }
-    
-    .sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-    }
-    
-    .summary-card {
-        background: white;
-        border: 1px solid #e8e8e8;
-        border-radius: 16px;
-        padding: 28px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    
-    .summary-title {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #1a1a1a;
-    }
-    
-    .summary-icon {
-        font-size: 25px;
-    }
-    
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        font-size: 18px;
-    }
-    
-    .summary-label {
-        color: #616161;
-        font-weight: 400;
-    }
-    
-    .summary-value {
-        font-weight: 600;
-        color: #1a1a1a;
-    }
-    
-    .summary-value.free {
-        color: #4caf50;
-        font-size: 18px;
-    }
-    
-    .summary-divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
-        margin: 20px 0;
-    }
-    
-    .summary-total {
-        display: flex;
-        justify-content: space-between;
-        font-size: 20px;
-        font-weight: 700;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px solid #f0f0f0;
-        color: #1a1a1a;
-    }
-    
-    .payment-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 20px;
-        padding: 12px 16px;
-        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-        border-radius: 10px;
-        color: #2e7d32;
-        font-size: 15px;
-        font-weight: 600;
-    }
-    
-    .payment-dot {
-        width: 8px;
-        height: 8px;
-        background: #4caf50;
-        border-radius: 50%;
-        animation: pulse-green 2s infinite;
-    }
-    
-    @keyframes pulse-green {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
-        50% { box-shadow: 0 0 0 4px rgba(76,175,80,0); }
-    }
-    
-    .delivery-card {
-        background: white;
-        border: 1px solid #e8e8e8;
-        border-radius: 16px;
-        padding: 28px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    
-    .delivery-title {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #1a1a1a;
-    }
-    
-    .address-name {
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 12px;
-        font-size: 17px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .address-details {
-        color: #616161;
-        font-size: 15px;
-        line-height: 1.7;
-        padding-left: 28px;
-    }
-    
-    .address-phone {
-        color: #616161;
-        font-size: 15px;
-        margin-top: 12px;
-        padding-left: 28px;
-        font-weight: 500;
-    }
-    
-    .return-policy {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 28px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .return-policy::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        border-radius: 50%;
-        transform: translate(50%, -50%);
-    }
-    
-    .return-header {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 14px;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .return-icon {
-        width: 44px;
-        height: 44px;
-        background: rgba(255,255,255,0.15);
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-    
-    .return-title {
-        font-size: 18px;
-        font-weight: 700;
-    }
-    
-    .return-text {
-        font-size: 15px;
-        color: rgba(255,255,255,0.85);
-        margin-bottom: 16px;
-        line-height: 1.6;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .return-link {
-        color: white;
-        text-decoration: none;
-        font-size: 15px;
-        font-weight: 600;
-        border-bottom: 1.5px solid rgba(255,255,255,0.5);
-        padding-bottom: 2px;
-        transition: all 0.2s;
-        position: relative;
-        z-index: 1;
-        display: inline-block;
-    }
-    
-    .return-link:hover {
-        border-bottom-color: white;
-        padding-left: 4px;
-    }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    @media (max-width: 968px) {
-        .content-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .order-container {
-            padding: 12px;
-        }
-        
-        .order-card {
-            padding: 20px;
-            border-radius: 12px;
-        }
-        
-        .order-header {
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .order-number {
-            font-size: 22px;
-        }
-        
-        .order-date {
-            font-size: 14px;
-        }
-        
-        .delivery-estimate {
-            width: 100%;
-            text-align: left;
-        }
-        
-        .delivery-date {
-            font-size: 18px;
-        }
-        
-        .status-badge {
-            font-size: 12px;
-            padding: 6px 12px;
-        }
-        
-        /* Progress Tracker Mobile */
-        .progress-tracker {
-            overflow-x: auto;
-            padding: 10px 0;
-        }
-        
-        .step-circle {
-            width: 50px;
-            height: 50px;
-        }
-        
-        .step-label {
-            font-size: 12px;
-        }
-        
-        .progress-line {
-            min-width: 40px;
-        }
-        
-        /* Items Section Mobile */
-        .items-section {
-            margin-top: 32px;
-        }
-        
-        .items-header {
-            font-size: 20px;
-        }
-        
-        .items-count {
-            font-size: 15px;
-        }
-        
-        .items-table {
-            font-size: 13px;
-        }
-        
-        .items-table th {
-            font-size: 12px;
-            padding: 12px 6px;
-        }
-        
-        .items-table th:first-child {
-            padding-left: 12px;
-        }
-        
-        .items-table th:last-child {
-            padding-right: 12px;
-        }
-        
-        .items-table td {
-            padding: 16px 6px;
-        }
-        
-        .items-table td:first-child {
-            padding-left: 12px;
-        }
-        
-        .items-table td:last-child {
-            padding-right: 12px;
-        }
-        
-        .product-cell {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .product-image {
-            width: 70px;
-            height: 70px;
-        }
-        
-        .product-name {
-            font-size: 14px;
-            line-height: 1.3;
-        }
-        
-        .price-text {
-            font-size: 14px;
-        }
-        
-        /* Sidebar Mobile */
-        .sidebar {
-            gap: 16px;
-        }
-        
-        .summary-card,
-        .delivery-card {
-            padding: 20px;
-            border-radius: 12px;
-        }
-        
-        .summary-title,
-        .delivery-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        
-        .summary-row {
-            font-size: 16px;
-            margin-bottom: 14px;
-        }
-        
-        .summary-total {
-            font-size: 18px;
-        }
-        
-        .payment-status {
-            font-size: 14px;
-            padding: 10px 14px;
-        }
-        
-        .address-name {
-            font-size: 16px;
-        }
-        
-        .address-details,
-        .address-phone {
-            font-size: 14px;
-            padding-left: 24px;
-        }
-        
-        .return-policy {
-            padding: 20px;
-            border-radius: 12px;
-        }
-        
-        .return-title {
-            font-size: 16px;
-        }
-        
-        .return-text,
-        .return-link {
-            font-size: 14px;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .order-container {
-            padding: 8px;
-        }
-        
-        .order-card {
-            padding: 16px;
-        }
-        
-        .order-number {
-            font-size: 20px;
-        }
-        
-        .step-circle {
-            width: 44px;
-            height: 44px;
-        }
-        
-        .step-circle svg {
-            width: 20px;
-            height: 20px;
-        }
-        
-        .step-label {
-            font-size: 11px;
-        }
-        
-        .product-image {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .product-name {
-            font-size: 14px;
-        }
-        
-        .summary-card,
-        .delivery-card,
-        .return-policy {
-            padding: 16px;
-        }
-    }
+:root {
+    --bg: #F5F6FA;
+    --surface: #FFFFFF;
+    --border: #E8EAEF;
+    --border-strong: #D1D5DB;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --accent: #2563EB;
+    --accent-light: #EFF6FF;
+    --green: #16A34A;
+    --green-light: #DCFCE7;
+    --orange: #EA580C;
+    --orange-light: #FFF7ED;
+    --yellow: #D97706;
+    --yellow-light: #FFFBEB;
+    --red: #DC2626;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --radius: 10px;
+    --radius-lg: 14px;
+    --font: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+}
 
+/* body { font-family: var(--font); background: var(--bg); color: var(--text-primary); } */
 
+/* ─── Page shell ─── */
+.od-page { max-width: 1280px; margin: 0 auto; padding: 32px 24px 60px; }
 
+/* ─── Top bar ─── */
+.od-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.od-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; font-weight: 500; color: var(--text-secondary);
+    text-decoration: none; transition: color .2s;
+}
+.od-back:hover { color: var(--text-primary); }
+.od-back svg { width: 16px; height: 16px; }
 
-    
+.od-heading-row {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.od-id {
+    font-size: 24px; font-weight: 700; letter-spacing: -0.4px;
+    font-family: var(--font-mono); color: var(--text-primary);
+}
+.od-paid-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--green-light); color: var(--green);
+    font-size: 12px; font-weight: 600;
+}
+.od-paid-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+.od-meta {
+    font-size: 13px; color: var(--text-muted); margin-top: 4px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.od-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); }
+
+.od-actions { display: flex; align-items: center; gap: 8px; }
+.od-btn-outline {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px;
+    border: 1.5px solid var(--border-strong); background: var(--surface);
+    color: var(--text-primary); font-size: 13px; font-weight: 500;
+    text-decoration: none; cursor: pointer; transition: all .2s;
+}
+.od-btn-outline:hover { border-color: var(--text-primary); background: var(--bg); }
+.od-btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px;
+    background: var(--accent); border: none;
+    color: #fff; font-size: 13px; font-weight: 600;
+    text-decoration: none; cursor: pointer; transition: all .2s;
+}
+.od-btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.3); }
+
+/* ─── Grid ─── */
+.od-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: start;
+}
+
+/* ─── Card base ─── */
+.od-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.od-card + .od-card { margin-top: 16px; }
+.od-card-header {
+    padding: 16px 20px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.od-card-title {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    display: flex; align-items: center; gap: 8px;
+}
+.od-card-title svg { width: 16px; height: 16px; color: var(--text-secondary); }
+.od-card-body { padding: 20px; }
+
+/* ─── Progress / Stepper ─── */
+.od-stepper {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 24px 20px 20px; position: relative;
+}
+.od-step { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; flex: 1; }
+.od-step-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 2px solid var(--border-strong); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); transition: all .3s;
+}
+.od-step.completed .od-step-circle { background: var(--green); border-color: var(--green); color: #fff; }
+.od-step.active .od-step-circle { background: var(--surface); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 4px rgba(37,99,235,.1); }
+.od-step-circle svg { width: 16px; height: 16px; }
+.od-step-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-align: center; line-height: 1.4; }
+.od-step.completed .od-step-label { color: var(--green); }
+.od-step.active .od-step-label { color: var(--accent); font-weight: 600; }
+
+.od-step-connector {
+    flex: 1; height: 2px; background: var(--border);
+    margin-top: 19px; position: relative; z-index: 1; align-self: flex-start;
+    transition: background .4s;
+}
+.od-step-connector.done { background: var(--green); }
+
+/* ─── Expected delivery banner ─── */
+.od-delivery-banner {
+    margin: 0 20px 20px;
+    padding: 12px 16px; border-radius: 8px;
+    background: var(--accent-light); border: 1px solid #BFDBFE;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; flex-wrap: wrap; gap: 8px;
+}
+.od-delivery-banner-left { display: flex; align-items: center; gap: 8px; color: var(--accent); font-weight: 500; }
+.od-delivery-banner-left svg { width: 16px; height: 16px; flex-shrink: 0; }
+.od-delivery-date { font-size: 13px; font-weight: 700; color: var(--accent); }
+
+/* ─── Products ─── */
+.od-status-pill {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+    background: var(--orange-light); color: var(--orange);
+}
+.od-status-pill.delivered { background: var(--green-light); color: var(--green); }
+.od-status-pill.processing { background: var(--yellow-light); color: var(--yellow); }
+.od-status-pill.shipped { background: #EFF6FF; color: var(--accent); }
+
+.od-products-table { width: 100%; border-collapse: collapse; }
+.od-products-table th {
+    text-align: left; padding: 0 16px 10px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted);
+    border-bottom: 1.5px solid var(--border);
+}
+.od-products-table th:last-child { text-align: right; }
+.od-products-table td { padding: 16px; vertical-align: middle; border-bottom: 1px solid var(--border); }
+.od-products-table tbody tr:last-child td { border-bottom: none; }
+.od-products-table td:last-child { text-align: right; }
+
+.od-product-cell { display: flex; align-items: center; gap: 14px; }
+.od-product-img {
+    width: 64px; height: 64px; border-radius: 8px; object-fit: cover;
+    border: 1.5px solid var(--border); background: var(--bg); flex-shrink: 0;
+}
+.od-product-name { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.4; }
+.od-product-sku { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; }
+.od-product-variant { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.od-price { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.od-qty { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+
+.od-action-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    text-decoration: none; transition: all .2s; white-space: nowrap;
+}
+.od-action-btn.replace {
+    background: var(--text-primary); color: #fff; border: 1.5px solid var(--text-primary);
+}
+.od-action-btn.replace:hover { background: #1e293b; }
+.od-action-btn.view-replace {
+    background: var(--orange-light); color: var(--orange);
+    border: 1.5px solid #FDBA74;
+}
+.od-action-btn.view-replace:hover { background: #FED7AA; }
+.od-expired-text { font-size: 12px; color: var(--red); font-weight: 600; }
+.od-pending-badge {
+    display: inline-block; padding: 4px 10px; border-radius: 20px;
+    background: var(--yellow-light); color: var(--yellow);
+    font-size: 12px; font-weight: 600;
+}
+
+.od-reserved { padding: 10px 16px; background: var(--bg); font-size: 12px; color: var(--text-secondary); }
+
+/* ─── Payment details ─── */
+.od-payment-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+.od-payment-row:last-of-type { border-bottom: none; }
+.od-payment-label { color: var(--text-secondary); font-weight: 500; }
+.od-payment-value { color: var(--text-primary); font-weight: 600; }
+.od-payment-method { display: flex; align-items: center; gap: 6px; }
+.od-visa-icon {
+    background: #1A1F71; color: #fff; font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 3px; letter-spacing: .5px;
+    font-family: var(--font-mono);
+}
+.od-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 12px; padding: 14px 16px;
+    background: var(--text-primary); border-radius: 8px;
+}
+.od-total-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.od-total-amount { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.5px; }
+
+/* ─── Sidebar ─── */
+.od-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+/* Customer card */
+.od-customer-cell { display: flex; align-items: center; gap: 12px; }
+.od-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 15px; font-weight: 700; flex-shrink: 0;
+}
+.od-customer-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.od-customer-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.od-customer-edit { color: var(--text-muted); cursor: pointer; padding: 4px; }
+.od-customer-edit:hover { color: var(--text-primary); }
+
+/* Map */
+.od-map-placeholder {
+    width: 100%; height: 110px; background: linear-gradient(135deg, #e8f4fd 0%, #d1eaf7 100%);
+    border-radius: 8px; border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 12px; margin-bottom: 14px;
+    overflow: hidden; position: relative;
+}
+.od-map-placeholder svg { width: 100%; height: 100%; }
+
+.od-address-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.od-address-line { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+.od-view-map { font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.od-view-map:hover { text-decoration: underline; }
+
+/* Contact */
+.od-contact-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    font-size: 13px; color: var(--text-primary); font-weight: 500; margin-bottom: 8px;
+}
+.od-contact-item:last-child { margin-bottom: 0; }
+.od-contact-item svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+
+/* Tags */
+.od-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--bg); border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    margin-right: 6px; margin-bottom: 6px;
+}
+.od-tag-remove { cursor: pointer; color: var(--text-muted); line-height: 1; }
+
+/* Order note */
+.od-note-text {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.65;
+}
+.od-note-edit { cursor: pointer; color: var(--text-muted); }
+.od-note-edit:hover { color: var(--text-primary); }
+
+/* Return */
+.od-return-card {
+    background: var(--text-primary); color: #fff;
+    border-radius: var(--radius-lg); padding: 20px;
+}
+.od-return-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.od-return-text { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.6; margin-bottom: 12px; }
+.od-return-link { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.9); border-bottom: 1px solid rgba(255,255,255,.3); text-decoration: none; padding-bottom: 1px; }
+.od-return-link:hover { color: #fff; border-bottom-color: #fff; }
+
+/* ─── Mobile ─── */
+@media (max-width: 1024px) {
+    .od-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .od-page { padding: 16px 12px 48px; }
+    .od-topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .od-id { font-size: 20px; }
+    .od-stepper { padding: 16px 12px; overflow-x: auto; }
+    .od-step-label { font-size: 10px; max-width: 56px; }
+    .od-products-table thead { display: none; }
+    .od-products-table td { display: block; border: none; padding: 6px 16px; }
+    .od-products-table td:first-child { padding-top: 16px; }
+    .od-products-table td:last-child { padding-bottom: 16px; text-align: left; }
+    .od-products-table tr { display: block; border-bottom: 1px solid var(--border); }
+    .od-products-table tbody tr:last-child { border-bottom: none; }
+}
+
+/* ─── Animations ─── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.od-page { animation: fadeUp .4s ease; }
+.od-card { animation: fadeUp .5s ease backwards; }
+.od-sidebar > * { animation: fadeUp .5s ease backwards; }
+.od-sidebar > *:nth-child(1) { animation-delay: .05s; }
+.od-sidebar > *:nth-child(2) { animation-delay: .1s; }
+.od-sidebar > *:nth-child(3) { animation-delay: .15s; }
+.od-sidebar > *:nth-child(4) { animation-delay: .2s; }
+.od-sidebar > *:nth-child(5) { animation-delay: .25s; }
 </style>
 
-<div class="order-container">
-    <div class="content-grid">
+<div class="od-page">
+
+    <!-- ─── Top Bar ─── -->
+    <div class="od-topbar">
         <div>
-            <div class="order-card">
-                <div class="order-header">
-                    <div>
-                        <h2 class="order-number">Order #{{ order.id }}</h2>
-                        <p class="order-date">Placed on {{ order.created_at|date:"d F, Y" }} at {{ order.created_at|date:"H:i A" }}</p>
-                    </div>
-                    <div class="delivery-estimate">
-                        <div class="delivery-label">Estimated Delivery</div>
-                        <div class="delivery-date">{{ expected_delivery|date:"d M, Y" }}</div>
-                    </div>
-                </div>
-                
-                <span class="status-badge">
-                    <span class="status-icon"></span>
-                    {{ order.get_status_display }}
-                </span>
-                
-                <!-- Order Progress Tracker -->
-                <div class="progress-tracker">
-                    <div class="progress-step {% if order.status == 'PLACED' or order.status == 'PROCESSING' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}completed{% endif %}">
-                        <div class="step-circle">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span class="step-label">Order Placed</span>
-                    </div>
 
-                    <div class="progress-line {% if order.status == 'PROCESSING' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}active{% endif %}"></div>
-
-                    <div class="progress-step {% if order.status == 'PROCESSING' %}active{% elif order.status == 'SHIPPED' or order.status == 'DELIVERED' %}completed{% endif %}">
-                        <div class="step-circle">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span class="step-label">In Transit</span>
-                    </div>
-
-                    <div class="progress-line {% if order.status == 'SHIPPED' or order.status == 'DELIVERED' %}active{% endif %}"></div>
-
-                    <div class="progress-step {% if order.status == 'SHIPPED' %}active{% elif order.status == 'DELIVERED' %}completed{% endif %}">
-                        <div class="step-circle">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <rect x="1" y="3" width="15" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M16 8h2.5c1.1 0 2 .9 2 2v3.5" stroke="currentColor" stroke-width="2"/>
-                                <circle cx="5.5" cy="18.5" r="2.5" stroke="currentColor" stroke-width="2"/>
-                                <circle cx="18.5" cy="18.5" r="2.5" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <span class="step-label">Out for Delivery</span>
-                    </div>
-
-                    <div class="progress-line {% if order.status == 'DELIVERED' %}active{% endif %}"></div>
-
-                    <div class="progress-step {% if order.status == 'DELIVERED' %}active completed{% endif %}">
-                        <div class="step-circle">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span class="step-label">Delivered</span>
-                    </div>
-                </div>
-                
-                <div class="items-section">
-                    <h3 class="items-header">Items</h3>
-                    <p class="items-count">You have {{ items|length }} item{{ items|length|pluralize }} in this order</p>
-                    
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Qty</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in items %}
-                            <tr>
-                                <td>
-                                    <div class="product-cell">
-                                        {% if item.product.primary_image %}
-                                            <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" class="product-image">
-                                        {% else %}
-                                            <img src="https://via.placeholder.com/64" alt="{{ item.product.name }}" class="product-image">
-                                        {% endif %}
-                                        <span class="product-name">{{ item.product.name }}</span>
-                                    </div>
-                                </td>
-                                <td class="price-text">₹{{ item.price|floatformat:2 }}</td>
-                                <td class="price-text">{{ item.quantity }}</td>
-                                <td class="price-text">₹{{ item.get_total|floatformat:2 }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="od-heading-row" style="margin-top:8px;">
+                <span class="od-id">Orders ID: #{{ order.id }}</span>
+                <span class="od-paid-badge">Paid</span>
+            </div>
+            <div class="od-meta">
+                <span>Order date {{ order.created_at|date:"M d, Y" }}</span>
+                <span class="od-meta-dot"></span>
+                <span>Order from <strong>{{ order.address.full_name }}</strong></span>
             </div>
         </div>
-        
-        <div class="sidebar">
-            <div class="summary-card">
-                <h3 class="summary-title">
-                    <span class="summary-icon">💳</span> Payment Summary
-                </h3>
-                
-                <div class="summary-row">
-                    <span class="summary-label">Subtotal</span>
-                    <span class="summary-value">₹{{ order.subtotal|floatformat:2 }}</span>
+        <div class="od-actions">
+            <button class="od-btn-outline">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Report
+            </button>
+            <button class="od-btn-outline">Duplicate</button>
+            <button class="od-btn-outline">Share Order</button>
+        </div>
+    </div>
+
+    <div class="od-grid">
+        <!-- ═══ LEFT COLUMN ═══ -->
+        <div>
+
+            <!-- Progress stepper card -->
+            <div class="od-card">
+                <!-- Delivery banner -->
+                <div class="od-delivery-banner">
+                    <div class="od-delivery-banner-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2.5a2 2 0 012 2v3.5"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        Return to <strong>{{ order.address.city }}</strong>
+                    </div>
+                    <div>
+                        Estimated arrived at
+                        <span class="od-delivery-date">{{ expected_delivery}}</span>
+                    </div>
                 </div>
-                
-                <div class="summary-row">
-                    <span class="summary-label">Shipping</span>
-                    <span class="summary-value free">{% if order.shipping_fee == 0 %}Free{% else %}₹{{ order.shipping_fee }}{% endif %}</span>
+
+                <!-- Steps -->
+                <div class="od-stepper">
+                    <!-- Placed -->
+                    <div class="od-step {% if order.status == 'PLACED' or order.status == 'PROCESSING' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="od-step-circle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/>
+                            </svg>
+                        </div>
+                        <span class="od-step-label">Review order</span>
+                    </div>
+
+                    <div class="od-step-connector {% if order.status == 'PROCESSING' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}done{% endif %}"></div>
+
+                    <!-- Processing -->
+                    <div class="od-step {% if order.status == 'PROCESSING' %}active{% elif order.status == 'SHIPPED' or order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="od-step-circle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                        </div>
+                        <span class="od-step-label">Preparing order</span>
+                    </div>
+
+                    <div class="od-step-connector {% if order.status == 'SHIPPED' or order.status == 'DELIVERED' %}done{% endif %}"></div>
+
+                    <!-- Shipped -->
+                    <div class="od-step {% if order.status == 'SHIPPED' %}active{% elif order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="od-step-circle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2.5a2 2 0 012 2v3.5"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                            </svg>
+                        </div>
+                        <span class="od-step-label">Shipping</span>
+                    </div>
+
+                    <div class="od-step-connector {% if order.status == 'DELIVERED' %}done{% endif %}"></div>
+
+                    <!-- Delivered -->
+                    <div class="od-step {% if order.status == 'DELIVERED' %}completed{% endif %}">
+                        <div class="od-step-circle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <span class="od-step-label">Delivered</span>
+                    </div>
                 </div>
-                
-                <div class="summary-row">
-                    <span class="summary-label">Tax</span>
-                    <span class="summary-value">₹{{ order.tax|floatformat:2 }}</span>
-                </div>
-                
-                <div class="summary-divider"></div>
-                
-                <div class="summary-total">
-                    <span>Total</span>
-                    <span>₹{{ order.total_price|floatformat:2 }}</span>
-                </div>
-                
-                <div class="payment-status">
-                    <span class="payment-dot"></span>
-                    Payment Status: {{ order.get_payment_status_display }}
+
+                <div style="padding: 0 20px 16px; display:flex; gap:10px;">
+                    <button class="od-btn-outline" style="color:var(--red); border-color:#FECACA;">Cancel Order</button>
+                    <a href="#" class="od-btn-primary" style="flex:1; justify-content:center;">
+                        Create Shipping Label
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
-            
-            <div class="delivery-card">
-                <h3 class="delivery-title">
-                    <span class="summary-icon">📦</span> Delivery Details
-                </h3>
-                
-                <div class="address-name">📍 {{ order.address.full_name }}</div>
-                <div class="address-details">
-                    {{ order.address.street }}<br>
-                    {{ order.address.city }}, {{ order.address.state }}<br>
-                    {{ order.address.pincode }}
+
+            <!-- Products card -->
+            <div class="od-card" style="margin-top:16px;">
+                <div class="od-card-header">
+                    <span class="od-card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                        Products
+                    </span>
+                    <span class="od-status-pill {% if order.status == 'DELIVERED' %}delivered{% elif order.status == 'PROCESSING' %}processing{% elif order.status == 'SHIPPED' %}shipped{% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
                 </div>
-                <div class="address-phone">{{ order.address.phone }}</div>
-            </div>
-            
-            <div class="return-policy">
-                <div class="return-header">
-                    <div class="return-icon"><i class="fas fa-undo-alt"></i></div>
-                    <div class="return-title">Return Policy</div>
+
+                <table class="od-products-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <div class="od-product-cell">
+                                    {% if item.product.primary_image %}
+                                        <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" class="od-product-img">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/64" alt="{{ item.product.name }}" class="od-product-img">
+                                    {% endif %}
+                                    <div>
+                                        <div class="od-product-name">{{ item.product.name }}</div>
+                                        <div class="od-product-sku">SKU: {{ item.product.sku|default:"N/A" }}</div>
+                                        <div class="od-product-variant">{{ item.product.color|default:"" }}{% if item.product.color and item.product.size %} · {% endif %}{{ item.product.size|default:"" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="od-price">AED {{ item.price|floatformat:2|intcomma }}</span></td>
+                            <td><span class="od-qty">Qty {{ item.quantity }}</span></td>
+                            <td>
+                                <span class="od-price">AED {{ item.get_total|floatformat:2|intcomma }}</span>
+                                {% if order.status == "DELIVERED" %}
+                                    <div style="margin-top:6px;">
+                                        {% if item.replacement_requested and item.replacement_order %}
+                                            <a href="{% url 'replacement_order_detail' item.replacement_order.id %}" class="od-action-btn view-replace">View Replacement</a>
+                                        {% elif item.replacement_requested %}
+                                            <span class="od-pending-badge">Replacement Requested</span>
+                                        {% else %}
+                                            {% if replacement_allowed %}
+                                                <a href="{% url 'request_replacement' item.id %}" class="od-action-btn replace">Request Replacement</a>
+                                            {% else %}
+                                                <span class="od-expired-text">Replacement period expired</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="od-reserved">
+                    <a href="#" style="font-size:12px; font-weight:600; color:var(--accent); text-decoration:none;">Reserved Item</a>
                 </div>
-                <p class="return-text">You can return items within 30 days of delivery.</p>
-                <a href="#" class="return-link">Read full policy</a>
             </div>
+
+            <!-- Payment details card -->
+            <div class="od-card" style="margin-top:16px;">
+                <div class="od-card-header">
+                    <span class="od-card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        Payment Details
+                    </span>
+                    <span class="od-paid-badge">Paid</span>
+                </div>
+                <div class="od-card-body">
+                    <div class="od-payment-row">
+                        <span class="od-payment-label">Payment Method</span>
+                        <span class="od-payment-value od-payment-method">
+                            <span class="od-visa-icon">VISA</span>
+                            #{{ order.id|stringformat:"04d"|slice:"-4:" }}
+                        </span>
+                    </div>
+                    <div class="od-payment-row">
+                        <span class="od-payment-label">Subtotal</span>
+                        <span class="od-payment-value">{{ items|length }} items &nbsp; AED {{ order.subtotal|floatformat:2|intcomma }}</span>
+                    </div>
+                    <div class="od-payment-row">
+                        <span class="od-payment-label">Shipping Type</span>
+                        <span class="od-payment-value">{% if order.shipping_fee == 0 %}Free Shipping ($0.00 at checkout){% else %}Standard Shipping{% endif %}</span>
+                    </div>
+                    <div class="od-payment-row">
+                        <span class="od-payment-label">Shipping Fee</span>
+                        <span class="od-payment-value">{% if order.shipping_fee == 0 %}Free{% else %}AED {{ order.shipping_fee|intcomma }}{% endif %}</span>
+                    </div>
+                    <div class="od-payment-row" style="border-bottom:none;">
+                        <span class="od-payment-label">Tax</span>
+                        <span class="od-payment-value">AED {{ order.tax|floatformat:2|intcomma }}</span>
+                    </div>
+                    <div class="od-total-row">
+                        <span class="od-total-label">Total</span>
+                        <span class="od-total-amount">AED {{ order.total_price|floatformat:2|intcomma }}</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══ RIGHT SIDEBAR ═══ -->
+        <div class="od-sidebar">
+
+
+
+            <!-- Customer -->
+            <div class="od-card">
+                <div class="od-card-header">
+                    <span class="od-card-title">Customer</span>
+                    <span class="od-customer-edit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </span>
+                </div>
+                <div class="od-card-body">
+                    <div class="od-customer-cell">
+                        <div class="od-avatar">{{ order.address.full_name|slice:":1"|upper }}</div>
+                        <div>
+                            <div class="od-customer-name">{{ order.address.full_name }}</div>
+                            <div class="od-customer-sub">Total: {{ order.address.full_name|default:"1" }} order</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="od-card">
+                <div class="od-card-header">
+                    <span class="od-card-title">Shipping Address</span>
+                    <span class="od-customer-edit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </span>
+                </div>
+                <div class="od-card-body">
+                    <!-- Map placeholder -->
+                    <div class="od-map-placeholder">
+                        <svg viewBox="0 0 300 110" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="300" height="110" fill="#dbeafe"/>
+                            <line x1="0" y1="55" x2="300" y2="55" stroke="#93c5fd" stroke-width="8"/>
+                            <line x1="0" y1="30" x2="300" y2="38" stroke="#93c5fd" stroke-width="4" opacity=".6"/>
+                            <line x1="0" y1="80" x2="300" y2="72" stroke="#93c5fd" stroke-width="4" opacity=".6"/>
+                            <line x1="120" y1="0" x2="115" y2="110" stroke="#93c5fd" stroke-width="5"/>
+                            <line x1="200" y1="0" x2="195" y2="110" stroke="#93c5fd" stroke-width="3" opacity=".5"/>
+                            <circle cx="148" cy="52" r="10" fill="#2563EB" opacity=".9"/>
+                            <circle cx="148" cy="52" r="5" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="od-address-name">
+                        {{ order.address.full_name }}
+                        <a href="#" class="od-view-map">View on Map</a>
+                    </div>
+                    <div class="od-address-line">
+                        {{ order.address.street }}<br>
+                        {{ order.address.city }} {{ order.address.state }} {{ order.address.pincode }}<br>
+                        {{ order.address.country|default:"UAE" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="od-card">
+                <div class="od-card-header">
+                    <span class="od-card-title">Contact Information</span>
+                </div>
+                <div class="od-card-body">
+                    <div class="od-contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        {{ order.address.email|default:"customer@example.com" }}
+                    </div>
+                    <div class="od-contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.49a16 16 0 006.29 6.29l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+                        {{ order.address.phone }}
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Return Policy -->
+            <div class="od-return-card">
+                <div class="od-return-title">↩ Return Policy</div>
+                <p class="od-return-text">You can return items within 30 days of delivery. Items must be in original condition.</p>
+                <a href="#" class="od-return-link">Read full policy →</a>
+            </div>
+
         </div>
     </div>
 </div>

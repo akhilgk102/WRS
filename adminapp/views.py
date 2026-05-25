@@ -1,3 +1,6 @@
+# adminapp/views
+
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,10 +13,21 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import get_user_model
 from userapp.models import *
-
+from userapp.email_utils import send_welcome_email
 User = get_user_model()
+from userapp.email_utils import send_order_confirmation_email
+from userapp.email_utils import send_order_shipped_email
+from userapp.email_utils import send_order_delivered_email
+from userapp.email_utils import send_order_cancelled_email
+
+
 
 def index(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("dashboard")
+        return redirect("user_home")
+    
     sections = HomepageSection.objects.filter(is_active=True).prefetch_related(
         'homepage_products__product__images',
         'homepage_products__product__category',
@@ -85,6 +99,9 @@ def index(request):
     # -----------------------------
     # Final Context
     # -----------------------------
+
+    categories = Category.objects.all()
+
     context = {
         'homepage_data': homepage_data,
 
@@ -102,6 +119,8 @@ def index(request):
         # Best Sellers
         'best_seller_categories': best_seller_categories,
         'best_sellers_by_category': best_sellers_by_category,
+
+        'categories': categories
     }
 
     return render(request, 'index.html', context)
@@ -139,7 +158,35 @@ def homepage_sections_manage(request):
         'section_category_products': section_category_products,
     })
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
+import json
 
+@staff_member_required
+@require_POST
+def homepage_section_reorder_products(request, section_id):
+    """Handle AJAX request to reorder products"""
+    try:
+        data = json.loads(request.body)
+        product_ids = data.get('product_ids', [])
+        
+        # Update the display_order field for each product
+        for index, product_id in enumerate(product_ids):
+            HomepageProduct.objects.filter(
+                id=product_id,
+                section_id=section_id
+            ).update(display_order=index)
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Product order updated successfully'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'error': str(e)
+        }, status=400)
 
 @staff_member_required
 def homepage_section_add_product(request, section_id):
@@ -210,17 +257,25 @@ def login_page(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        next_url = request.POST.get('next') or request.GET.get('next')
 
         user = authenticate(request, username=email, password=password)
 
         if user:
             login(request, user)
+
+            # ✅ RETURN TO SAME PAGE IF next EXISTS
+            if next_url:
+                return redirect(next_url)
+
+            # ✅ FALLBACK
             return redirect('dashboard' if user.is_staff else 'user_home')
 
         messages.error(request, "Invalid email or password")
         return redirect('index')
 
     return redirect('index')
+
 
 
 def logout_view(request):
@@ -249,6 +304,14 @@ def register_page(request):
             password=password
         )
 
+        try:
+            send_welcome_email(user)
+            print("WELCOME EMAIL SENT")
+
+        except Exception as e:
+            print("EMAIL ERROR:", e)
+
+            
         # ✅ This is REQUIRED because you have 2 authentication backends (allauth + ModelBackend)
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
@@ -428,6 +491,10 @@ from django.db.models import Q, Count
 
 
 
+
+
+@login_required
+@staff_member_required
 def category_create(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -453,6 +520,10 @@ def category_create(request):
 
     return render(request, "categories/create.html")
 
+
+
+@login_required
+@staff_member_required
 def category_update(request, id):
     category = get_object_or_404(Category, id=id)
 
@@ -482,10 +553,18 @@ def category_update(request, id):
     })
 
 
+
+
+@login_required
+@staff_member_required
 def category_list(request):
     categories = Category.objects.all()
     return render(request, "categories/list.html", {"categories": categories})
 
+
+
+@login_required
+@staff_member_required
 def category_delete(request, id):
     category = get_object_or_404(Category, id=id)
     category.delete()
@@ -493,6 +572,10 @@ def category_delete(request, id):
     return redirect("category_list")
 
 
+
+
+@login_required
+@staff_member_required
 def subcategory_create(request):
     categories = Category.objects.all()
 
@@ -524,11 +607,19 @@ def subcategory_create(request):
     return render(request, "subcategory/create.html", {"categories": categories,"edit": False})
 
 
+
+
+@login_required
+@staff_member_required
 def subcategory_list(request):
     subcategories = SubCategory.objects.select_related("category").all()
     return render(request, "subcategory/list.html", {"subcategories": subcategories})
 
 
+
+
+@login_required
+@staff_member_required
 def subcategory_update(request, id):
     sub = get_object_or_404(SubCategory, id=id)
     categories = Category.objects.all()
@@ -564,6 +655,10 @@ def subcategory_update(request, id):
     })
 
 
+
+
+@login_required
+@staff_member_required
 def subcategory_delete(request, id):
     sub = get_object_or_404(SubCategory, id=id)
     sub.delete()
@@ -571,6 +666,10 @@ def subcategory_delete(request, id):
     return redirect("subcategory_list")
 
 
+
+
+@login_required
+@staff_member_required
 def brand_create(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -591,12 +690,20 @@ def brand_create(request):
     return render(request, "brand/create.html", {"edit": False})
 
 
+
+
+@login_required
+@staff_member_required
 def brand_list(request):
     brands = Brand.objects.all().order_by("name")
     return render(request, "brand/list.html", {"brands": brands})
 
 
 
+
+
+@login_required
+@staff_member_required
 def brand_update(request, id):
     brand = get_object_or_404(Brand, id=id)
 
@@ -622,6 +729,10 @@ def brand_update(request, id):
 
 
 
+
+
+@login_required
+@staff_member_required
 def brand_delete(request, id):
     brand = get_object_or_404(Brand, id=id)
     brand.delete()
@@ -630,6 +741,10 @@ def brand_delete(request, id):
 
 
 
+
+
+@login_required
+@staff_member_required
 def product_create(request):
     categories = Category.objects.all()
     subcategories = SubCategory.objects.all()
@@ -681,6 +796,10 @@ def product_create(request):
         "edit": False
     })
 
+
+
+@login_required
+@staff_member_required
 def product_list(request):
     products = Product.objects.select_related("category", "subcategory", "brand").prefetch_related("images").all()
     
@@ -718,6 +837,10 @@ def product_list(request):
         "categories": categories
     })
 
+
+
+@login_required
+@staff_member_required
 def product_detail(request, slug):
     """
     Display product details
@@ -734,6 +857,10 @@ def product_detail(request, slug):
     
     return render(request, 'product/detail.html', context)
 
+
+
+@login_required
+@staff_member_required
 def product_update(request, id):
     product = get_object_or_404(Product, id=id)
 
@@ -791,6 +918,10 @@ def product_update(request, id):
 
 
 
+
+
+@login_required
+@staff_member_required
 def product_delete(request, id):
     product = get_object_or_404(Product, id=id)
     product.delete()
@@ -798,6 +929,10 @@ def product_delete(request, id):
     return redirect("product_list")
 
 
+
+
+@login_required
+@staff_member_required
 def product_image_list(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     
@@ -818,6 +953,11 @@ def product_image_list(request, product_id):
         "product": product,
         "images": images
     })
+
+
+
+@login_required
+@staff_member_required
 def product_image_make_primary(request, id):
     image = get_object_or_404(ProductImage, id=id)
     product = image.product
@@ -833,6 +973,10 @@ def product_image_make_primary(request, id):
     return redirect("product_image_list", product_id=product.id)
 
 
+
+
+@login_required
+@staff_member_required
 def product_image_delete(request, id):
     image = get_object_or_404(ProductImage, id=id)
     product_id = image.product.id
@@ -843,6 +987,10 @@ def product_image_delete(request, id):
 
 
 
+
+
+@login_required
+@staff_member_required
 def attribute_list(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     attributes = ProductAttribute.objects.filter(product=product)
@@ -852,6 +1000,10 @@ def attribute_list(request, product_id):
         "attributes": attributes
     })
 
+
+
+@login_required
+@staff_member_required
 def attribute_add(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -876,6 +1028,10 @@ def attribute_add(request, product_id):
 
 
 
+
+
+@login_required
+@staff_member_required
 def attribute_update(request, id):
     attribute = get_object_or_404(ProductAttribute, id=id)
     product = attribute.product
@@ -904,6 +1060,10 @@ def attribute_update(request, id):
 
 
 
+
+
+@login_required
+@staff_member_required
 def attribute_delete(request, id):
     attribute = get_object_or_404(ProductAttribute, id=id)
     product_id = attribute.product.id
@@ -914,6 +1074,10 @@ def attribute_delete(request, id):
 
 
 
+
+
+@login_required
+@staff_member_required
 # ORDER LIST
 def order_list(request):
     orders = Order.objects.all().order_by('-created_at')
@@ -923,16 +1087,48 @@ def order_list(request):
 
 from userapp.models import Order, STATUS_CHOICES
 
+
+
+@login_required
+@staff_member_required
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     items = order.items.all()
 
     if request.method == "POST":
+
         new_status = request.POST.get("status")
+
         if new_status in dict(STATUS_CHOICES):
+
+            # Store old status before updating
+            old_status = order.status
+
+            # Update status
             order.status = new_status
             order.save()
-            messages.success(request, "Order status updated successfully.")
+
+            # =====================================
+            # SEND EMAILS BASED ON STATUS
+            # =====================================
+
+            # SHIPPED EMAIL
+            if new_status == "SHIPPED" and old_status != "SHIPPED":
+                send_order_shipped_email(order)
+
+            # DELIVERED EMAIL
+            elif new_status == "DELIVERED" and old_status != "DELIVERED":
+                send_order_delivered_email(order)
+
+            # CANCELLED EMAIL
+            elif new_status == "CANCELLED" and old_status != "CANCELLED":
+                send_order_cancelled_email(order)
+
+            messages.success(
+                request,
+                "Order status updated successfully."
+            )
+
             return redirect("order_detail", pk=order.pk)
 
     return render(
@@ -941,12 +1137,14 @@ def order_detail(request, pk):
         {
             "order": order,
             "items": items,
-            "status_choices": STATUS_CHOICES,   # ✅ pass explicitly
+            "status_choices": STATUS_CHOICES,
         }
     )
 
 
-# ORDER DELETE
+
+@login_required
+@staff_member_required
 def order_delete(request, pk):
     order = get_object_or_404(Order, pk=pk)
     order.delete()
@@ -954,6 +1152,10 @@ def order_delete(request, pk):
 
 
 
+
+
+@login_required
+@staff_member_required
 def user_list(request):
     users = User.objects.all().order_by("-date_joined")
     return render(request, "users/user_list.html", {"users": users})
@@ -968,6 +1170,10 @@ from userapp.models import Order, Address
 
 User = get_user_model()
 
+
+
+@login_required
+@staff_member_required
 def user_detail(request, pk):
     user_obj = get_object_or_404(User, pk=pk)
     
@@ -995,6 +1201,10 @@ def user_detail(request, pk):
 # ----------------------
 # USER DELETE (simple delete like you asked)
 # ----------------------
+
+
+@login_required
+@staff_member_required
 def user_delete(request, pk):
     user_obj = get_object_or_404(User, pk=pk)
     user_obj.delete()
@@ -1004,7 +1214,11 @@ from datetime import datetime
 
 from datetime import datetime
 
+
+
+
 @login_required
+@staff_member_required
 def coupon_create(request):
     if not request.user.is_staff:
         return redirect("index")
@@ -1048,7 +1262,11 @@ def coupon_create(request):
 
 
 
+
+
+
 @login_required
+@staff_member_required
 def coupon_list(request):
     if not request.user.is_staff:
         return redirect("index")
@@ -1057,7 +1275,9 @@ def coupon_list(request):
     return render(request, "coupon/list.html", {"coupons": coupons})
 
 
+
 @login_required
+@staff_member_required
 def coupon_update(request, id):
     if not request.user.is_staff:
         return redirect("index")
@@ -1090,7 +1310,11 @@ def coupon_update(request, id):
 
 
 
+
+
+
 @login_required
+@staff_member_required
 def coupon_delete(request, id):
     if not request.user.is_staff:
         return redirect("index")
@@ -1098,3 +1322,192 @@ def coupon_delete(request, id):
     Coupon.objects.filter(id=id).delete()
     messages.success(request, "Coupon deleted")
     return redirect("coupon_list")
+
+
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def cancelled_orders_list(request):
+    orders = Order.objects.filter(
+        status="CANCELLED"
+    ).select_related("user", "address").prefetch_related(
+        "items__product"
+    ).order_by("-cancelled_at")
+
+    return render(request, "orders/cancelled_orders_list.html", {
+        "orders": orders
+    })
+
+
+@staff_member_required
+def cancelled_order_detail(request, pk):
+    order = get_object_or_404(
+        Order,
+        pk=pk,
+        status="CANCELLED"
+    )
+
+    # 🔥 THIS PART IS UPDATE
+    if request.method == "POST":
+        refund_status = request.POST.get("refund_status")
+
+        if refund_status in dict(Order.REFUND_STATUS_CHOICES):
+            order.refund_status = refund_status
+
+            # If refund completed → mark payment refunded
+            if refund_status == "COMPLETED":
+                order.payment_status = "REFUNDED"
+
+            order.save()   # ✅ UPDATE HAPPENS HERE
+
+            messages.success(request, "Refund status updated successfully")
+            return redirect("cancelled_order_detail", pk=pk)
+
+    return render(request, "orders/cancelled_order_detail.html", {
+        "order": order,
+        "items": order.items.all(),
+        "refund_status_choices": Order.REFUND_STATUS_CHOICES,
+    })
+
+
+@staff_member_required
+def cancelled_order_delete(request, pk):
+    order = get_object_or_404(
+        Order,
+        pk=pk,
+        status="CANCELLED"
+    )
+
+    if request.method == "POST":
+        order.delete()
+        messages.success(request, "Cancelled order deleted successfully")
+        return redirect("cancelled_orders_list")
+
+    return render(request, "orders/cancelled_order_confirm_delete.html", {
+        "order": order
+    })
+
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from userapp.models import OrderItem
+
+
+@staff_member_required
+def replacement_requests_list(request):
+    items = OrderItem.objects.filter(
+        replacement_requested=True,
+    ).select_related(
+        "order",
+        "order__user",
+        "product"
+    ).order_by("-replacement_requested_at")
+
+    return render(
+        request,
+        "orders/replacement_requests_list.html",
+        {"items": items}
+    )
+
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from userapp.models import (
+    OrderItem,
+    ReplacementOrder,
+    ReplacementOrderItem
+)
+
+
+@staff_member_required
+def replacement_request_detail(request, item_id):
+    item = get_object_or_404(
+        OrderItem,
+        id=item_id,
+        replacement_requested=True
+    )
+
+    if request.method == "POST":
+        status = request.POST.get("status")
+
+        if status == "APPROVED":
+            # 🔥 CREATE ReplacementOrder
+            replacement_order = ReplacementOrder.objects.create(
+                user=item.order.user,
+                original_order=item.order,
+                address=item.order.address,
+                status="PROCESSING"
+            )
+
+            # 🔥 CREATE ReplacementOrderItem
+            ReplacementOrderItem.objects.create(
+                replacement_order=replacement_order,
+                product=item.product,
+                quantity=item.quantity
+            )
+
+            # 🔥 LINK BACK TO OrderItem
+            item.replacement_status = "APPROVED"
+            item.replacement_order = replacement_order
+            item.save()
+
+            messages.success(request, "Replacement approved & order created.")
+
+        elif status == "REJECTED":
+            item.replacement_status = "REJECTED"
+            item.save()
+            messages.success(request, "Replacement rejected.")
+
+        return redirect("replacement_requests_list")
+
+    return render(
+        request,
+        "orders/replacement_request_detail.html",
+        {"item": item}
+    )
+
+
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from userapp.models import ReplacementOrder
+
+
+@staff_member_required
+def replacement_order_manage(request, pk):
+    """
+    Admin can update replacement order status:
+    PROCESSING → SHIPPED → DELIVERED
+    """
+    order = get_object_or_404(ReplacementOrder, pk=pk)
+
+    if request.method == "POST":
+        status = request.POST.get("status")
+
+        if status in ["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]:
+            order.status = status
+            order.save()
+
+            messages.success(request, "Replacement order status updated")
+            return redirect("admin_replacement_orders")
+
+    return render(
+        request,
+        "orders/replacement_order_manage.html",
+        {"order": order}
+    )
+
+
+
+@staff_member_required
+def admin_replacement_orders(request):
+    orders = ReplacementOrder.objects.select_related(
+        "user", "original_order"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "orders/admin_replacement_orders.html",
+        {"orders": orders}
+    )

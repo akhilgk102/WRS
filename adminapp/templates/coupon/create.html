@@ -17,16 +17,6 @@
     <!-- Card Body -->
     <div class="card-body">
 
-      {% if messages %}
-      <ul>
-        {% for message in messages %}
-        <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
-          {{ message }}
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
       <!-- FORM -->
       <form method="POST">
         {% csrf_token %}
@@ -53,7 +43,7 @@
 
           <!-- Discount Amount -->
           <div class="col-md-6 col-12">
-            <label class="form-label">Discount Amount (₹)</label>
+            <label class="form-label">Discount Amount (AED )</label>
             <div class="icon-field">
               <span class="icon">
                 <iconify-icon icon="mdi:currency-inr"></iconify-icon>

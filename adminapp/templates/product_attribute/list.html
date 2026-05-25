@@ -22,20 +22,7 @@
     </ul>
   </div>
 
-  <!-- Messages -->
-  {% if messages %}
-  <div class="row mb-24">
-    <div class="col-12">
-      {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-        <iconify-icon icon="{% if message.tags == 'success' %}mdi:check-circle{% elif message.tags == 'error' %}mdi:alert-circle{% else %}mdi:information{% endif %}" class="icon text-xl"></iconify-icon>
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
+ 
 
   <!-- Stats Cards Row -->
   <div class="row gy-4 mb-24">

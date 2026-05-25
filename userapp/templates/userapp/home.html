@@ -363,9 +363,9 @@
                                                 <img src="{% static 'img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}"
                                                     class="product-review-star" alt="star">
                                             {% endfor %}
-<span class="review-count">
-    ({{ product.avg_rating|default:"0.0" }})
-</span>
+                                        <span class="review-count">
+                                            ({{ product.avg_rating|default:"0.0" }})
+                                        </span>
                                         </div>
 
 
@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                priceElement.innerHTML = "AED " + formatted;
+                priceElement.innerHTML = "AED  " + formatted;
             }
         });
 
@@ -484,7 +484,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                priceElement.innerHTML = "AED " + formatted;
+                priceElement.innerHTML = "AED  " + formatted;
             }
         });
 
@@ -572,5 +572,33 @@ document.addEventListener("DOMContentLoaded", function() {
         window.location.search = urlParams.toString();
     }
 </script>
+<script>
+    prices.forEach((priceElement) => {
+    let amount = priceElement.getAttribute("data-price");
+    if (amount) {
+        let num = parseFloat(amount);
+        let formatted = num % 1 === 0 
+            ? num.toLocaleString('en-IN') 
+            : num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        priceElement.innerHTML = "AED " + formatted;
+    }
+});
+
+originalPrices.forEach((priceElement) => {
+    let amount = priceElement.getAttribute("data-price");
+    if (amount) {
+        let num = parseFloat(amount);
+        let formatted = num % 1 === 0 
+            ? num.toLocaleString('en-IN') 
+            : num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        priceElement.innerHTML = "AED " + formatted;
+    }
+});
+
+
+
+</script>
+
+
 
 {% endblock %}

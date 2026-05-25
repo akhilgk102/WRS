@@ -1,0 +1,254 @@
+{% extends "admin_base2.html" %}
+{% load static %}
+{% block title %} Replacement Order Manage {% endblock %}
+{% block content %}
+
+<div class="dashboard-main-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Replacement Order Details</h6>
+        <ul class="d-flex align-items-center gap-2">
+            <li class="fw-medium">
+                <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <i class="ri-home-4-line"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">
+                <a href="{% url 'admin_replacement_orders' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    Replacement Orders
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">Order #{{ order.id }}</li>
+        </ul>
+    </div>
+
+
+
+    <div class="row gy-4">
+        <!-- Order Summary Card -->
+        <div class="col-lg-8 col-md-12">
+            <div class="card h-100">
+                <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
+                    <h6 class="text-lg fw-semibold mb-0">Replacement Order #{{ order.id }}</h6>
+                    <form method="post" class="d-flex align-items-center gap-2">
+                        {% csrf_token %}
+                        <select name="status" class="form-select form-select-sm w-auto">
+                            <option value="PROCESSING" {% if order.status == "PROCESSING" %}selected{% endif %}>Processing</option>
+                            <option value="SHIPPED" {% if order.status == "SHIPPED" %}selected{% endif %}>Shipped</option>
+                            <option value="DELIVERED" {% if order.status == "DELIVERED" %}selected{% endif %}>Delivered</option>
+                            <option value="CANCELLED" {% if order.status == "CANCELLED" %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Update
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body p-24">
+                    <div class="table-responsive scroll-sm">
+                        <table class="table bordered-table sm-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-sm fw-semibold">Product</th>
+                                    <th scope="col" class="text-sm fw-semibold text-center">Quantity</th>
+                                    <th scope="col" class="text-sm fw-semibold text-center">SKU</th>
+                                    <th scope="col" class="text-sm fw-semibold text-center">Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            {% if item.product and item.product.primary_image %}
+                                            <img src="{{ item.product.primary_image.image.url }}" 
+                                                 alt="{{ item.product.name }}" 
+                                                 class="w-60-px h-60-px rounded-4 object-fit-cover flex-shrink-0">
+                                            {% else %}
+                                            <div class="w-60-px h-60-px rounded-4 bg-neutral-200 d-flex align-items-center justify-content-center flex-shrink-0">
+                                                <i class="ri-image-line text-xl text-neutral-600"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="text-md mb-0 fw-normal">{{ item.product.name }}</h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-md fw-medium text-secondary-light">{{ item.quantity }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-md fw-medium text-secondary-light">
+                                            {% if item.product.sku %}{{ item.product.sku }}{% else %}-{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-md fw-medium text-secondary-light">
+                                            {% if item.product.category %}{{ item.product.category.name }}{% else %}-{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        No replacement items found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer & Delivery Info -->
+        <div class="col-lg-4 col-md-12">
+            <div class="row gy-4">
+                <!-- Customer Information -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Customer Information</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div class="d-flex align-items-center gap-3 mb-16">
+                                <div class="w-44-px h-44-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-user-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-secondary-light mb-4">Customer Email</p>
+                                    <h6 class="text-md fw-semibold mb-0">{{ order.user.email }}</h6>
+                                </div>
+                            </div>
+
+                            {% if order.address %}
+                            <div class="d-flex align-items-center gap-3 mb-16">
+                                <div class="w-44-px h-44-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-user-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-secondary-light mb-4">Full Name</p>
+                                    <h6 class="text-md fw-semibold mb-0">{{ order.address.full_name }}</h6>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-44-px h-44-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-phone-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-secondary-light mb-4">Phone Number</p>
+                                    <h6 class="text-md fw-semibold mb-0">{{ order.address.phone }}</h6>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Address -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Delivery Address</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            {% if order.address %}
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="w-44-px h-44-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="ri-map-pin-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-md fw-medium text-secondary-light mb-8">
+                                        {{ order.address.street }}
+                                    </p>
+                                    <p class="text-sm text-secondary-light mb-0">
+                                        {{ order.address.city }}, {{ order.address.state }}<br>
+                                        {{ order.address.pincode }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p class="text-muted mb-0">No address available</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Details -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Order Details</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div class="d-flex align-items-center justify-content-between mb-16">
+                                <span class="text-sm text-secondary-light">Original Order</span>
+                                <span class="text-sm fw-semibold text-primary-light">
+                                    #{{ order.original_order.id }}
+                                </span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-16">
+                                <span class="text-sm text-secondary-light">Created On</span>
+                                <span class="text-sm fw-semibold text-primary-light">
+                                    {{ order.created_at|date:"d M Y, H:i" }}
+                                </span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-16">
+                                <span class="text-sm text-secondary-light">Last Updated</span>
+                                <span class="text-sm fw-semibold text-primary-light">
+                                    {{ order.updated_at|date:"d M Y, H:i" }}
+                                </span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-sm text-secondary-light">Status</span>
+                                <span class="badge 
+                                    {% if order.status == 'PROCESSING' %}bg-warning-100 text-warning-600
+                                    {% elif order.status == 'SHIPPED' %}bg-info-100 text-info-600
+                                    {% elif order.status == 'DELIVERED' %}bg-success-100 text-success-600
+                                    {% elif order.status == 'CANCELLED' %}bg-danger-100 text-danger-600
+                                    {% endif %} px-16 py-6 radius-4 fw-semibold text-sm">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex align-items-center gap-3 mt-24">
+        <a href="{% url 'admin_replacement_orders' %}" class="btn btn-neutral-600 radius-8 px-24 py-12">
+            <i class="ri-arrow-left-line"></i>
+            Back to Orders
+        </a>
+    </div>
+</div>
+
+<style>
+@media print {
+    .sidebar, .navbar-header, footer, .btn, .breadcrumb {
+        display: none !important;
+    }
+    .dashboard-main-body {
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+.hover-text-primary:hover {
+    color: #487fff !important;
+}
+</style>
+{% endblock %}

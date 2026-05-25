@@ -1,0 +1,870 @@
+{% extends "user_base.html" %}
+{% load static %}
+
+{% block title %}Cancel Order{% endblock %}
+
+{% block content %}
+
+<div class="section after-banner">
+  <div class="container">
+    
+
+
+    <!-- Main Cancel Card -->
+    <div class="cancel-order-wrapper">
+      
+      <!-- Header Section -->
+      <div class="cancel-order-header">
+        <div class="cancel-header-content">
+          <h2 class="cancel-order-title">Cancel Order</h2>
+          <p class="cancel-order-subtitle">
+            Order ID: <span class="order-id-badge">#{{ order.id }}</span>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Order Summary Section -->
+      <div class="order-summary-section">
+        <div class="section-header">
+          <h3 class="section-header-title">Order Details</h3>
+          <span class="section-header-line"></span>
+        </div>
+
+        <div class="order-items-list">
+          {% for item in order.items.all %}
+          <div class="order-item-card">
+            <div class="item-image-wrapper">
+              {% if item.product.primary_image %}
+                <img src="{{ item.product.primary_image.image.url }}" 
+                     alt="{{ item.product.name }}" 
+                     class="item-image">
+              {% else %}
+                <img src="{% static 'img/no-image.png' %}" 
+                     alt="No Image" 
+                     class="item-image">
+              {% endif %}
+              <div class="item-quantity-badge">{{ item.quantity }}x</div>
+            </div>
+
+            <div class="item-details">
+              <h4 class="item-name">{{ item.product.name }}</h4>
+              <p class="item-quantity-text">Quantity: {{ item.quantity }}</p>
+            </div>
+
+            <div class="item-price-wrapper">
+              <span class="item-price">AED  {{ item.price }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Order Total -->
+        <div class="order-total-section">
+          <div class="total-row">
+            <span class="total-label">Total Amount</span>
+            <span class="total-amount">AED  {{ order.total_price }}</span>
+          </div>
+        </div>
+
+        <!-- Warning Alert -->
+        <div class="alert-box alert-warning">
+          <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 6V11M10 14H10.01M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="alert-content">
+            <p class="alert-title">Important Notice</p>
+            <p class="alert-text">Once cancelled, this order cannot be restored. Refund will be processed after verification within 5-7 business days.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cancellation Form -->
+      <form method="post" class="cancel-order-form">
+        {% csrf_token %}
+
+        <!-- Reason Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3 class="section-header-title">Cancellation Reason</h3>
+            <span class="section-header-line"></span>
+          </div>
+
+          <div class="form-field-group">
+            <label for="reason" class="form-label">
+              Why are you cancelling this order? <span class="required">*</span>
+            </label>
+            <div class="select-wrapper">
+              <select name="reason" id="reason" class="form-select" required>
+                <option value="">Select a reason</option>
+                <option value="Changed my mind">Changed my mind</option>
+                <option value="Ordered wrong item">Ordered wrong item</option>
+                <option value="Found a better price">Found a better price</option>
+                <option value="Delivery taking too long">Delivery taking too long</option>
+                <option value="Other">Other</option>
+              </select>
+              <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refund Details Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3 class="section-header-title">Refund Account Details</h3>
+            <span class="section-header-line"></span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field-group">
+              <label for="account_name" class="form-label">
+                Account Holder Name <span class="required">*</span>
+              </label>
+              <input type="text" 
+                     name="account_name" 
+                     id="account_name" 
+                     class="form-input" 
+                     placeholder="Enter account holder name"
+                     required>
+            </div>
+
+            <div class="form-field-group">
+              <label for="account_number" class="form-label">
+                Account Number <span class="required">*</span>
+              </label>
+              <input type="text" 
+                     name="account_number" 
+                     id="account_number" 
+                     class="form-input" 
+                     placeholder="Enter account number"
+                     required>
+            </div>
+
+            <div class="form-field-group">
+              <label for="ifsc" class="form-label">
+                IFSC Code <span class="required">*</span>
+              </label>
+              <input type="text" 
+                     name="ifsc" 
+                     id="ifsc" 
+                     class="form-input" 
+                     placeholder="Enter IFSC code"
+                     required>
+            </div>
+
+            <div class="form-field-group">
+              <label for="bank_name" class="form-label">
+                Bank Name <span class="required">*</span>
+              </label>
+              <input type="text" 
+                     name="bank_name" 
+                     id="bank_name" 
+                     class="form-input" 
+                     placeholder="Enter bank name"
+                     required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <a href="{% url 'order_history' %}" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 14L2 8L8 2M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Go Back
+          </a>
+          <button type="submit" class="btn-primary btn-danger">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Confirm Cancellation
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* ==================== CANCEL ORDER STYLES ==================== */
+
+.cancel-order-wrapper {
+  background: #ffffff;
+  border: 1px solid rgba(30, 30, 30, 0.1);
+  border-radius: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Header Section */
+.cancel-order-header {
+  background: linear-gradient(135deg, #0B3F66 0%, #094361 100%);
+  padding: 30px 60px;
+  border-bottom: 3px solid var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cancel-order-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.cancel-order-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.cancel-header-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.cancel-order-title {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-order-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.order-id-badge {
+  display: inline-block;
+  background: #ffffff;
+  color: var(--primary-color);
+  padding: 6px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-left: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cancel-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  padding: 10px 20px;
+  border-radius: 35px;
+  border: 2px solid #ffe0b2;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #ff9800;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-text {
+  color: #e65100;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.section-header-title {
+  color: #070707;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.section-header-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(11, 63, 102, 0.2) 0%, rgba(11, 63, 102, 0) 100%);
+}
+
+/* Order Summary Section */
+.order-summary-section {
+  padding: 50px 60px;
+  background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.order-item-card {
+  background: #ffffff;
+  border: 2px solid rgba(30, 30, 30, 0.06);
+  border-radius: 18px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.order-item-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary-color);
+  transform: scaleY(0);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.order-item-card:hover::before {
+  transform: scaleY(1);
+}
+
+.order-item-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 12px 32px rgba(11, 63, 102, 0.15);
+  transform: translateX(8px);
+}
+
+.item-image-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.item-image {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 15px;
+  border: 2px solid rgba(30, 30, 30, 0.08);
+  transition: all 0.4s ease;
+}
+
+.order-item-card:hover .item-image {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.item-quantity-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #094361 100%);
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  color: #070707;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+}
+
+.item-quantity-text {
+  color: #737b86;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.item-price-wrapper {
+  text-align: right;
+}
+
+.item-price {
+  color: var(--primary-color);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Order Total */
+.order-total-section {
+  background: #ffffff;
+  border: 2px solid var(--primary-color);
+  border-radius: 15px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  color: #070707;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.total-amount {
+  color: var(--primary-color);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Alert Box */
+.alert-box {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.alert-warning {
+  background: #fff3e0;
+  border-color: #ffe0b2;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  color: #f57c00;
+  margin-top: 2px;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  color: #e65100;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.alert-text {
+  color: #737b86;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Form Sections */
+.cancel-order-form {
+  padding: 40px;
+}
+
+.form-section {
+  margin-bottom: 40px;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-field-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  color: #070707;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.required {
+  color: #ef1b27;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid rgba(30, 30, 30, 0.15);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #070707;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(11, 63, 102, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9aa5b3;
+}
+
+/* Select Wrapper */
+.select-wrapper {
+  position: relative;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #737b86;
+}
+
+.form-select {
+  appearance: none;
+  padding-right: 45px;
+  cursor: pointer;
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(30, 30, 30, 0.08);
+}
+
+.btn-secondary,
+.btn-primary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 30px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #f7f8f9;
+  color: #070707;
+  border: 1px solid rgba(30, 30, 30, 0.15);
+}
+
+.btn-secondary:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #094361;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(11, 63, 102, 0.25);
+}
+
+.btn-danger {
+  background: #ef1b27;
+}
+
+.btn-danger:hover {
+  background: #c91522;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 991px) {
+  .cancel-order-header {
+    padding: 25px 30px;
+    gap: 16px;
+  }
+
+  .cancel-order-title {
+    font-size: 26px;
+    margin: 0 0 8px 0;
+  }
+
+  .cancel-order-subtitle {
+    font-size: 15px;
+  }
+
+  .cancel-order-header::before {
+    width: 250px;
+    height: 250px;
+  }
+
+  .cancel-order-header::after {
+    width: 180px;
+    height: 180px;
+  }
+
+  .order-id-badge {
+    padding: 5px 14px;
+    font-size: 15px;
+  }
+
+  .cancel-status-badge {
+    padding: 10px 18px;
+  }
+
+  .order-summary-section,
+  .cancel-order-form {
+    padding: 30px;
+  }
+
+  .form-grid {
+    gap: 20px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .cancel-order-header {
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .cancel-order-title {
+    font-size: 20px;
+    margin: 0 0 6px 0;
+  }
+
+  .cancel-order-subtitle {
+    font-size: 14px;
+  }
+
+  .order-id-badge {
+    padding: 4px 12px;
+    font-size: 14px;
+  }
+
+  .cancel-status-badge {
+    padding: 8px 16px;
+    margin-top: 12px;
+  }
+
+  .status-text {
+    font-size: 13px;
+  }
+
+  .cancel-order-header::before {
+    width: 200px;
+    height: 200px;
+  }
+
+  .cancel-order-header::after {
+    width: 150px;
+    height: 150px;
+  }
+
+  .section-header-title {
+    font-size: 18px;
+  }
+
+  .order-summary-section,
+  .cancel-order-form {
+    padding: 25px;
+  }
+
+  .order-item-card {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .item-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .item-name {
+    font-size: 16px;
+  }
+
+  .item-price {
+    font-size: 18px;
+  }
+
+  .total-amount {
+    font-size: 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .cancel-order-header {
+    padding: 16px;
+    gap: 0;
+  }
+
+  .cancel-order-title {
+    font-size: 18px;
+    margin: 0 0 5px 0;
+  }
+
+  .cancel-order-subtitle {
+    font-size: 13px;
+  }
+
+  .order-id-badge {
+    display: block;
+    margin-left: 0;
+    margin-top: 6px;
+    width: fit-content;
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+
+  .cancel-status-badge {
+    padding: 6px 14px;
+    margin-top: 10px;
+  }
+
+  .status-text {
+    font-size: 12px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .cancel-order-header::before {
+    width: 150px;
+    height: 150px;
+  }
+
+  .cancel-order-header::after {
+    width: 100px;
+    height: 100px;
+  }
+
+  .section-header-title {
+    font-size: 16px;
+  }
+
+  .order-summary-section,
+  .cancel-order-form {
+    padding: 20px;
+  }
+
+  .order-item-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .item-details {
+    text-align: center;
+  }
+
+  .item-price-wrapper {
+    text-align: center;
+  }
+
+  .total-row {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .alert-box {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    padding: 14px 25px;
+    font-size: 15px;
+  }
+}
+</style>
+
+{% endblock %}

@@ -1,723 +1,392 @@
 {% extends 'admin_base2.html' %}
 {% load static %}
 {% load custom_filters %}
+
+{% block title %}Homepage Sections{% endblock %}
+
 {% block content %}
-<div class="container-fluid py-4">
-    
+<div class="dashboard-main-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Homepage Sections</h6>
+        <ul class="d-flex align-items-center gap-2">
+            <li class="fw-medium">
+                <a href="{% url 'dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <i class="ri-home-4-line"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">Sections</li>
+        </ul>
+    </div>
+
     {% for section in sections %}
-    <div class="section-card mb-4">
-        <!-- Header -->
-        <div class="section-header">
-            <div class="header-left">
-                <div class="section-title-group">
-                    <div class="icon-wrapper">
-                        <i class="fas fa-layer-group icon"></i>
-                    </div>
-                    <div>
-                        <h4 class="section-title">{{ section.name }}</h4>
-                        <div class="badge-group">
-                            <span class="status-badge {% if section.is_active %}status-active{% else %}status-inactive{% endif %}">
-                                <span class="status-dot"></span>
-                                {% if section.is_active %}Active{% else %}Inactive{% endif %}
-                            </span>
-                            <span class="type-badge">{{ section.get_display_type_display }}</span>
-                        </div>
+    <div class="card mb-24">
+        <!-- Section Header -->
+        <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="w-40-px h-40-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center flex-shrink-0">
+                    <i class="ri-layout-grid-line text-xl"></i>
+                </div>
+                <div>
+                    <h6 class="text-lg fw-semibold mb-4">{{ section.name }}</h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge {% if section.is_active %}bg-success-100 text-success-600{% else %}bg-neutral-100 text-neutral-600{% endif %} px-12 py-4 radius-4 fw-medium text-sm">
+                            {% if section.is_active %}
+                                <i class="ri-checkbox-circle-line me-1"></i>Active
+                            {% else %}
+                                <i class="ri-close-circle-line me-1"></i>Inactive
+                            {% endif %}
+                        </span>
+                        <span class="badge bg-primary-100 text-primary-600 px-12 py-4 radius-4 fw-medium text-sm">
+                            {{ section.get_display_type_display }}
+                        </span>
                     </div>
                 </div>
             </div>
-            <div class="header-right">
-                <form method="POST" action="{% url 'homepage_section_toggle' section.id %}" class="d-inline">
+            <form method="POST" action="{% url 'homepage_section_toggle' section.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm {% if section.is_active %}btn-warning-600{% else %}btn-success-600{% endif %}">
+                    <i class="ri-power-line"></i>
+                    {% if section.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+            </form>
+        </div>
+
+        <div class="card-body p-24">
+            {% if section.section_type == 'best_seller' or section.section_type == 'new_arrival' %}
+            <!-- Category Selection -->
+            <div class="mb-24">
+                <h6 class="text-md fw-semibold mb-16 d-flex align-items-center gap-2">
+                    <i class="ri-price-tag-3-line text-primary-600"></i>
+                    Category Selection
+                </h6>
+                
+                <form method="POST" action="{% url 'homepage_section_update_categories' section.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="toggle-btn {% if section.is_active %}btn-deactivate{% else %}btn-activate{% endif %}">
-                        <i class="fas fa-power-off"></i>
-                        <span>{% if section.is_active %}Deactivate{% else %}Activate{% endif %}</span>
+                    <div class="row g-3 mb-16">
+                        {% for category in categories %}
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <label class="form-check form-check-custom">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       name="categories" 
+                                       value="{{ category.id }}"
+                                       {% if category in section.categories.all %}checked{% endif %}>
+                                <span class="form-check-label text-sm">{{ category.name }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary-600">
+                        <i class="ri-save-line"></i>
+                        Save Categories
                     </button>
                 </form>
             </div>
-        </div>
 
-        <div class="section-body">
-{% if section.section_type == 'best_seller' or section.section_type == 'new_arrival' %}
-    <!-- Category Selection -->
-    <div class="content-block">
-        <div class="block-header">
-            <div class="block-title">
-                <i class="fas fa-tags"></i>
-                <span>Category Selection</span>
-            </div>
-        </div>
-
-        <form method="POST" action="{% url 'homepage_section_update_categories' section.id %}">
-            {% csrf_token %}
-
-            <div class="category-grid">
-                {% for category in categories %}
-                <label class="category-checkbox">
-                    <input type="checkbox"
-                           name="categories"
-                           value="{{ category.id }}"
-                           {% if category in section.categories.all %}checked{% endif %}>
-                    <span class="checkbox-card">
-                        <span class="checkbox-icon">
-                            <i class="fas fa-check"></i>
-                        </span>
-                        <span class="checkbox-label">{{ category.name }}</span>
-                    </span>
-                </label>
-                {% endfor %}
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-save"></i>
-                    <span>Save Categories</span>
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <div class="divider"></div>
-{% endif %}
+            <div class="border-top my-24"></div>
+            {% endif %}
 
             <!-- Products Section -->
-            <div class="content-block">
-                <div class="block-header">
-                    <div class="block-title">
-                        <i class="fas fa-box"></i>
-                        <span>Assigned Products</span>
-                        <span class="count-badge">{{ section.homepage_products.count }}</span>
-                    </div>
-                    <a href="{% url 'homepage_section_add_product' section.id %}" class="btn-add">
-                        <i class="fas fa-plus"></i>
-                        <span>Add Product</span>
-                    </a>
-                </div>
-
-                {% if section.homepage_products.exists %}
-                <div class="products-grid">
-                    {% for hp in section.homepage_products.all %}
-                    <div class="product-card">
-                        <div class="product-image">
-                            {% if hp.product.primary_image %}
-                            <img src="{{ hp.product.primary_image.image.url }}" 
-                                 alt="{{ hp.product.name }}">
-                            {% else %}
-                            <div class="image-placeholder">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            {% endif %}
-                            <span class="category-label">{{ hp.product.category.name }}</span>
-                        </div>
-                        <div class="product-info">
-                            <h6 class="product-name" title="{{ hp.product.name }}">
-                                {{ hp.product.name }}
-                            </h6>
-                            <div class="product-price">
-                                {% if hp.product.offer_price %}
-                                <span class="price-original">AED {{ hp.product.price }}</span>
-                                <span class="price-offer">AED {{ hp.product.offer_price }}</span>
-                                {% else %}
-                                <span class="price-current">AED {{ hp.product.price }}</span>
-                                {% endif %}
-                            </div>
-                            <form method="POST" action="{% url 'homepage_product_remove' hp.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-remove" 
-                                        onclick="return confirm('Remove {{ hp.product.name }} from {{ section.name }}?')">
-                                    <i class="fas fa-trash"></i>
-                                    <span>Remove</span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-inbox"></i>
-                    <p>No products assigned to this section yet.</p>
-                    <span>Click "Add Product" to get started.</span>
-                </div>
-                {% endif %}
+            <div class="d-flex align-items-center justify-content-between mb-16">
+                <h6 class="text-lg fw-semibold mb-0 d-flex align-items-center gap-2">
+                    <i class="ri-box-3-line text-primary-600"></i>
+                    Assigned Products
+                    <span class="badge bg-neutral-100 text-neutral-600 px-12 py-4 radius-4 fw-medium text-sm">
+                        {{ section.homepage_products.count }}
+                    </span>
+                </h6>
+                <a href="{% url 'homepage_section_add_product' section.id %}" class="btn btn-sm btn-success-600">
+                    <i class="ri-add-line"></i>
+                    Add Product
+                </a>
             </div>
 
-
+            {% if section.homepage_products.exists %}
+            <div class="alert alert-info d-flex align-items-center gap-2 mb-16">
+                <i class="ri-information-line"></i>
+                <span class="text-sm">Drag and drop rows to reorder products</span>
+            </div>
+            
+            <div class="table-responsive scroll-sm">
+                <table class="table bordered-table sm-table mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-sm fw-semibold" style="width: 50px;"></th>
+                            <th scope="col" class="text-sm fw-semibold">Product</th>
+                            <th scope="col" class="text-sm fw-semibold text-center">Category</th>
+                            <th scope="col" class="text-sm fw-semibold text-center">Price</th>
+                            <th scope="col" class="text-sm fw-semibold text-center">Status</th>
+                            <th scope="col" class="text-sm fw-semibold text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sortable-products" data-section-id="{{ section.id }}">
+                        {% for hp in section.homepage_products.all %}
+                        <tr class="sortable-row" data-product-id="{{ hp.id }}">
+                            <td class="text-center drag-handle" style="cursor: grab;">
+                                <i class="ri-draggable" style="font-size: 24px; color: #999;"></i>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if hp.product.primary_image %}
+                                    <img src="{{ hp.product.primary_image.image.url }}" 
+                                         alt="{{ hp.product.name|truncatechars:40 }}" 
+                                         class="w-60-px h-60-px rounded-4 object-fit-cover flex-shrink-0">
+                                    {% else %}
+                                    <div class="w-60-px h-60-px rounded-4 bg-neutral-200 d-flex align-items-center justify-content-center flex-shrink-0">
+                                        <i class="ri-image-line text-xl text-neutral-600"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="text-md mb-0 fw-normal">{{ hp.product.name|truncatechars:40 }}</h6>
+                                        {% if hp.product.brand %}
+                                        <span class="text-sm text-secondary-light fw-normal">{{ hp.product.brand.name }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-info-100 text-info-600 px-12 py-6 radius-4 fw-medium text-sm">
+                                    {{ hp.product.category.name }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {% if hp.product.offer_price %}
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="text-sm text-secondary-light text-decoration-line-through">AED  {{ hp.product.price }}</span>
+                                    <span class="text-md fw-semibold text-success-600">AED  {{ hp.product.offer_price }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-md fw-semibold text-primary-light">AED  {{ hp.product.price }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if hp.product.is_active %}
+                                <span class="badge bg-success-100 text-success-600 px-12 py-6 radius-4 fw-medium text-sm">
+                                    Active
+                                </span>
+                                {% else %}
+                                <span class="badge bg-neutral-100 text-neutral-600 px-12 py-6 radius-4 fw-medium text-sm">
+                                    Inactive
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <form method="POST" action="{% url 'homepage_product_remove' hp.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-danger-600"
+                                            onclick="return confirm('Remove {{ hp.product.name|truncatechars:40 }} from {{ section.name }}?')">
+                                        <i class="ri-delete-bin-line"></i>
+                                        Remove
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-64">
+                <div class="w-100-px h-100-px rounded-circle bg-neutral-100 d-flex align-items-center justify-content-center mx-auto mb-16">
+                    <i class="ri-inbox-line text-xxl text-neutral-400"></i>
+                </div>
+                <h6 class="text-md fw-semibold mb-8">No products assigned yet</h6>
+                <p class="text-sm text-secondary-light mb-0">Click "Add Product" to get started.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
-
 </div>
 
 <style>
-/* Section Card */
-.section-card {
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-}
-
-/* Dark Mode Variables */
-[data-theme="dark"] .section-card,
-.dark .section-card {
-    --card-bg: #1e293b;
-    --border-color: #334155;
-    --header-bg: #0f172a;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --input-bg: #0f172a;
-    --hover-bg: #334155;
-}
-
-/* Section Header */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px;
-    background: var(--header-bg, #f9fafb);
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-}
-
-.header-left {
-    flex: 1;
-}
-
-.section-title-group {
+/* Custom Checkbox Styling */
+.form-check-custom {
     display: flex;
     align-items: center;
-    gap: 16px;
-}
-
-.icon-wrapper {
-    width: 78px;
-    height: 78px;
-    background: var(--card-bg, #ffffff);
-    border: 2px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    color: #3b82f6;
-}
-
-.section-title {
-    margin: 0 0 8px 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-primary, #111827);
-}
-
-.badge-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    border: 1px solid;
-}
-
-.status-badge.status-active {
-    background: #ecfdf5;
-    color: #059669;
-    border-color: #a7f3d0;
-}
-
-.status-badge.status-inactive {
-    background: #f3f4f6;
-    color: #6b7280;
-    border-color: #d1d5db;
-}
-
-.status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-}
-
-.type-badge {
-    padding: 4px 12px;
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-/* Toggle Button */
-.toggle-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
+    padding: 12px 16px;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
-}
-
-.toggle-btn i {
-    font-size: 14px;
-}
-
-.toggle-btn.btn-deactivate {
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fbbf24;
-}
-
-.toggle-btn.btn-deactivate:hover {
-    background: #fde68a;
-}
-
-.toggle-btn.btn-activate {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #6ee7b7;
-}
-
-.toggle-btn.btn-activate:hover {
-    background: #a7f3d0;
-}
-
-/* Section Body */
-.section-body {
-    padding: 24px;
-}
-
-/* Content Block */
-.content-block {
-    margin-bottom: 32px;
-}
-
-.content-block:last-child {
-    margin-bottom: 0;
-}
-
-.block-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.block-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary, #111827);
-}
-
-.block-title i {
-    color: var(--text-secondary, #6b7280);
-    font-size: 18px;
-}
-
-.count-badge {
-    padding: 2px 10px;
-    background: var(--input-bg, #f3f4f6);
-    color: var(--text-primary, #374151);
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-/* Category Grid */
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.category-checkbox {
-    cursor: pointer;
+    transition: all 0.2s ease;
     margin: 0;
 }
 
-.category-checkbox input {
-    display: none;
+.form-check-custom:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.05);
 }
 
-.checkbox-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    background: var(--input-bg, #f9fafb);
-    border: 2px solid var(--border-color, #e5e7eb);
-    border-radius: 8px;
-    transition: all 0.2s;
+.form-check-custom .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
 }
 
-.category-checkbox input:checked + .checkbox-card {
-    background: #eff6ff;
-    border-color: #3b82f6;
+.form-check-custom .form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }
 
-[data-theme="dark"] .category-checkbox input:checked + .checkbox-card,
-.dark .category-checkbox input:checked + .checkbox-card {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: #3b82f6;
+.form-check-custom:has(.form-check-input:checked) {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-color: var(--bs-primary);
 }
 
-.checkbox-icon {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #d1d5db;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--card-bg, #ffffff);
-    transition: all 0.2s;
+.form-check-label {
+    cursor: pointer;
+    margin-bottom: 0;
+    user-select: none;
 }
 
-.category-checkbox input:checked + .checkbox-card .checkbox-icon {
-    background: #3b82f6;
-    border-color: #3b82f6;
+/* Sortable Styles */
+.sortable-row {
+    transition: background-color 0.2s ease;
 }
 
-.checkbox-icon i {
-    font-size: 12px;
-    color: #ffffff;
-    opacity: 0;
-    transition: opacity 0.2s;
+.sortable-row:hover {
+    background-color: rgba(13, 110, 253, 0.05);
 }
 
-.category-checkbox input:checked + .checkbox-card .checkbox-icon i {
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.sortable-drag {
     opacity: 1;
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.checkbox-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary, #374151);
+.drag-handle:active {
+    cursor: grabbing !important;
 }
 
-.category-checkbox:hover .checkbox-card {
-    border-color: var(--text-secondary, #9ca3af);
+.drag-handle:hover i {
+    color: #0d6efd !important;
 }
 
-.category-checkbox input:checked:hover + .checkbox-card {
-    border-color: #2563eb;
+/* Print Styles */
+@media print {
+    .sidebar, .navbar-header, footer, .btn, .breadcrumb, form {
+        display: none !important;
+    }
+    .dashboard-main-body {
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        page-break-inside: avoid;
+    }
 }
 
-/* Buttons */
-.btn-primary,
-.btn-add {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: #ffffff;
-}
-
-.btn-primary:hover {
-    background: #2563eb;
-}
-
-.btn-add {
-    background: #10b981;
-    color: #ffffff;
-}
-
-.btn-add:hover {
-    background: #059669;
-    color: #ffffff;
-}
-
-.form-actions {
-    padding-top: 8px;
-}
-
-/* Products Grid */
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
-}
-
-.product-card {
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.3s;
-}
-
-.product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border-color: var(--hover-bg, #d1d5db);
-}
-
-[data-theme="dark"] .product-card:hover,
-.dark .product-card:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-}
-
-.product-image {
-    position: relative;
-    width: 100%;
-    height: 200px;
-    background: var(--input-bg, #f3f4f6);
-}
-
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.image-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted, #9ca3af);
-    font-size: 48px;
-}
-
-.category-label {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 4px 10px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #3b82f6;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    border: 1px solid #e5e7eb;
-}
-
-.product-info {
-    padding: 16px;
-}
-
-.product-name {
-    margin: 0 0 10px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary, #111827);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.product-price {
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.price-original {
-    font-size: 14px;
-    color: #9ca3af;
-    text-decoration: line-through;
-}
-
-.price-offer,
-.price-current {
-    font-size: 16px;
-    font-weight: 600;
-    color: #3b82f6;
-}
-
-.btn-remove {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 8px;
-    background: #fef2f2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-remove:hover {
-    background: #fee2e2;
-    border-color: #fca5a5;
-}
-
-/* Empty State */
-.empty-state {
-    padding: 60px 20px;
-    text-align: center;
-    background: var(--input-bg, #f9fafb);
-    border: 2px dashed var(--border-color, #d1d5db);
-    border-radius: 10px;
-}
-
-.empty-state i {
-    font-size: 48px;
-    color: var(--text-muted, #d1d5db);
-    margin-bottom: 16px;
-}
-
-.empty-state p {
-    margin: 0 0 6px 0;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-primary, #374151);
-}
-
-.empty-state span {
-    font-size: 14px;
-    color: var(--text-secondary, #6b7280);
-}
-
-/* Category Breakdown */
-.category-breakdown {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.breakdown-item {
-    padding: 16px;
-    background: var(--input-bg, #f9fafb);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 8px;
-}
-
-.breakdown-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    color: var(--text-secondary, #6b7280);
-}
-
-.breakdown-header i {
-    font-size: 16px;
-}
-
-.breakdown-title {
-    flex: 1;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary, #374151);
-}
-
-.breakdown-count {
-    padding: 2px 10px;
-    background: var(--border-color, #e5e7eb);
-    color: var(--text-primary, #374151);
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.breakdown-products {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.product-tag {
-    display: inline-block;
-    padding: 6px 12px;
-    background: var(--card-bg, #ffffff);
-    color: var(--text-primary, #374151);
-    border: 1px solid var(--border-color, #d1d5db);
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-.product-tag-more {
-    display: inline-block;
-    padding: 6px 12px;
-    color: var(--text-secondary, #6b7280);
-    font-size: 13px;
-    font-style: italic;
-}
-
-.breakdown-empty {
-    padding: 8px 0;
-    color: var(--text-muted, #9ca3af);
-    font-size: 14px;
-}
-
-/* Divider */
-.divider {
-    height: 1px;
-    background: var(--border-color, #e5e7eb);
-    margin: 32px 0;
-}
-
-/* Responsive */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
+    .table-responsive {
+        margin: 0 -24px;
+        padding: 0 24px;
     }
-
-    .header-right {
-        width: 100%;
-    }
-
-    .toggle-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .category-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-
-    .block-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .btn-add {
-        width: 100%;
-        justify-content: center;
+    
+    .w-60-px {
+        width: 50px !important;
+        height: 50px !important;
     }
 }
 </style>
+
+<!-- SortableJS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing sortable...');
+    
+    // Initialize sortable for each product table
+    const sortableTables = document.querySelectorAll('.sortable-products');
+    console.log('Found tables:', sortableTables.length);
+    
+    sortableTables.forEach(function(table) {
+        const sortable = new Sortable(table, {
+            animation: 200,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            forceFallback: true,
+            onStart: function(evt) {
+                console.log('Drag started');
+            },
+            onEnd: function(evt) {
+                console.log('Drag ended');
+                
+                // Get the section ID
+                const sectionId = table.dataset.sectionId;
+                
+                // Get all product IDs in new order
+                const productIds = Array.from(table.querySelectorAll('.sortable-row'))
+                    .map(row => row.dataset.productId);
+                
+                console.log('New order:', productIds);
+                
+                // Send AJAX request to update order
+                updateProductOrder(sectionId, productIds);
+            }
+        });
+        
+        console.log('Sortable initialized for section:', table.dataset.sectionId);
+    });
+    
+    function updateProductOrder(sectionId, productIds) {
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        console.log('Sending update request...');
+        
+        fetch(`/homepage/section/${sectionId}/reorder-products/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                product_ids: productIds
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response:', data);
+            if (data.success) {
+                showToast('Product order updated successfully', 'success');
+            } else {
+                showToast('Failed to update product order', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred while updating order', 'error');
+        });
+    }
+    
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        toast.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+        toast.innerHTML = `<i class="ri-${type === 'success' ? 'checkbox-circle' : 'error-warning'}-line me-2"></i>${message}`;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.3s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+});
+</script>
 {% endblock %}

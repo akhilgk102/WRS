@@ -1,4 +1,4 @@
-
+# adminapp/models
 from django.db import models
 
 class Category(models.Model):
@@ -125,6 +125,7 @@ class HomepageProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     display_order = models.IntegerField(default=0)
     
+    
     class Meta:
         ordering = ['display_order']
         unique_together = ['section', 'product']
@@ -173,3 +174,34 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+
+
+from django.conf import settings
+
+
+
+class CouponUsage(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    coupon = models.ForeignKey(
+        Coupon,
+        on_delete=models.CASCADE
+    )
+
+    order = models.ForeignKey(
+        "userapp.Order",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "coupon")
+
+    def __str__(self):
+        return f"{self.user.email} used {self.coupon.code}"

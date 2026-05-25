@@ -1,0 +1,1812 @@
+{% extends 'user_base.html' %}
+{% load static %}
+{% load dict_extras %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+
+<style>
+      .product-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4em;
+        max-height: 2.8em;
+        font-size: 1.3rem;
+    }
+</style>
+
+{% with banner=homepage_data.banner %}
+{% if banner.products %}
+<section class="banner-v1-wrapper">
+  <div class="container">
+
+    <!-- ================= TOP GRID ================= -->
+    <div class="banner-grid-wrap">
+
+      <!-- LEFT OFFER PRODUCT (1st product) -->
+      {% if banner.products|length > 0 %}
+      {% with product=banner.products.0 %}
+      <div class="offer-product-wrap">
+        <div class="offer-product-content-wrapper">
+
+          <a href="{% url 'product_detail' product.slug %}"
+             class="offer-product w-inline-block">
+
+            {% if product.primary_image %}
+              <img src="{{ product.primary_image.image.url }}"
+                   loading="lazy"
+                   alt="{{ product.name }}"
+                   class="offer-product-img"
+                   style="max-height: 200px;">
+            {% endif %}
+          </a>
+
+          <div class="offer-product-details-wrap">
+            <h6 class="offer-product-name">
+              <span class="offer-product-name-marked">
+                {{ product.category.name }}
+              </span>
+            </h6>
+
+            <h2 class="offer-product-discount">
+              <span class="offer-product-discount-marked">Up To</span>
+              60% OFF
+            </h2>
+
+            <div class="btn-inline-wrap">
+              <a href="{% url 'product_detail' product.slug %}"
+                 class="shop-button w-inline-block">
+                <div>Shop Now</div>
+                <img src="{% static 'img/stock_img/65bb6898399d6048583a560a_Shop-Btn-Arrow.svg' %}"
+                     loading="lazy"
+                     alt=""
+                     class="shop-button-icon">
+                <div class="shop-btn-border" style="width: 80%; height: 1px;"></div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endwith %}
+      {% endif %}
+
+      <!-- RIGHT BIG DISCOUNT PRODUCT (2nd product) -->
+      {% if banner.products|length > 1 %}
+      {% with product=banner.products.1 %}
+      <div class="banner-discount-product">
+        <div class="banner-discount-slide-1-content">
+
+          <div class="discount-slide-content-wrap" style="max-width: 435px;">
+            <div class="slide-discount-type">
+              <div class="discount-type-text">Special Offer</div>
+            </div>
+
+            <h2 class="discount-slide-product-name">
+              <span class="discount-slide-product-name-mark">
+                {{product.brand}}
+              </span>
+              {{ product.name|truncatechars:10 }}
+            </h2>
+
+            <div class="discount-slide-declar">
+              Limited time deal. Don’t miss it!
+            </div>
+
+            <div class="btn-inline-wrap">
+              <a href="{% url 'product_detail' product.slug %}"
+                 class="primary-button w-inline-block">
+                <div>Shop Now</div>
+                <div class="primary-button-hover-bg"></div>
+              </a>
+            </div>
+          </div>
+
+          <div class="discount-slide-img-wrap">
+            {% if product.primary_image %}
+              <img src="{{ product.primary_image.image.url }}"
+                   loading="lazy"
+                   alt="{{ product.name }}"
+                   class="discount-slide-img"
+                   style="max-height: 400px;">
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+      {% endwith %}
+      {% endif %}
+
+    </div>
+
+    <!-- ================= BOTTOM GRID ================= -->
+    <div class="banner-grid-two-wrap">
+
+      {% for product in banner.products|slice:"2:4" %}
+      <div class="banner-discount-product-wrap">
+        <div class="discount-product-flex">
+
+          <div class="discount-product-content-wrap">
+            <div class="discount-product-type">Weekend Discount</div>
+
+            <h3 class="discount-product-name">
+              {{ product.category|truncatechars:15 }}
+            </h3>
+
+            <div class="discount-product-alart">
+              Don’t miss the last opportunity.
+            </div>
+
+            <div class="btn-inline-wrap">
+              <a href="{% url 'product_detail' product.slug %}"
+                 class="shop-button primary w-inline-block">
+                <div>Shop Now</div>
+                <img src="{% static 'img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                     loading="lazy"
+                     alt=""
+                     class="shop-button-icon">
+                <div class="shop-btn-border primary"
+                     style="width: 80%; height: 1px;"></div>
+              </a>
+            </div>
+          </div>
+
+          <div class="discount-product-img-wrap">
+            {% if product.primary_image %}
+              <img src="{{ product.primary_image.image.url }}"
+                   loading="lazy"
+                   alt="{{ product.name }}"
+                   class="discount-product-img"
+                   style="height: 270px;">
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+
+        
+    <section class="section categories">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="mini-title-wrap">
+            <div class="mini-title">CATEGORIES</div>
+          </div>
+          <h2 class="section-title">Categories</h2>
+        </div>
+        <div class="category-collection-wrap">
+          <div class="w-dyn-list">
+            <div role="list" class="category-collection-grid-wrap w-dyn-items">
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'printer-amc' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Printer AMC" loading="lazy" src="{% static '/img/categories/printer_img.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Printer <br> AMC</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'information-technology' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Information Technology" loading="lazy" src="{% static '/img/categories/input.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Information Technology</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'desk-accessories' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Desk Accessories" loading="lazy" src="{% static '/img/categories/desk.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Desk Accessories</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'toners-cartridges' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Toners & Cartridges" loading="lazy" src="{% static '/img/categories/cartridge.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Toners & Cartridges</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'storage-devices' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Storage Devices" loading="lazy" src="{% static '/img/categories/storage.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Storage <br> Devices</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'box-file-folders' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Box File & Folders" loading="lazy" src="{% static '/img/categories/folder.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Box File & Folders</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'softwares' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Softwares" loading="lazy" src="{% static '/img/categories/kaspersky.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Softwares</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'routers' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Earbuds" loading="lazy" src="{% static '/img/categories/router.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Routers</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'cables-adapters' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Drone" loading="lazy" src="{% static '/img/categories/cables.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Cables & Adapters</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'paper-products' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Speaker" loading="lazy" src="{% static '/img/categories/paper.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Paper <br> Products</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'boards' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Microphone" loading="lazy" src="{% static '/img/categories/board.png' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">Boards</div>
+                  </div>
+                </a>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <a href="{% url 'category_products' 'school-products' %}" class="single-category-wrapper w-inline-block">
+                  <div class="category-content-wrap">
+                    <div class="category-image-wrap-big">
+                      <img alt="Scanner" loading="lazy" src="{% static '/img/categories/school.jpg' %}" class="category-image-big">
+                    </div>
+                    <div class="category-name-big">School Products</div>
+                  </div>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <style>
+    /* Big Image Category Styles */
+    .single-category-wrapper {
+      border: 1.13px solid rgba(0, 0, 0, .2);
+      border-radius: 20px;
+      justify-content: flex-start;
+      align-items: stretch;
+      min-height: 280px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.35s ease;
+    }
+
+    .single-category-wrapper:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border-color: #0B3F66;
+    }
+
+    .category-content-wrap {
+      text-align: center;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .category-image-wrap-big {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    }
+
+    .category-image-big {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+
+    .single-category-wrapper:hover .category-image-big {
+      transform: scale(1.1);
+    }
+
+    .category-name-big {
+      color: var(--text-color);
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 27px;
+      padding: 25px 15px;
+      background: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 991px) {
+      .single-category-wrapper {
+        min-height: 240px;
+      }
+      
+      .category-image-wrap-big {
+        height: 160px;
+      }
+      
+      .category-name-big {
+        font-size: 18px;
+        line-height: 24px;
+        padding: 20px 15px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .single-category-wrapper {
+        min-height: 200px;
+      }
+      
+      .category-image-wrap-big {
+        height: 140px;
+      }
+      
+      .category-name-big {
+        font-size: 16px;
+        line-height: 20px;
+        padding: 15px 10px;
+      }
+    }
+
+    @media (max-width: 479px) {
+      .single-category-wrapper {
+        min-height: 180px;
+      }
+      
+      .category-image-wrap-big {
+        height: 120px;
+      }
+      
+      .category-name-big {
+        font-size: 15px;
+        padding: 12px 10px;
+      }
+    }
+    </style>
+
+
+<!-- Featured Products Section -->
+{% if featured_products %}
+<section class="section product-v1">
+  <div class="container">
+    <div class="section-title-wrap">
+      <div class="mini-title-wrap green-dark">
+        <div class="mini-title">Featured</div>
+      </div>
+      <h2 class="section-title">Featured Product.</h2>
+    </div>
+    
+    <div class="product-collection-list-wrapper">
+      <div class="product-collection-list w-dyn-list">
+        <div role="list" class="products-grid-wrap w-dyn-items">
+          
+          {% for product in featured_products %}
+          <div role="listitem" class="w-dyn-item">
+            <div class="single-product-wrap">
+              <div class="product-contents-wrapper">
+                <div class="product-img-wrapper">
+                  <a href="{% url 'product_detail' product.slug %}" class="product-img-wrap w-inline-block">
+                    {% if product.primary_image %}
+                      <img src="{{ product.primary_image.image.url }}" 
+                           alt="{{ product.name }}" 
+                           class="product-img">
+                    {% else %}
+                      <img src="{% static '/img/no-image.png' %}" 
+                           alt="{{ product.name }}" 
+                           class="product-img">
+                    {% endif %}
+                  </a>
+                </div>
+                
+                <div class="product-details-wrap">
+                  <a href="{% url 'product_detail' product.slug %}" class="product-name-wrap w-inline-block">
+                    <h5 class="product-name">{{ product.name }}</h5>
+                  </a>
+                  
+                  <div class="product-review">
+                    <img src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy" alt="" class="product-review-star">
+                    <img src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy" alt="" class="product-review-star">
+                    <img src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy" alt="" class="product-review-star">
+                    <img src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy" alt="" class="product-review-star">
+                    <img src="{% static '/img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}" loading="lazy" alt="" class="product-review-star">
+                  </div>
+                  
+                  <div class="product-price-wrap">
+                    {% if product.offer_price %}
+                      <div class="product-price past">{{ product.price }}</div>
+                      <div class="product-price">AED {{ product.offer_price }}</div>
+                    {% else %}
+                      <div class="product-price">AED {{ product.price }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="product-small-buttons-flex">
+                <a href="{% url 'product_detail' product.slug %}" class="product-small-button w-inline-block">
+                  <img src="{% static '/img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}" loading="lazy" alt="" class="product-small-buttons-icon">
+                </a>
+              </div>
+              
+              <div class="product-add-to-cart">
+                <form method="post" action="{%url 'product_detail' product.slug%}" class="w-commerce-commerceaddtocartform add-cart-default-state">
+                  {% csrf_token %}
+                  <input type="hidden" name="product_id" value="{{ product.id }}">
+                  <input  type="submit" class="w-commerce-commerceaddtocartbutton add-to-cart-button" value="Shop Now">
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+
+{% if new_arrival_categories %}
+<section class="section">
+  <div class="container">
+    
+    <!-- TITLE -->
+    <div class="section-title-wrap"
+         style="transform: translate3d(0px, 30px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d; opacity: 0;">
+      <div class="mini-title-wrap">
+        <div class="mini-title">NEW ARRIVAL</div>
+      </div>
+      <h2 class="section-title">New Arrival Product</h2>
+    </div>
+
+    <!-- TABS WRAPPER -->
+    <div class="new-arrival-tabs-wrapper" style="opacity: 0;">
+      <div data-current="Tab 1" 
+           data-easing="ease" 
+           data-duration-in="300" 
+           data-duration-out="100"
+           class="new-arrival-tabs-wrap w-tabs">
+
+        <!-- TAB MENU (TOP) -->
+        <div class="new-arrival-tab-menu-wrap w-tab-menu" role="tablist">
+          
+{% for category in new_arrival_categories %}
+          <a data-w-tab="Tab {{ forloop.counter }}"
+             class="new-arrival-single-tab-link w-inline-block w-tab-link {% if forloop.first %}w--current{% endif %}"
+             style="background-color: {% if forloop.first %}rgb(126, 29, 250){% else %}rgb(255, 255, 255){% endif %};"
+             {% if forloop.first %}{% else %}tabindex="-1"{% endif %}
+             id="w-tabs-0-data-w-tab-{{ forloop.counter0 }}"
+             href="#w-tabs-0-data-w-pane-{{ forloop.counter0 }}"
+             role="tab"
+             aria-controls="w-tabs-0-data-w-pane-{{ forloop.counter0 }}"
+             aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+            
+            <div class="new-arrival-tab-link-content">
+              {% if category.icon %}
+              <!-- Use category's custom icon if available -->
+              <img loading="lazy"
+                   src="{{ category.icon.url }}"
+                   alt="{{ category.name }}"
+                   class="new-arrival-icon"
+                   style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+              {% else %}
+              <!-- Fallback: Use slug-based icon selection -->
+              {% with slug=category.slug|lower %}
+                {% if 'printer' in slug or 'amc' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/65bdef5d6d804afa72980038_Category-Icon-8.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'information' in slug or 'technology' in slug or 'computer' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/it.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'desk' in slug or 'accessories' in slug or 'accessory' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/office-supplies.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'toner' in slug or 'cartridge' in slug or 'ink' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/cartridge.png' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'storage' in slug or 'device' in slug or 'drive' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/pendrive.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'box' in slug or 'file' in slug or 'folder' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/paper-products.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'software' in slug or 'app' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/software.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'router' in slug or 'network' in slug or 'wifi' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/router.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'cable' in slug or 'adapter' in slug or 'charger' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/cables.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'paper' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/paper-products.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'board' in slug or 'whiteboard' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/whiteboard.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'school' in slug or 'student' in slug or 'education' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/school-supplies.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% elif 'stapl' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/stapler.png' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                
+                {% else %}
+                  <!-- Default icon -->
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/category.svg' %}"
+                       alt="{{ category.name }}"
+                       class="new-arrival-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %}; max-width: 40px; max-height: 40px; object-fit: contain;">
+                {% endif %}
+              {% endwith %}
+              {% endif %}
+              
+              <h5 class="new-arrival-text" 
+                  style="color: {% if forloop.first %}rgb(255, 255, 255){% else %}rgb(19, 19, 19){% endif %};">
+                {{ category.name }}
+              </h5>
+            </div>
+          </a>
+          {% endfor %}
+
+        </div>
+
+        <!-- TAB CONTENT -->
+        <div class="tabs-content w-tab-content">
+
+          {% for category in new_arrival_categories %}
+          <div data-w-tab="Tab {{ forloop.counter }}"
+               class="w-tab-pane {% if forloop.first %}w--tab-active{% endif %}"
+               id="w-tabs-0-data-w-pane-{{ forloop.counter0 }}"
+               role="tabpanel"
+               aria-labelledby="w-tabs-0-data-w-tab-{{ forloop.counter0 }}">
+
+            <div class="arrival-collection-wrapper">
+              <div class="w-dyn-list">
+                <div role="list" class="arrival-grid-wrapper w-dyn-items">
+
+                  {% for product in new_arrivals_by_category|get_item:category.id %}
+                  <div role="listitem" class="w-dyn-item">
+                    <div class="single-arrival-product">
+                      
+                      <div class="arrival-product-content-wrapper">
+                        <!-- Product Image -->
+                        <div class="arrival-product-img-wrapper">
+                          <a data-w-id="b09fb8af-2460-086b-8cc2-d99f35cf958e"
+                             
+                             href="{% url 'product_detail' product.slug %}"
+                             class="arrival-product-img-wrap w-inline-block">
+                            {% if product.primary_image %}
+                            <img src="{{ product.primary_image.image.url }}"
+                                 alt="{{ product.name }}"
+                                 class="arrival-product-img"
+                                 
+                                 >
+                            {% else %}
+                            <img src="{% static 'img/no-image.png' %}"
+                                 alt="{{ product.name }}"
+                                 class="arrival-product-img">
+                            {% endif %}
+                          </a>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="product-details-wrap"
+                             style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          
+                          <!-- Product Name -->
+                          <a href="{% url 'product_detail' product.slug %}"
+                             class="product-name-wrap w-inline-block">
+                            <h5 class="product-name">{{ product.name }}</h5>
+                          </a>
+
+                          <!-- Product Review -->
+                          <div class="product-review">
+                            <img loading="lazy"
+                                 src="{% static 'img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                                 alt=""
+                                 class="product-review-star">
+                            <img loading="lazy"
+                                 src="{% static 'img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                                 alt=""
+                                 class="product-review-star">
+                            <img loading="lazy"
+                                 src="{% static 'img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                                 alt=""
+                                 class="product-review-star">
+                            <img loading="lazy"
+                                 src="{% static 'img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                                 alt=""
+                                 class="product-review-star">
+                            <img loading="lazy"
+                                 src="{% static 'img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}"
+                                 alt=""
+                                 class="product-review-star">
+                          </div>
+
+                          <!-- Product Price -->
+                          <div class="product-price-wrap">
+                            {% if product.offer_price %}
+                            <div class="product-price past">AED {{ product.price }}</div>
+                            <div class="product-price">AED {{ product.offer_price }}</div>
+                            {% else %}
+                            <div class="product-price">AED {{ product.price }}</div>
+                            {% endif %}
+                          </div>
+
+                          <!-- Add to Cart -->
+                          <div class="arrival-cart">
+                            <form action="{%url 'product_detail' product.slug %}"
+                                  class="w-commerce-commerceaddtocartform add-cart-default-state">
+                              <input 
+                                     type="submit"
+                                     data-node-type="commerce-add-to-cart-button"
+                                     data-loading-text="Adding to cart..."
+                                     aria-busy="false"
+                                     aria-haspopup="dialog"
+                                     class="w-commerce-commerceaddtocartbutton add-to-cart-button border-black"
+                                     value="Shop Now"
+                                     fdprocessedid="hoy4vi">
+                              <a data-node-type="commerce-buy-now-button"
+                                 data-default-text="Buy now"
+                                 data-subscription-text="Subscribe now"
+                                 aria-busy="false"
+                                 aria-haspopup="false"
+                                 style="display:none"
+                                 class="w-commerce-commercebuynowbutton w-dyn-hide"
+                                 href="">Buy now</a>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Product Small Buttons -->
+                      <div class="product-small-buttons-flex">
+                        <a href="{% url 'product_detail' product.slug %}"
+                           class="product-small-button w-inline-block">
+                          <img loading="lazy"
+                               src="{% static 'img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}"
+                               alt=""
+                               class="product-small-buttons-icon">
+                        </a>
+                      </div>
+
+                    </div>
+                  </div>
+                  {% empty %}
+                  <div class="w-dyn-empty">
+                    <div>No products in this category</div>
+                  </div>
+                  {% endfor %}
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section best-deals">
+  <div class="container">
+    <div class="section-title-wrap">
+      <div class="mini-title-wrap">
+        <div class="mini-title">Today's best deal</div>
+      </div>
+      <h2 class="section-title">Deals Of The Day</h2>
+    </div>
+    <div class="best-deal-slider-wrapper">
+      <div data-delay="4000" data-animation="slide" class="slider best-deals w-slider" data-autoplay="false"
+        data-easing="ease" data-hide-arrows="false" data-disable-swipe="false" data-autoplay-limit="0"
+        data-nav-spacing="3" data-duration="500" data-infinite="true" role="region" aria-label="carousel">
+        <div class="best-deals-slide-mask w-slider-mask" id="w-slider-mask-0">
+          
+          {% for product in deals_products %}
+          <div class="best-deals-slide-one w-slide" aria-label="{{ forloop.counter }} of {{ deals_products|length }}" role="group">
+            <div class="best-deals-slide-content-wrap">
+              <div class="w-dyn-list">
+                <div role="list" class="w-dyn-items">
+                  <div role="listitem" class="w-dyn-item">
+                    <div class="best-deals-grid-wrap">
+                      <div id="w-node-c407abeb-6d89-446e-c6a4-0f7ba86745af-ed6217da" class="split-content">
+                        <div class="best-deal-content">
+                          <a href="{% url 'product_detail' product.slug %}" class="best-deal-name-wrap w-inline-block">
+                            <h2 class="best-deal-name">{{ product.name|truncatechars:30 }}</h2>
+                          </a>
+                          
+                          <div class="product-timer-wrapper" data-product-id="{{ product.id }}">
+                            <div class="single-time-box-wrap">
+                              <div class="time-box-content-wrap">
+                                <div class="time-box-content-title">Days</div>
+                                <h4 class="time-box-content-time countdown-days">00</h4>
+                              </div>
+                            </div>
+                            <div class="single-time-box-divider">
+                              <div class="time-box-divider-dot"></div>
+                              <div class="time-box-divider-dot"></div>
+                            </div>
+                            <div class="single-time-box-wrap">
+                              <div class="time-box-content-wrap">
+                                <div class="time-box-content-title">Hours</div>
+                                <h4 class="time-box-content-time countdown-hours">00</h4>
+                              </div>
+                            </div>
+                            <div class="single-time-box-divider">
+                              <div class="time-box-divider-dot"></div>
+                              <div class="time-box-divider-dot"></div>
+                            </div>
+                            <div class="single-time-box-wrap">
+                              <div class="time-box-content-wrap">
+                                <div class="time-box-content-title">Minutes</div>
+                                <h4 class="time-box-content-time countdown-minutes">00</h4>
+                              </div>
+                            </div>
+                            <div class="single-time-box-divider">
+                              <div class="time-box-divider-dot"></div>
+                              <div class="time-box-divider-dot"></div>
+                            </div>
+                            <div class="single-time-box-wrap">
+                              <div class="time-box-content-wrap">
+                                <div class="time-box-content-title">Seconds</div>
+                                <h4 class="time-box-content-time countdown-seconds">00</h4>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="best-deal-cart">
+                            <form action="{%url 'product_detail' product.slug %}"
+                              class="w-commerce-commerceaddtocartform add-cart-default-state">
+                              <input  
+                                type="submit"
+                                data-node-type="commerce-add-to-cart-button" 
+                                data-loading-text="Adding to cart..."
+                                aria-busy="false" 
+                                aria-haspopup="dialog"
+                                class="w-commerce-commerceaddtocartbutton add-to-cart-button best-deal"
+                                value="Shop Now">
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div id="w-node-_1cce0ef2-890d-e2b3-3657-d7002587b1ae-ed6217da" class="split-content best-deal">
+                        <a href="{% url 'product_detail' product.slug %}" class="best-deal-img-wrap w-inline-block">
+                          {% if product.primary_image %}
+                          <img alt="{{ product.name }}" 
+                            loading="lazy"
+                            src="{{ product.primary_image.image.url }}"
+                            sizes="(max-width: 479px) 100vw, (max-width: 767px) 488px, (max-width: 991px) 39vw, 27vw"
+                            class="best-deal-img _{{ forloop.counter }}">
+                          {% else %}
+                          <img alt="{{ product.name }}" 
+                            loading="lazy"
+                            src="{% static 'img/no-image.png' %}"
+                            sizes="(max-width: 479px) 100vw, (max-width: 767px) 488px, (max-width: 991px) 39vw, 27vw"
+                            class="best-deal-img _{{ forloop.counter }}">
+                          {% endif %}
+                        </a>
+                      </div>
+                    </div>
+                    
+                    <div class="product-small-buttons-flex best-deals">
+                      <a href="{% url 'product_detail' product.slug %}" class="product-small-button light w-inline-block">
+                        <img loading="lazy"
+                          src="{% static 'img/stock_img/65bf6e8e77a6b18b998e55fb_View-Icon-White.svg' %}" 
+                          alt=""
+                          class="product-small-buttons-icon">
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          
+        </div>
+        
+        <div class="dp-none w-slider-arrow-left" role="button" tabindex="0" aria-controls="w-slider-mask-0"
+          aria-label="previous slide">
+          <div class="w-icon-slider-left"></div>
+        </div>
+        <div class="dp-none w-slider-arrow-right" role="button" tabindex="0" aria-controls="w-slider-mask-0"
+          aria-label="next slide">
+          <div class="w-icon-slider-right"></div>
+        </div>
+        
+        <div class="deals-dots w-slider-nav w-slider-nav-invert w-round">
+          {% for product in deals_products %}
+          <div class="w-slider-dot {% if forloop.first %}w-active{% endif %}" 
+               data-wf-ignore="" 
+               aria-label="Show slide {{ forloop.counter }} of {{ deals_products|length }}" 
+               aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+               role="button" 
+               tabindex="{% if forloop.first %}0{% else %}-1{% endif %}" 
+               style="margin-left: 3px; margin-right: 3px;"></div>
+          {% endfor %}
+        </div>
+        
+        <div class="testimonials-nav-outline">
+          {% for product in deals_products %}
+          <div class="best-deal-nav-outline-item _{{ forloop.counter }}" style="opacity: {% if forloop.first %}1{% else %}0{% endif %};"></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Initialize countdown for each product
+document.addEventListener('DOMContentLoaded', function() {
+  const timers = document.querySelectorAll('.product-timer-wrapper');
+  
+  timers.forEach(timer => {
+    const productId = timer.getAttribute('data-product-id');
+    const timerKey = `dealEndDate_${productId}`;
+    
+    function getDealEndDate() {
+      let endDate = localStorage.getItem(timerKey);
+      
+      if (!endDate) {
+        const newEndDate = new Date();
+        newEndDate.setHours(newEndDate.getHours() + 24);
+        localStorage.setItem(timerKey, newEndDate.getTime());
+        return newEndDate;
+      }
+      
+      return new Date(parseInt(endDate));
+    }
+    
+    const dealEndDate = getDealEndDate();
+    
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = dealEndDate - now;
+      
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      timer.querySelector('.countdown-days').textContent = String(days).padStart(2, '0');
+      timer.querySelector('.countdown-hours').textContent = String(hours).padStart(2, '0');
+      timer.querySelector('.countdown-minutes').textContent = String(minutes).padStart(2, '0');
+      timer.querySelector('.countdown-seconds').textContent = String(seconds).padStart(2, '0');
+      
+      if (distance < 0) {
+        clearInterval(window['interval_' + productId]);
+        localStorage.removeItem(timerKey);
+        timer.querySelector('.countdown-days').textContent = '00';
+        timer.querySelector('.countdown-hours').textContent = '00';
+        timer.querySelector('.countdown-minutes').textContent = '00';
+        timer.querySelector('.countdown-seconds').textContent = '00';
+      }
+    }
+    
+    window['interval_' + productId] = setInterval(updateCountdown, 1000);
+    updateCountdown();
+  });
+});
+</script>
+
+
+
+{% if best_seller_categories %}
+<section class="section best-seller">
+  <div class="container">
+
+    <!-- TITLE -->
+    <div class="section-title-wrap"
+         style="transform: translate3d(0px, 30px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d; opacity: 0;">
+      <div class="mini-title-wrap green-dark">
+        <div class="mini-title">Best Seller</div>
+      </div>
+      <h2 class="section-title">Best Seller Items</h2>
+    </div>
+
+    <!-- TABS -->
+    <div data-current="Tab 1" 
+         data-easing="ease" 
+         data-duration-in="300" 
+         data-duration-out="100"
+         class="best-seller-tabs-wrapper w-tabs">
+
+      <!-- TAB MENU (LEFT) -->
+      <div id="w-node-_0841c7ef-af03-c3ad-c5e0-50ec9c1834ea-ed6217da"
+           data-w-id="0841c7ef-af03-c3ad-c5e0-50ec9c1834ea" 
+           style="opacity: 0;"
+           class="best-seller-tabs-menu-wrap w-tab-menu" 
+           role="tablist">
+        
+        {% for category in best_seller_categories %}
+        <a data-w-tab="Tab {{ forloop.counter }}"
+           class="best-seller-single-tab-link-wrap w-inline-block w-tab-link {% if forloop.first %}w--current{% endif %} {% if forloop.last %}last{% endif %}"
+           style="background-color: {% if forloop.first %}rgb(126, 29, 250){% else %}rgb(255, 255, 255){% endif %};"
+           id="w-tabs-1-data-w-tab-{{ forloop.counter0 }}"
+           href="#w-tabs-1-data-w-pane-{{ forloop.counter0 }}"
+           role="tab"
+           aria-controls="w-tabs-1-data-w-pane-{{ forloop.counter0 }}"
+           aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+           {% if not forloop.first %}tabindex="-1"{% endif %}>
+          
+          <div class="best-seller-tab-link-flex">
+<div class="best-seller-tab-icon-wrap">
+              {% if category.icon %}
+              <!-- Use category's custom icon if available -->
+              <img loading="lazy"
+                   src="{{ category.icon.url }}"
+                   alt="{{ category.name }}"
+                   class="best-seller-tab-icon"
+                   style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+              {% else %}
+              <!-- Fallback: Use slug-based icon selection -->
+              {% with slug=category.slug|lower %}
+                {% if 'printer' in slug or 'amc' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/65bdef5d6d804afa72980038_Category-Icon-8.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'information' in slug or 'technology' in slug or 'computer' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/it.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'desk' in slug or 'accessories' in slug or 'accessory' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/office-supplies.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'toner' in slug or 'cartridge' in slug or 'ink' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/cartridge.png' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'storage' in slug or 'device' in slug or 'drive' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/pendrive.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'box' in slug or 'file' in slug or 'folder' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/paper-products.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'software' in slug or 'app' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/software.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'router' in slug or 'network' in slug or 'wifi' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/router.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'cable' in slug or 'adapter' in slug or 'charger' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/cables.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'paper' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/paper-products.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'board' in slug or 'whiteboard' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/whiteboard.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% elif 'school' in slug or 'student' in slug or 'education' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/school-supplies.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                
+                {% elif 'stapl' in slug %}
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/stapler.png' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                
+                {% else %}
+                  <!-- Default icon -->
+                  <img loading="lazy"
+                       src="{% static '/img/stock_img/category.svg' %}"
+                       alt="{{ category.name }}"
+                       class="best-seller-tab-icon"
+                       style="filter: {% if forloop.first %}invert(100%){% else %}invert(0%){% endif %};">
+                {% endif %}
+              {% endwith %}
+              {% endif %}
+            </div>
+            <div class="best-seller-tab-text" 
+                 style="color: {% if forloop.first %}rgb(255, 255, 255){% else %}rgb(19, 19, 19){% endif %};">
+              {{ category.name }}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+
+      </div>
+
+      <!-- TAB CONTENT (RIGHT) -->
+      <div class="best-seller-tab-content w-tab-content">
+
+        {% for category in best_seller_categories %}
+        <div data-w-tab="Tab {{ forloop.counter }}"
+             class="w-tab-pane {% if forloop.first %}w--tab-active{% endif %}"
+             id="w-tabs-1-data-w-pane-{{ forloop.counter0 }}"
+             role="tabpanel"
+             aria-labelledby="w-tabs-1-data-w-tab-{{ forloop.counter0 }}">
+
+          <div class="product-collection-list-wrapper">
+            <div class="product-collection-list w-dyn-list">
+              <div role="list" class="best-seller-grid-wrap w-dyn-items">
+
+                {% for product in best_sellers_by_category|get_item:category.id %}
+                <div role="listitem" class="w-dyn-item">
+                  <div data-w-id="64ed35ae-5b03-1f2c-4a7b-78e54691387a" 
+                       style="opacity: 0;"
+                       class="single-product-wrap">
+
+                    <div class="product-contents-wrapper">
+                      <div class="product-img-wrapper">
+                        <a href="{% url 'product_detail' product.slug %}"
+                           class="product-img-wrap w-inline-block" 
+                           style="opacity: 0;">
+                          {% if product.primary_image %}
+                          <img src="{{ product.primary_image.image.url }}"
+                               alt="{{ product.name }}"
+                               class="product-img">
+                          {% else %}
+                          <img src="{% static '/img/no-image.png' %}"
+                               alt="{{ product.name }}"
+                               class="product-img">
+                          {% endif %}
+                        </a>
+                      </div>
+
+                      <div class="product-details-wrap" style="opacity: 0;">
+                        <a href="{% url 'product_detail' product.slug %}"
+                           class="product-name-wrap w-inline-block">
+                          <h5 class="product-name">{{ product.name }}</h5>
+                        </a>
+
+                        <div class="product-review">
+                          <img loading="lazy"
+                               src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                               alt=""
+                               class="product-review-star">
+                          <img loading="lazy"
+                               src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                               alt=""
+                               class="product-review-star">
+                          <img loading="lazy"
+                               src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                               alt=""
+                               class="product-review-star">
+                          <img loading="lazy"
+                               src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}"
+                               alt=""
+                               class="product-review-star">
+                          <img loading="lazy"
+                               src="{% static '/img/stock_img/65be2e8dbdf9c5fda8bf37f4_Review-Star-off.svg' %}"
+                               alt=""
+                               class="product-review-star">
+                        </div>
+
+                        <div class="product-price-wrap">
+                          {% if product.offer_price %}
+                          <div class="product-price past">AED {{ product.price }}</div>
+                          <div class="product-price">AED {{ product.offer_price }}</div>
+                          {% else %}
+                          <div class="product-price">AED {{ product.price }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="product-small-buttons-flex">
+                      <a href="{% url 'product_detail' product.slug %}"
+                         class="product-small-button w-inline-block">
+                        <img loading="lazy"
+                             src="{% static '/img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}"
+                             alt=""
+                             class="product-small-buttons-icon">
+                      </a>
+                    </div>
+
+                    <div class="product-add-to-cart">
+                      <form action="{%url 'product_detail' product.slug %}"
+                            class="w-commerce-commerceaddtocartform add-cart-default-state">
+                        <input 
+                               type="submit"
+                               data-node-type="commerce-add-to-cart-button"
+                               data-loading-text="Adding to cart..."
+                               aria-busy="false"
+                               aria-haspopup="dialog"
+                               class="w-commerce-commerceaddtocartbutton add-to-cart-button"
+                               value="Shop Now"
+                               fdprocessedid="hoy4vi">
+                        <a data-node-type="commerce-buy-now-button"
+                           data-default-text="Buy now"
+                           data-subscription-text="Subscribe now"
+                           aria-busy="false"
+                           aria-haspopup="false"
+                           style="display:none"
+                           class="w-commerce-commercebuynowbutton w-dyn-hide"
+                           href="">Buy now</a>
+                      </form>
+                    </div>
+
+                  </div>
+                </div>
+                {% empty %}
+                <div class="w-dyn-empty">
+                  <div>No products in this category</div>
+                </div>
+                {% endfor %}
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+
+    <section class="section testimonial">
+      <div class="container">
+        <div class="section-title-wrap"
+          style="transform: translate3d(0px, 30px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d; opacity: 0;">
+          <div class="mini-title-wrap">
+            <div class="mini-title">testimonial</div>
+          </div>
+          <h2 class="section-title">What People Says</h2>
+        </div>
+        <div class="testimonial-slider-wrap">
+          <div data-delay="4000" data-animation="slide" class="slider testimonial w-slider" data-autoplay="false"
+            data-easing="ease" style="opacity: 0;" data-hide-arrows="false" data-disable-swipe="false"
+            data-w-id="089d656e-5545-ebad-1b84-632577c79240" data-autoplay-limit="0" data-nav-spacing="0"
+            data-duration="500" data-infinite="true" role="region" aria-label="carousel">
+            <div class="testimonial-slide-mask w-slider-mask" id="w-slider-mask-1">
+              <div data-w-id="089d656e-5545-ebad-1b84-632577c79242" class="testimonial-single-slide w-slide"
+                aria-label="1 of 5" role="group" style="transition: all; transform: translateX(0px); opacity: 1;">
+                <div class="single-testimonial-wrap">
+                  <div class="testimonial-content-wrap">
+                    <div class="testimonial-author-flex">
+                      <div class="testimonial-author-wrap"><img
+                          src="{% static '/img/stock_img/65bddd0f7f5edc2f327424ea_Testimonial-Img-1.png' %}"
+                          loading="lazy" alt="" class="testimonial-author-img">
+                        <div class="testimonial-author-info-wrap">
+                          <h4 class="testimonial-author-name">James Blunt</h4>
+                          <div class="testimonial-author-username">Businessman</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="testimonial-details-wrapper">
+                      <p class="testimonial-details">“I've tried numerous brands, but none have impressed me quite like
+                        WRS. Their range of products is not only extensive but also consistently
+                        top-notch in quality. From their state-of-the-art TVs to their innovative gaming peripherals.
+                      </p>
+                      <div class="testimonial-review-flex"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div data-w-id="089d656e-5545-ebad-1b84-632577c7925a" class="testimonial-single-slide w-slide"
+                aria-label="2 of 5" role="group" aria-hidden="true"
+                style="transition: all; transform: translateX(0px); opacity: 1;">
+                <div class="single-testimonial-wrap" aria-hidden="true">
+                  <div class="testimonial-content-wrap" aria-hidden="true">
+                    <div class="testimonial-author-flex" aria-hidden="true">
+                      <div class="testimonial-author-wrap" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddd0f0b546a064c1e0df8_Testimonial-Img-2.png' %}"
+                          loading="lazy" alt="" class="testimonial-author-img" aria-hidden="true">
+                        <div class="testimonial-author-info-wrap" aria-hidden="true">
+                          <h4 class="testimonial-author-name" aria-hidden="true">Michel Clark</h4>
+                          <div class="testimonial-author-username" aria-hidden="true">Businessman</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="testimonial-details-wrapper" aria-hidden="true">
+                      <p class="testimonial-details" aria-hidden="true">Ever since I switched to  WRS
+                        for my smartphone needs, I haven't looked back. Their devices are not only powerful and
+                        feature-rich but also incredibly user-friendly. I highly recommend them!</p>
+                      <div class="testimonial-review-flex" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div data-w-id="089d656e-5545-ebad-1b84-632577c79272" class="testimonial-single-slide w-slide"
+                aria-label="3 of 5" role="group" aria-hidden="true"
+                style="transition: all; transform: translateX(0px); opacity: 1;">
+                <div class="single-testimonial-wrap" aria-hidden="true">
+                  <div class="testimonial-content-wrap" aria-hidden="true">
+                    <div class="testimonial-author-flex" aria-hidden="true">
+                      <div class="testimonial-author-wrap" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddd0f35c3344bd72ecdcc_Testimonial-Img-3.png' %}"
+                          loading="lazy" alt="" class="testimonial-author-img" aria-hidden="true">
+                        <div class="testimonial-author-info-wrap" aria-hidden="true">
+                          <h4 class="testimonial-author-name" aria-hidden="true">Jacob Jones</h4>
+                          <div class="testimonial-author-username" aria-hidden="true">Businessman</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="testimonial-details-wrapper" aria-hidden="true">
+                      <p class="testimonial-details" aria-hidden="true">“I recently bought a new laptop from WRS , and I couldn't be happier with my purchase!”</p>
+                      <div class="testimonial-review-flex" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"><img
+                          src="{% static '/img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg' %}" loading="lazy"
+                          alt="" class="testimonial-star" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- <div data-w-id="089d656e-5545-ebad-1b84-632577c7928a" class="testimonial-single-slide w-slide"
+                aria-label="4 of 5" role="group" aria-hidden="true"
+                style="transition: all; transform: translateX(0px); opacity: 1;">
+                <div class="single-testimonial-wrap" aria-hidden="true">
+                  <div class="testimonial-content-wrap" aria-hidden="true">
+                    <div class="testimonial-author-flex" aria-hidden="true">
+                      <div class="testimonial-author-wrap" aria-hidden="true"><img
+                          src="./img/stock_img/65bddd0f7261f4d64d41b3c3_Testimonial-Img-4.png" loading="lazy" alt=""
+                          class="testimonial-author-img" aria-hidden="true">
+                        <div class="testimonial-author-info-wrap" aria-hidden="true">
+                          <h4 class="testimonial-author-name" aria-hidden="true">Floyd Miles</h4>
+                          <div class="testimonial-author-username" aria-hidden="true">Businessman</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="testimonial-details-wrapper" aria-hidden="true">
+                      <p class="testimonial-details" aria-hidden="true">“I just received my new smartphone from Zaitron,
+                        and I'm thrilled with both the product and the service. The Zaitron template made it.”</p>
+                      <div class="testimonial-review-flex" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div data-w-id="089d656e-5545-ebad-1b84-632577c792a2" class="testimonial-single-slide w-slide"
+                aria-label="5 of 5" role="group" aria-hidden="true"
+                style="transition: all; transform: translateX(0px); opacity: 1;">
+                <div class="single-testimonial-wrap" aria-hidden="true">
+                  <div class="testimonial-content-wrap" aria-hidden="true">
+                    <div class="testimonial-author-flex" aria-hidden="true">
+                      <div class="testimonial-author-wrap" aria-hidden="true"><img
+                          src="./img/stock_img/65bddd0f800bda510dec5a54_Testimonial-Img-5.png" loading="lazy" alt=""
+                          class="testimonial-author-img" aria-hidden="true">
+                        <div class="testimonial-author-info-wrap" aria-hidden="true">
+                          <h4 class="testimonial-author-name" aria-hidden="true">Jerome Bell</h4>
+                          <div class="testimonial-author-username" aria-hidden="true">Businessman</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="testimonial-details-wrapper" aria-hidden="true">
+                      <p class="testimonial-details" aria-hidden="true">“I recently purchased a camera from Zaitron
+                        using the Zaitron template, and I'm extremely satisfied with my decision.”</p>
+                      <div class="testimonial-review-flex" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"><img
+                          src="./img/stock_img/65bddace7f5edc2f3272ec62_Review-Star.svg" loading="lazy" alt=""
+                          class="testimonial-star" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+              <div aria-live="off" aria-atomic="true" class="w-slider-aria-label" data-wf-ignore=""></div>
+            </div>
+            <div class="dp-none w-slider-arrow-left" role="button" tabindex="0" aria-controls="w-slider-mask-1"
+              aria-label="previous slide">
+              <div class="slider-arrow-wrap"><img
+                  src="{% static '/img/stock_img/65bba437e015fb68780f7508_Arrow-Left-Black.svg' %}" loading="lazy"
+                  alt="" class="slider-arrow"><img
+                  src="{% static '/img/stock_img/65bba437e015fb68780f7509_Arrow-Left-White.svg' %}" loading="lazy"
+                  alt="" class="slider-arrow-hover"></div>
+            </div>
+            <div class="dp-none w-slider-arrow-right" role="button" tabindex="0" aria-controls="w-slider-mask-1"
+              aria-label="next slide" style="">
+              <div class="slider-arrow-wrap"><img
+                  src="{% static '/img/stock_img/65bba437e015fb68780f750b_Arrow-Right-Black.svg' %}" loading="lazy"
+                  alt="" class="slider-arrow"><img
+                  src="{% static '/img/stock_img/65bba437e015fb68780f750a_Arrow-Right-White.svg' %}" loading="lazy"
+                  alt="" class="slider-arrow-hover"></div>
+            </div>
+            <div class="testimonial-dots w-slider-nav w-slider-nav-invert w-round">
+              <div class="w-slider-dot w-active" data-wf-ignore="" aria-label="Show slide 1 of 5" aria-pressed="true"
+                role="button" tabindex="0" style="margin-left: 0px; margin-right: 0px;" fdprocessedid="kqmrkj"></div>
+              <div class="w-slider-dot" data-wf-ignore="" aria-label="Show slide 2 of 5" aria-pressed="false"
+                role="button" tabindex="-1" style="margin-left: 0px; margin-right: 0px;"></div>
+              <div class="w-slider-dot" data-wf-ignore="" aria-label="Show slide 3 of 5" aria-pressed="false"
+                role="button" tabindex="-1" style="margin-left: 0px; margin-right: 0px;"></div>
+            </div>
+            <div class="testimonials-nav-outline">
+              <div class="testimonials-nav-outline-item _1" style="opacity: 1;"></div>
+              <div class="testimonials-nav-outline-item _2" style="opacity: 0;"></div>
+              <div class="testimonials-nav-outline-item _3" style="opacity: 0;"></div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section blog-v1">
+      <div class="container">
+        <div class="section-title-wrap flex bottom"
+          style="transform: translate3d(0px, 30px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d; opacity: 0;">
+          <div class="split-content blog-v1-title-wrap">
+            <div class="mini-title-wrap dark">
+              <div class="mini-title">Services</div>
+            </div>
+            <h2 class="section-title">Our Services</h2>
+          </div>
+          <div class="split-content blog-v1">
+            <div class="btn-inline-wrap"><a href=""
+                class="shop-button primary w-inline-block">
+                <div>All Services</div><img
+                  src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}" loading="lazy"
+                  alt="" class="shop-button-icon"
+                  style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+              </a></div>
+          </div>
+        </div>
+        <div class="blog-collection-wrapper">
+          <div class="w-dyn-list">
+            <div role="list" class="blog-grid-wrap w-dyn-items">
+              <div role="listitem" class="w-dyn-item">
+                <div class="single-blog-post-wrap" style="opacity: 0;"><a
+                    href=""
+                    class="blog-img-wrap w-inline-block"><img alt="" loading="lazy"
+                      src="{% static '/img/cartridge-refilling.png' %}"
+                      class="blog-img"></a>
+                  <div class="blog-content-wrapper">
+                    <div class="blog-contents-wrap">
+                      <a
+                        href=""
+                        class="post-title-wrap w-inline-block">
+                        <h4 class="post-title">Printer Cartridges Refilling</h4>
+                      </a>
+                      <div class="btn-inline-wrap"><a
+                          href=""
+                          class="shop-button primary w-inline-block">
+                          <div>Read More</div><img
+                            src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                            loading="lazy" alt="" class="shop-button-icon"
+                            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+                        </a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div role="listitem" class="w-dyn-item">
+                <div class="single-blog-post-wrap" style="opacity: 0;"><a
+                    href=""
+                    class="blog-img-wrap w-inline-block"><img alt="" loading="lazy"
+                      src="{% static '/img/optimisation.png' %}"
+                      class="blog-img"></a>
+                  <div class="blog-content-wrapper">
+                    <div class="blog-contents-wrap">
+                      <a
+                        href=""
+                        class="post-title-wrap w-inline-block">
+                        <h4 class="post-title">Printer Optimization &amp; Tune-Up </h4>
+                      </a>
+                      <div class="btn-inline-wrap"><a
+                          href=""
+                          class="shop-button primary w-inline-block">
+                          <div>Read More</div><img
+                            src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                            loading="lazy" alt="" class="shop-button-icon"
+                            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+                        </a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div role="listitem" class="w-dyn-item">
+                <div class="single-blog-post-wrap" style="opacity: 0;"><a
+                    href=""
+                    class="blog-img-wrap w-inline-block"><img alt="" loading="lazy"
+                      src="{% static '/img/roller.png' %}"
+                      class="blog-img"></a>
+                  <div class="blog-content-wrapper">
+                    <div class="blog-contents-wrap">
+                      <a
+                        href=""
+                        class="post-title-wrap w-inline-block">
+                        <h4 class="post-title">Printer Feeding & Roller Problems</h4>
+                      </a>
+                      <div class="btn-inline-wrap"><a
+                          href=""
+                          class="shop-button primary w-inline-block">
+                          <div>Read More</div><img
+                            src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                            loading="lazy" alt="" class="shop-button-icon"
+                            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+                        </a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <div class="single-blog-post-wrap" style="opacity: 0;"><a
+                    href=""
+                    class="blog-img-wrap w-inline-block"><img alt="" loading="lazy"
+                      src="{% static '/img/installation.png' %}"
+                      class="blog-img"></a>
+                  <div class="blog-content-wrapper">
+                    <div class="blog-contents-wrap">
+                      <a
+                        href=""
+                        class="post-title-wrap w-inline-block">
+                        <h4 class="post-title">Printer Installation</h4>
+                      </a>
+                      <div class="btn-inline-wrap"><a
+                          href=""
+                          class="shop-button primary w-inline-block">
+                          <div>Read More</div><img
+                            src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                            loading="lazy" alt="" class="shop-button-icon"
+                            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+                        </a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <div class="single-blog-post-wrap" style="opacity: 0;"><a
+                    href=""
+                    class="blog-img-wrap w-inline-block"><img alt="" loading="lazy"
+                      src="{% static '/img/virtual.png' %}"
+                      class="blog-img"></a>
+                  <div class="blog-content-wrapper">
+                    <div class="blog-contents-wrap">
+                      <a
+                        href=""
+                        class="post-title-wrap w-inline-block">
+                        <h4 class="post-title">Virtual Assistants</h4>
+                      </a>
+                      <div class="btn-inline-wrap"><a
+                          href=""
+                          class="shop-button primary w-inline-block">
+                          <div>Read More</div><img
+                            src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                            loading="lazy" alt="" class="shop-button-icon"
+                            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+                        </a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div role="listitem" class="w-dyn-item">
+                <div class="single-blog-post-wrap" style="opacity: 0;"><a
+                    href=""
+                    class="blog-img-wrap w-inline-block"><img alt="" loading="lazy"
+                      src="{% static '/img/motherboard.png' %}"
+                      class="blog-img"></a>
+                  <div class="blog-content-wrapper">
+                    <div class="blog-contents-wrap">
+                      <a
+                        href=""
+                        class="post-title-wrap w-inline-block">
+                        <h4 class="post-title">Power Failure & Motherboard issue</h4>
+                      </a>
+                      <div class="btn-inline-wrap"><a
+                          href=""
+                          class="shop-button primary w-inline-block">
+                          <div>Read More</div><img
+                            src="{% static '/img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
+                            loading="lazy" alt="" class="shop-button-icon"
+                            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+                          <div class="shop-btn-border primary" style="width: 80%; height: 1px;"></div>
+                        </a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to show all images and details in active tab
+  function showActiveTabContent() {
+    const activePane = document.querySelector('.w-tab-pane.w--tab-active');
+    if (activePane) {
+      // Show product images
+      activePane.querySelectorAll('.arrival-product-img-wrap').forEach(img => {
+        img.style.opacity = '1';
+        img.style.transition = 'opacity 0.3s ease';
+      });
+      
+      // Show product details
+      activePane.querySelectorAll('.product-details-wrap').forEach(details => {
+        details.style.opacity = '1';
+        details.style.transition = 'opacity 0.3s ease';
+      });
+    }
+  }
+  
+  // Show content on initial load
+  showActiveTabContent();
+  
+  // Add click listeners to all tab links
+  document.querySelectorAll('.new-arrival-single-tab-link').forEach(tab => {
+    tab.addEventListener('click', function() {
+      // Wait for tab switch to complete
+      setTimeout(showActiveTabContent, 150);
+    });
+  });
+});
+
+
+
+// Add this script at the end of your template, after the countdown timer script
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to show all content in active Best Seller tab
+  function showBestSellerTabContent() {
+    const activePane = document.querySelector('.best-seller-tabs-wrapper .w-tab-pane.w--tab-active');
+    if (activePane) {
+      // Show product wrappers
+      activePane.querySelectorAll('.single-product-wrap').forEach(product => {
+        product.style.opacity = '1';
+        product.style.transition = 'opacity 0.3s ease';
+      });
+      
+      // Show product images
+      activePane.querySelectorAll('.product-img-wrap').forEach(img => {
+        img.style.opacity = '1';
+        img.style.transition = 'opacity 0.3s ease';
+      });
+      
+      // Show product details
+      activePane.querySelectorAll('.product-details-wrap').forEach(details => {
+        details.style.opacity = '1';
+        details.style.transition = 'opacity 0.3s ease';
+      });
+    }
+  }
+  
+  // Show content on initial load
+  showBestSellerTabContent();
+  
+  // Add click listeners to all Best Seller tab links
+  document.querySelectorAll('.best-seller-single-tab-link-wrap').forEach(tab => {
+    tab.addEventListener('click', function() {
+      // Wait for tab switch to complete
+      setTimeout(showBestSellerTabContent, 150);
+    });
+  });
+});
+    </script>
+
+
+
+
+
+
+{% endblock %}

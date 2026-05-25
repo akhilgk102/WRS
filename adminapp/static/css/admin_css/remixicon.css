@@ -279,7 +279,7 @@
 .ri-brackets-fill:before { content: "\eaea"; }
 .ri-brackets-line:before { content: "\eaeb"; }
 .ri-briefcase-2-fill:before { content: "\eaec"; }
-.ri-briefcase-2-line:before { content: "\eaed"; }
+.ri-briefcase-2-line:before { content: "\eAED "; }
 .ri-briefcase-3-fill:before { content: "\eaee"; }
 .ri-briefcase-3-line:before { content: "\eaef"; }
 .ri-briefcase-4-fill:before { content: "\eaf0"; }
@@ -2781,10 +2781,10 @@
 .ri-scroll-to-bottom-line:before { content: "\f4b0"; }
 .ri-add-large-fill:before { content: "\f4b1"; }
 .ri-add-large-line:before { content: "\f4b2"; }
-.ri-aed-electrodes-fill:before { content: "\f4b3"; }
-.ri-aed-electrodes-line:before { content: "\f4b4"; }
-.ri-aed-fill:before { content: "\f4b5"; }
-.ri-aed-line:before { content: "\f4b6"; }
+.ri-AED -electrodes-fill:before { content: "\f4b3"; }
+.ri-AED -electrodes-line:before { content: "\f4b4"; }
+.ri-AED -fill:before { content: "\f4b5"; }
+.ri-AED -line:before { content: "\f4b6"; }
 .ri-alibaba-cloud-fill:before { content: "\f4b7"; }
 .ri-alibaba-cloud-line:before { content: "\f4b8"; }
 .ri-align-item-bottom-fill:before { content: "\f4b9"; }

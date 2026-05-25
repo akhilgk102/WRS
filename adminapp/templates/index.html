@@ -34,7 +34,7 @@
       <div class="offer-product-wrap">
         <div class="offer-product-content-wrapper">
 
-          <a href="{% url 'product_detail_no_login' product.slug %}"
+          <a href="{% url 'product_detail' product.slug %}"
              class="offer-product w-inline-block">
 
             {% if product.primary_image %}
@@ -59,7 +59,7 @@
             </h2>
 
             <div class="btn-inline-wrap">
-              <a href="{% url 'product_detail_no_login' product.slug %}"
+              <a href="{% url 'product_detail' product.slug %}"
                  class="shop-button w-inline-block">
                 <div>Shop Now</div>
                 <img src="{% static 'img/stock_img/65bb6898399d6048583a560a_Shop-Btn-Arrow.svg' %}"
@@ -99,7 +99,7 @@
             </div>
 
             <div class="btn-inline-wrap">
-              <a href="{% url 'product_detail_no_login' product.slug %}"
+              <a href="{% url 'product_detail' product.slug %}"
                  class="primary-button w-inline-block">
                 <div>Shop Now</div>
                 <div class="primary-button-hover-bg"></div>
@@ -143,7 +143,7 @@
             </div>
 
             <div class="btn-inline-wrap">
-              <a href="{% url 'product_detail_no_login' product.slug %}"
+              <a href="{% url 'product_detail' product.slug %}"
                  class="shop-button primary w-inline-block">
                 <div>Shop Now</div>
                 <img src="{% static 'img/stock_img/65bb7e5d074a295f5caab2dd_Shop-Btn-Arrow-Primary.svg' %}"
@@ -191,7 +191,7 @@
             <div role="list" class="category-collection-grid-wrap w-dyn-items">
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'printer-amc' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Printer AMC" loading="lazy" src="{% static '/img/categories/printer_img.png' %}" class="category-image-big">
@@ -202,7 +202,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'information-technology' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Information Technology" loading="lazy" src="{% static '/img/categories/input.png' %}" class="category-image-big">
@@ -213,7 +213,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'desk-accessories' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Desk Accessories" loading="lazy" src="{% static '/img/categories/desk.png' %}" class="category-image-big">
@@ -224,7 +224,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'toners-cartridges' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Toners & Cartridges" loading="lazy" src="{% static '/img/categories/cartridge.png' %}" class="category-image-big">
@@ -235,7 +235,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'storage-devices' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Storage Devices" loading="lazy" src="{% static '/img/categories/storage.png' %}" class="category-image-big">
@@ -246,7 +246,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'box-file-folders' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Box File & Folders" loading="lazy" src="{% static '/img/categories/folder.png' %}" class="category-image-big">
@@ -257,7 +257,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'softwares' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Softwares" loading="lazy" src="{% static '/img/categories/kaspersky.png' %}" class="category-image-big">
@@ -268,7 +268,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'routers' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Earbuds" loading="lazy" src="{% static '/img/categories/router.png' %}" class="category-image-big">
@@ -279,7 +279,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'cables-adapters' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Drone" loading="lazy" src="{% static '/img/categories/cables.png' %}" class="category-image-big">
@@ -290,7 +290,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'paper-products' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Speaker" loading="lazy" src="{% static '/img/categories/paper.png' %}" class="category-image-big">
@@ -301,7 +301,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'boards' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Microphone" loading="lazy" src="{% static '/img/categories/board.png' %}" class="category-image-big">
@@ -312,7 +312,7 @@
               </div>
 
               <div role="listitem" class="w-dyn-item">
-                <a href="" class="single-category-wrapper w-inline-block">
+                <a href="{% url 'category_products_no_login' 'school-products' %}" class="single-category-wrapper w-inline-block">
                   <div class="category-content-wrap">
                     <div class="category-image-wrap-big">
                       <img alt="Scanner" loading="lazy" src="{% static '/img/categories/school.jpg' %}" class="category-image-big">
@@ -456,7 +456,7 @@
             <div class="single-product-wrap">
               <div class="product-contents-wrapper">
                 <div class="product-img-wrapper">
-                  <a href="{% url 'product_detail_no_login' product.slug %}" class="product-img-wrap w-inline-block">
+                  <a href="{% url 'product_detail' product.slug %}" class="product-img-wrap w-inline-block">
                     {% if product.primary_image %}
                       <img src="{{ product.primary_image.image.url }}" 
                            alt="{{ product.name }}" 
@@ -470,7 +470,7 @@
                 </div>
                 
                 <div class="product-details-wrap">
-                  <a href="{% url 'product_detail_no_login' product.slug %}" class="product-name-wrap w-inline-block">
+                  <a href="{% url 'product_detail' product.slug %}" class="product-name-wrap w-inline-block">
                     <h5 class="product-name">{{ product.name }}</h5>
                   </a>
                   
@@ -485,16 +485,16 @@
                   <div class="product-price-wrap">
                     {% if product.offer_price %}
                       <div class="product-price past">{{ product.price }}</div>
-                      <div class="product-price">AED {{ product.offer_price }}</div>
+                      <div class="product-price">AED  {{ product.offer_price }}</div>
                     {% else %}
-                      <div class="product-price">AED {{ product.price }}</div>
+                      <div class="product-price">AED  {{ product.price }}</div>
                     {% endif %}
                   </div>
                 </div>
               </div>
               
               <div class="product-small-buttons-flex">
-                <a href="{% url 'product_detail_no_login' product.slug %}" class="product-small-button w-inline-block">
+                <a href="{% url 'product_detail' product.slug %}" class="product-small-button w-inline-block">
                   <img src="{% static '/img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}" loading="lazy" alt="" class="product-small-buttons-icon">
                 </a>
               </div>
@@ -700,7 +700,7 @@
                         <div class="arrival-product-img-wrapper">
                           <a data-w-id="b09fb8af-2460-086b-8cc2-d99f35cf958e"
                              
-                             href="{% url 'product_detail_no_login' product.slug %}"
+                             href="{% url 'product_detail' product.slug %}"
                              class="arrival-product-img-wrap w-inline-block">
                             {% if product.primary_image %}
                             <img src="{{ product.primary_image.image.url }}"
@@ -721,7 +721,7 @@
                              style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
                           
                           <!-- Product Name -->
-                          <a href="{% url 'product_detail_no_login' product.slug %}"
+                          <a href="{% url 'product_detail' product.slug %}"
                              class="product-name-wrap w-inline-block">
                             <h5 class="product-name">{{ product.name }}</h5>
                           </a>
@@ -753,10 +753,10 @@
                           <!-- Product Price -->
                           <div class="product-price-wrap">
                             {% if product.offer_price %}
-                            <div class="product-price past">${{ product.price }}</div>
-                            <div class="product-price">${{ product.offer_price }}</div>
+                            <div class="product-price past">AED {{ product.price }}</div>
+                            <div class="product-price">AED {{ product.offer_price }}</div>
                             {% else %}
-                            <div class="product-price">${{ product.price }}</div>
+                            <div class="product-price">AED {{ product.price }}</div>
                             {% endif %}
                           </div>
 
@@ -791,7 +791,7 @@
 
                       <!-- Product Small Buttons -->
                       <div class="product-small-buttons-flex">
-                        <a href="{% url 'product_detail_no_login' product.slug %}"
+                        <a href="{% url 'product_detail' product.slug %}"
                            class="product-small-button w-inline-block">
                           <img loading="lazy"
                                src="{% static 'img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}"
@@ -845,7 +845,7 @@
                     <div class="best-deals-grid-wrap">
                       <div id="w-node-c407abeb-6d89-446e-c6a4-0f7ba86745af-ed6217da" class="split-content">
                         <div class="best-deal-content">
-                          <a href="{% url 'product_detail_no_login' product.slug %}" class="best-deal-name-wrap w-inline-block">
+                          <a href="{% url 'product_detail' product.slug %}" class="best-deal-name-wrap w-inline-block">
                             <h2 class="best-deal-name">{{ product.name|truncatechars:30 }}</h2>
                           </a>
                           
@@ -908,7 +908,7 @@
                       </div>
                       
                       <div id="w-node-_1cce0ef2-890d-e2b3-3657-d7002587b1ae-ed6217da" class="split-content best-deal">
-                        <a href="{% url 'product_detail_no_login' product.slug %}" class="best-deal-img-wrap w-inline-block">
+                        <a href="{% url 'product_detail' product.slug %}" class="best-deal-img-wrap w-inline-block">
                           {% if product.primary_image %}
                           <img alt="{{ product.name }}" 
                             loading="lazy"
@@ -927,7 +927,7 @@
                     </div>
                     
                     <div class="product-small-buttons-flex best-deals">
-                      <a href="{% url 'product_detail_no_login' product.slug %}" class="product-small-button light w-inline-block">
+                      <a href="{% url 'product_detail' product.slug %}" class="product-small-button light w-inline-block">
                         <img loading="lazy"
                           src="{% static 'img/stock_img/65bf6e8e77a6b18b998e55fb_View-Icon-White.svg' %}" 
                           alt=""
@@ -1215,7 +1215,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     <div class="product-contents-wrapper">
                       <div class="product-img-wrapper">
-                        <a href="{% url 'product_detail_no_login' product.slug %}"
+                        <a href="{% url 'product_detail' product.slug %}"
                            class="product-img-wrap w-inline-block" 
                            style="opacity: 0;">
                           {% if product.primary_image %}
@@ -1231,7 +1231,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       </div>
 
                       <div class="product-details-wrap" style="opacity: 0;">
-                        <a href="{% url 'product_detail_no_login' product.slug %}"
+                        <a href="{% url 'product_detail' product.slug %}"
                            class="product-name-wrap w-inline-block">
                           <h5 class="product-name">{{ product.name }}</h5>
                         </a>
@@ -1261,17 +1261,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         <div class="product-price-wrap">
                           {% if product.offer_price %}
-                          <div class="product-price past">${{ product.price }}</div>
-                          <div class="product-price">${{ product.offer_price }}</div>
+                          <div class="product-price past">AED {{ product.price }}</div>
+                          <div class="product-price">AED {{ product.offer_price }}</div>
                           {% else %}
-                          <div class="product-price">${{ product.price }}</div>
+                          <div class="product-price">AED {{ product.price }}</div>
                           {% endif %}
                         </div>
                       </div>
                     </div>
 
                     <div class="product-small-buttons-flex">
-                      <a href="{% url 'product_detail_no_login' product.slug %}"
+                      <a href="{% url 'product_detail' product.slug %}"
                          class="product-small-button w-inline-block">
                         <img loading="lazy"
                              src="{% static '/img/stock_img/65be34fe70efe705e8f6c0f9_View-Icon.svg' %}"

@@ -1,0 +1,57 @@
+{% extends "user_base.html" %}
+{% block title %}Replacement Orders{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <h2 class="mb-4">🔁 Replacement Orders</h2>
+
+    {% if orders %}
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Replacement ID</th>
+                            <th>Original Order</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>#{{ order.original_order.id }}</td>
+                            <td>{{ order.created_at|date:"d M Y" }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if order.status == 'DELIVERED' %}bg-success
+                                    {% elif order.status == 'SHIPPED' %}bg-primary
+                                    {% elif order.status == 'PROCESSING' %}bg-warning
+                                    {% else %}bg-secondary{% endif %}
+                                ">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'replacement_order_detail' order.id %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No replacement orders found.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

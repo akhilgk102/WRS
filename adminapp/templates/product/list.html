@@ -21,18 +21,7 @@
     </ul>
   </div>
 
-  <!-- Messages -->
-  {% if messages %}
-  <div class="mb-24">
-    {% for message in messages %}
-    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
+ 
   <div class="card basic-data-table">
     <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
       <h5 class="card-title mb-0">Products List</h5>
@@ -138,13 +127,13 @@
                 </style>
                   <span class="fw-semibold product-price">
                       {% if product.offer_price %}
-                          <span class="text-danger">₹{{ product.offer_price }}</span>
+                          <span class="text-danger">AED {{ product.offer_price }}</span>
                           <br>
                           <span class="text-muted text-decoration-line-through" style="font-size: 0.9rem;">
-                              ₹{{ product.price }}
+                              AED {{ product.price }}
                           </span>
                       {% else %}
-                          ₹{{ product.price }}
+                          AED {{ product.price }}
                       {% endif %}
                   </span>
 
@@ -299,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       });
-      priceElement.innerHTML = "₹" + formatted;
+      priceElement.innerHTML = "AED " + formatted;
     }
   });
 });

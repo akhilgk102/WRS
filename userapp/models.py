@@ -1,3 +1,4 @@
+# userapp/models
 from django.db import models
 from django.conf import settings   # ✅ add this
 from adminapp.models import Product,Coupon
@@ -35,6 +36,9 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    
+    def get_total_price(self):
+        return self.product.final_price * self.quantity
 
     def __str__(self):
         return f"{self.product.name} × {self.quantity}"
@@ -66,22 +70,66 @@ STATUS_CHOICES = [
 
 # In userapp/models.py - Update the Order model
 
+from django.db import models
+from django.conf import settings
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+from adminapp.models import Product, Coupon
+from .models import Address   # or wherever Address is defined
+
+
 class Order(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    # Add these fields
+
+    STATUS_CHOICES = [
+        ("PLACED", "Placed"),
+        ("PROCESSING", "Processing"),
+        ("SHIPPED", "Shipped"),
+        ("DELIVERED", "Delivered"),
+        ("CANCELLED", "Cancelled"),
+    ]
+
+    REFUND_STATUS_CHOICES = [
+        ("NA", "Not Applicable"),
+        ("PENDING", "Pending"),
+        ("COMPLETED", "Completed"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="orders"
+    )
+
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    # Pricing
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # ✅ ADD THIS
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="PLACED")
+    shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
-        # 🔥 COUPON FIELDS
-    coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True,blank=True)
-    discount_amount = models.DecimalField(max_digits=10,decimal_places=2,default=0)
+    # Coupon
+    coupon = models.ForeignKey(
+        Coupon,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
+    # Order status
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default="PLACED"
+    )
 
+    # Payment
     payment_status = models.CharField(
         max_length=20,
         choices=[
@@ -93,11 +141,26 @@ class Order(models.Model):
         ],
         default="NOT_PAID"
     )
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    stripe_payment_intent = models.CharField(max_length=255, blank=True, null=True)
 
-    razorpay_order_id = models.CharField(max_length=255, blank=True, null=True)
-    razorpay_payment_id = models.CharField(max_length=255, blank=True, null=True)
-    razorpay_signature = models.CharField(max_length=255, blank=True, null=True)
+    # 🔴 Cancellation & Refund
+    cancel_reason = models.CharField(max_length=255, blank=True, null=True)
 
+    refund_status = models.CharField(
+        max_length=20,
+        choices=REFUND_STATUS_CHOICES,
+        default="NA"
+    )
+
+    refund_account_name = models.CharField(max_length=255, blank=True, null=True)
+    refund_account_number = models.CharField(max_length=30, blank=True, null=True)
+    refund_ifsc = models.CharField(max_length=15, blank=True, null=True)
+    refund_bank_name = models.CharField(max_length=100, blank=True, null=True)
+
+    cancelled_at = models.DateTimeField(blank=True, null=True)
+
+    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -105,20 +168,60 @@ class Order(models.Model):
         return f"Order {self.id} → {self.user.username}"
 
 
-# Add this method to OrderItem model
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="items"
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
-    def __str__(self):
-        return f"{self.product.name} × {self.quantity}"
-    
+    # Replacement
+    replacement_requested = models.BooleanField(default=False)
+    replacement_reason = models.TextField(blank=True, null=True)
+
+    replacement_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("NA", "Not Applicable"),
+            ("REQUESTED", "Requested"),
+            ("APPROVED", "Approved"),
+            ("REJECTED", "Rejected"),
+            ("COMPLETED", "Completed"),
+        ],
+        default="NA"
+    )
+
+    replacement_requested_at = models.DateTimeField(blank=True, null=True)
+
+    replacement_order = models.OneToOneField(
+        "ReplacementOrder",   # ✅ STRING
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="order_item"
+    )
+
+    def mark_replacement_requested(self, reason):
+        self.replacement_requested = True
+        self.replacement_reason = reason
+        self.replacement_status = "REQUESTED"
+        self.replacement_requested_at = timezone.now()
+        self.save()
+
     def get_total(self):
-        """Calculate total for this order item"""
         return self.price * self.quantity
 
+    def __str__(self):
+        return f"{self.product} × {self.quantity}"
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
@@ -132,3 +235,60 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.product.name} Review by {self.user.username}"
+
+class ReplacementOrder(models.Model):
+    STATUS_CHOICES = [
+        ("PROCESSING", "Processing"),
+        ("SHIPPED", "Shipped"),
+        ("DELIVERED", "Delivered"),
+        ("CANCELLED", "Cancelled"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="replacement_orders"
+    )
+
+    original_order = models.ForeignKey(
+        "Order",   # ✅ STRING REFERENCE
+        on_delete=models.CASCADE,
+        related_name="replacement_orders"
+    )
+
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PROCESSING"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Replacement #{self.id}"
+
+
+class ReplacementOrderItem(models.Model):
+    replacement_order = models.ForeignKey(
+        ReplacementOrder,
+        on_delete=models.CASCADE,
+        related_name="items"
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.product} × {self.quantity}"

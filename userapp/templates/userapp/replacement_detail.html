@@ -1,0 +1,44 @@
+{% extends "user_base.html" %}
+{% block title %}Replacement Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">Replacement Request</h3>
+
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Order ID:</strong> #{{ item.order.id }}</p>
+            <p><strong>Product:</strong> {{ item.product.name }}</p>
+            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+            <p><strong>Reason:</strong><br>{{ item.replacement_reason }}</p>
+
+            <p>
+                <strong>Status:</strong>
+                <span class="badge 
+                    {% if item.replacement_status == 'REQUESTED' %}bg-warning
+                    {% elif item.replacement_status == 'APPROVED' %}bg-primary
+                    {% elif item.replacement_status == 'COMPLETED' %}bg-success
+                    {% else %}bg-danger{% endif %}
+                ">
+                    {{ item.replacement_status }}
+                </span>
+            </p>
+
+            <p>
+                <strong>Requested On:</strong>
+                {{ item.replacement_requested_at|date:"d M Y, H:i" }}
+            </p>
+
+            <a href="{% url 'user_order_detail' item.order.id %}"
+               class="btn btn-outline-secondary">
+                View Order
+            </a>
+
+            <a href="{% url 'replacement_list' %}"
+               class="btn btn-secondary">
+                Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

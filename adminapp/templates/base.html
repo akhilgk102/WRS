@@ -39,6 +39,51 @@
     }
   </style>
     <style>
+
+      
+/* Mobile responsive fixes ONLY for categories dropdown */
+@media screen and (max-width: 991px) {
+  /* Ensure the categories button is always visible */
+  .mega-menu-wrapper {
+    position: relative !important;
+    z-index: 1000 !important;
+  }
+
+  .mega-menu-link-wrap {
+    position: relative !important;
+    z-index: 1001 !important;
+    background-color: #f7f8f9 !important;
+  }
+
+  /* Position dropdown BELOW the button */
+  .mega-menu-wrapper .dropdown-list.categories.w--open {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    margin-top: 5px !important;
+    transform: none !important;
+    z-index: 999 !important;
+  }
+
+  .dropdown-collection-wrapper {
+    padding: 15px !important;
+  }
+
+  .single-category-dropdown-link {
+    padding: 12px 15px !important;
+    font-size: 15px !important;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .mega-menu-wrapper .dropdown-list.categories.w--open {
+    max-height: 350px !important;
+  }
+}
     /* Remove preloader/white screen */
     .page-wrapper {
       opacity: 1 !important;
@@ -64,8 +109,54 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <title>{%block title%} {%endblock%}</title>
-  <meta content="Home V1 | Zaitron | Webflow Ecommerce Website Template" property="og:title">
-  <meta content="Home V1 | Zaitron | Webflow Ecommerce Website Template" property="twitter:title">
+
+{% if product and product.primary_image %}
+
+<meta property="og:type" content="product">
+
+<meta property="og:title"
+      content="{{ product.name }}">
+
+<meta property="og:description"
+      content="{{ product.description|striptags|truncatechars:120 }}">
+
+<meta property="og:url"
+      content="https://{{ request.get_host }}{{ request.path }}">
+
+<meta property="og:image"
+      content="https://{{ request.get_host }}{{ product.primary_image.image.url }}">
+
+<meta property="og:image:secure_url"
+      content="https://{{ request.get_host }}{{ product.primary_image.image.url }}">
+
+<meta property="og:image:type"
+      content="image/png">
+
+<meta property="og:image:width"
+      content="1200">
+
+<meta property="og:image:height"
+      content="630">
+
+<meta property="og:site_name"
+      content="WRS Ecommerce">
+
+<meta name="twitter:card"
+      content="summary_large_image">
+
+<meta name="twitter:title"
+      content="{{ product.name }}">
+
+<meta name="twitter:description"
+      content="{{ product.description|striptags|truncatechars:120 }}">
+
+<meta name="twitter:image"
+      content="https://{{ request.get_host }}{{ product.primary_image.image.url }}">
+
+{% endif %}
+
+
+
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta content="Webflow" name="generator">
   <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
@@ -76,9 +167,9 @@
   <script type="text/javascript">WebFont.load({ google: { families: ["Archivo:regular,500,600,700,800"] } });</script>
   <script
     type="text/javascript">!function (o, c) { var n = c.documentElement, t = " w-mod-"; n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch") }(window, document);</script>
-  <link href="https://cdn.prod.website-files.com/65b8e0357ac2740d76d66728/65b8edb2fcef7335d79dd331_Favicon.svg"
+  <link href="{% static 'img/logo3.png' %}"
     rel="shortcut icon" type="image/x-icon">
-  <link href="https://cdn.prod.website-files.com/65b8e0357ac2740d76d66728/65b8edb462ffa56f8af2ad5b_Webclip.svg"
+  <link href="{% static 'img/logo3.png' %}"
     rel="apple-touch-icon">
 </head>
 
@@ -91,8 +182,8 @@
               <div class="topbar-info">Call Us: +971 2449 1123 (UAE)</div>
             </a></div>
           <div class="topbar-split">
-            <div class="topbar-info">Limited-Time Offer on Office Automation Products - <span
-                class="topbar-bold">Up to 50% OFF!</span></div>
+            <div class="topbar-info">P.O . BOX-12893 WareHouse No.134 , Mussafah M-34 <span
+                class="topbar-bold">Abu Dhabi, UAE</span></div>
           </div>
           <div class="topbar-split"><a href="" class="w-inline-block">
               <div class="topbar-info">Email: sales@wrsofficeautomation.ae</div>
@@ -106,7 +197,7 @@
       <div class="container">
         <div class="top-navbar-wrap">
           <div class="split-content"><a href="{%url 'index'%}" class="main-logo-wrap w-inline-block"><img
-                src="{% static '/img/wrs_longlogo.png' %}" style="width: 150px;" loading="lazy" alt=""
+                src="{% static '/img/new-logo.png' %}" style="width: 150px;" loading="lazy" alt=""
                 class="main-logo"></a>
           </div>
 <!-- Replace the search form in your base template with this -->
@@ -202,9 +293,9 @@
           <div class="split-content">
             <nav role="navigation" class="nav-menu-wrap w-nav-menu">
             <div class="nav-menu-flex">
-                <a href="{%url 'index'%}" class="single-nav-link w-inline-block">
+                <!-- <a href="{%url 'index'%}" class="single-nav-link w-inline-block">
                     <div>Home</div>
-                </a>
+                </a> -->
                 <a href="{%url 'all_products'%}" class="single-nav-link w-inline-block">
                     <div>Shop</div>
                 </a>
@@ -266,6 +357,344 @@
       <div class="w-nav-overlay" data-wf-ignore="" id="w-nav-overlay-0"></div>
     </div>
 
+    
+    <!-- Add this CSS in your <head> section or in your static CSS file -->
+<style>
+/* Messages Container */
+.messages-container {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  z-index: 10000;
+  max-width: 420px;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* Individual Message */
+.message-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: all;
+  transform: translateY(-20px);
+  opacity: 0;
+  animation: slideDown 0.3s ease forwards;
+  position: relative;
+  font-family: 'Archivo', sans-serif;
+}
+
+/* Slide Down Animation */
+@keyframes slideDown {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Slide Up Animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+.message-item.hiding {
+  animation: slideUp 0.2s ease forwards;
+}
+
+/* Icon Container */
+.message-icon-container {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Message Content */
+.message-content {
+  flex: 1;
+  font-family: 'Archivo', sans-serif;
+}
+
+.message-text {
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.5;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Close Button */
+.message-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  font-size: 16px;
+  padding: 0;
+}
+
+.message-close:hover {
+  color: #4b5563;
+  background: #f3f4f6;
+}
+
+/* Success Message */
+.message-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.message-success .message-icon-container {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.message-success .message-text {
+  color: #065f46;
+}
+
+/* Error Message */
+.message-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.message-error .message-icon-container {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.message-error .message-text {
+  color: #991b1b;
+}
+
+/* Warning Message */
+.message-warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.message-warning .message-icon-container {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.message-warning .message-text {
+  color: #92400e;
+}
+
+/* Info Message */
+.message-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.message-info .message-icon-container {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.message-info .message-text {
+  color: #1e40af;
+}
+
+/* Progress Bar */
+.message-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  border-radius: 0 0 12px 12px;
+  animation: shrink 4s linear forwards;
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.message-success .message-progress {
+  background: #10b981;
+}
+
+.message-error .message-progress {
+  background: #ef4444;
+}
+
+.message-warning .message-progress {
+  background: #f59e0b;
+}
+
+.message-info .message-progress {
+  background: #3b82f6;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 991px) {
+  .messages-container {
+    top: 80px;
+    right: 15px;
+    left: 15px;
+    max-width: none;
+  }
+
+  .message-item {
+    padding: 12px 14px;
+  }
+
+  .message-icon-container {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .message-text {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .messages-container {
+    top: 70px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .message-item {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .message-icon-container {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .message-close {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+
+  .message-text {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .message-item {
+    border-radius: 10px;
+  }
+
+  .message-text {
+    font-size: 12px;
+  }
+}
+</style>
+
+<!-- Add this HTML right after your opening <body> tag or in your base template -->
+{% if messages %}
+<div class="messages-container" id="messagesContainer">
+  {% for message in messages %}
+  <div class="message-item message-{{ message.tags }}" data-message-id="{{ forloop.counter }}">
+    <div class="message-icon-container">
+      {% if message.tags == 'success' %}
+        <i class="fas fa-check"></i>
+      {% elif message.tags == 'error' %}
+        <i class="fas fa-times"></i>
+      {% elif message.tags == 'warning' %}
+        <i class="fas fa-exclamation"></i>
+      {% elif message.tags == 'info' %}
+        <i class="fas fa-info"></i>
+      {% else %}
+        <i class="fas fa-bell"></i>
+      {% endif %}
+    </div>
+    
+    <div class="message-content">
+      <div class="message-text">{{ message }}</div>
+    </div>
+    
+    <button class="message-close" onclick="closeMessage(this)" aria-label="Close message">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="message-progress"></div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Add this JavaScript at the bottom of your template, before </body> -->
+<script>
+// Auto-dismiss messages after 4 seconds
+document.addEventListener('DOMContentLoaded', function() {
+  const messages = document.querySelectorAll('.message-item');
+  
+  messages.forEach((message, index) => {
+    // Stagger the appearance of multiple messages
+    message.style.animationDelay = `${index * 0.1}s`;
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+      dismissMessage(message);
+    }, 4000 + (index * 100));
+  });
+});
+
+// Close message when clicking the X button
+function closeMessage(button) {
+  const message = button.closest('.message-item');
+  dismissMessage(message);
+}
+
+// Dismiss message with animation
+function dismissMessage(message) {
+  message.classList.add('hiding');
+  
+  setTimeout(() => {
+    message.remove();
+    
+    // Remove container if no messages left
+    const container = document.getElementById('messagesContainer');
+    if (container && container.children.length === 0) {
+      container.remove();
+    }
+  }, 200);
+}
+</script>
+
+
     {%block content%}
 
     {%endblock%}
@@ -318,7 +747,7 @@
           <div class="footer-details-menu-wrapper">
             <div data-w-id="61922942-b427-4fbf-814b-a388da710579" class="footer-details-wrapper" style="opacity: 0;"><a
                 href="" class="footer-logo-wrap w-inline-block"><img
-                  src="{% static '/img/wrs_longlogo.png' %}" loading="lazy" alt="" class="footer-logo"></a>
+                  src="{% static '/img/new-logo.png' %}" loading="lazy" alt="" class="footer-logo"></a>
               <div class="footer-location-contact-us">
                 <div class="footer-details-text location">P.O . BOX-12893 WareHouse No.134 , Mussafah M-34, Abu Dhabi,
                   UAE</div>
@@ -407,6 +836,10 @@
     
     <form method="post" action="{% url 'login' %}" class="login-form">
       {% csrf_token %}
+      <input type="hidden" name="next"
+       value="{{ login_next_url|default:request.get_full_path }}">
+
+
 <!-- Replace the Email field section -->
 <div class="sign-in-single-field-wrap">
   <label for="email" class="sign-in-field-label">Email</label>
@@ -437,7 +870,7 @@
   </div>
 </div>
       
-      <a href="" class="login-forgot">Forgot Password?</a>
+      <a href="{%url 'forgot_password'%}" class="login-forgot">Forgot Password?</a>
       
       <button type="submit" class="login-submit-btn">SIGN IN WITH EMAIL →</button>
     </form>
@@ -678,12 +1111,17 @@
 .toggle-password {
   position: absolute;
   right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   color: #a0aec0;
   padding: 4px;
   transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toggle-password:hover {
@@ -725,7 +1163,8 @@ function closeLoginModal() {
 }
 
 function handleGoogleLogin() {
-  window.location.href = "{% url 'google_login' %}";
+  const nextUrl = "{{ login_next_url|default:request.get_full_path }}";
+  window.location.href = "{% url 'google_login' %}?next=" + encodeURIComponent(nextUrl);
 }
 
 // Close modal on Escape key
@@ -879,7 +1318,35 @@ function switchToRegister(e) {
   }, 400);
 }
 </script>
+<script>
+  // Toggle password visibility for ALL toggle buttons on the page
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.toggle-password').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        // Find the input inside the same .input-wrapper
+        const wrapper = btn.closest('.input-wrapper');
+        const input = wrapper.querySelector('input[type="password"], input[type="text"]');
 
+        if (!input) return;
+
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+
+        // Swap the eye icon
+        btn.innerHTML = isHidden
+          ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+               <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+               <line x1="1" y1="1" x2="23" y2="23"/>
+             </svg>`
+          : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+               <circle cx="12" cy="12" r="3"></circle>
+             </svg>`;
+      });
+    });
+  });
+</script>
 </body>
 
 </html>
